@@ -34,16 +34,22 @@ export class TableGrouper {
             gPrev.op.isTableCellLine()) ||
           (g instanceof ListGroup &&
             gPrev instanceof BlockGroup &&
+            g.headOp &&
+            g.headOp!.attributes &&
             g.headOp!.attributes!.cell &&
             gPrev.op.isTableCellLine()) ||
           (g instanceof BlockGroup &&
             gPrev instanceof ListGroup &&
             g.op.isTableCellLine() &&
+            gPrev.headOp &&
+            gPrev.headOp!.attributes &&
             gPrev.headOp!.attributes!.cell) ||
           (g instanceof ListGroup &&
             gPrev instanceof ListGroup &&
             !!g.headOp &&
+            g.headOp!.attributes &&
             !!gPrev.headOp &&
+            gPrev.headOp!.attributes &&
             g.headOp!.attributes!.cell &&
             gPrev.headOp!.attributes!.cell)
         );
