@@ -147,7 +147,8 @@ class DeltaInsertOp {
     return (
       !!op.attributes.list &&
       (this.attributes.list!.list === op.attributes.list!.list ||
-        (op.isACheckList() && this.isACheckList()))
+        (op.isACheckList() && this.isACheckList())) &&
+      this.attributes.list!.cell === op.attributes.list.cell
     );
   }
 

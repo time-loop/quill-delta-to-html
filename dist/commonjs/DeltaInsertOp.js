@@ -101,8 +101,8 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isSameListAs = function (op) {
         return (!!op.attributes.list &&
-            (this.attributes.list.list === op.attributes.list.list ||
-                (op.isACheckList() && this.isACheckList())));
+            (this.attributes.list.list === op.attributes.list.list || (op.isACheckList() && this.isACheckList())) &&
+            this.attributes.list.cell === op.attributes.list.cell);
     };
     DeltaInsertOp.prototype.isSameTableCellAs = function (op) {
         return ((!!op.isTableCellLine() &&
