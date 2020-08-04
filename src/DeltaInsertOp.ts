@@ -106,6 +106,7 @@ class DeltaInsertOp {
       this.isOrderedList() ||
       this.isBulletList() ||
       this.isCheckedList() ||
+      this.isToggledList() ||
       this.isUncheckedList()
     );
   }
@@ -125,6 +126,12 @@ class DeltaInsertOp {
   isCheckedList() {
     return (
       !!this.attributes.list && this.attributes.list!.list === ListType.Checked
+    );
+  }
+
+  isToggledList() {
+    return (
+      !!this.attributes.list && this.attributes.list!.list === ListType.Toggled
     );
   }
 

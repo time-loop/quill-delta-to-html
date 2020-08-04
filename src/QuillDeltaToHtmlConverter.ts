@@ -105,6 +105,8 @@ class QuillDeltaToHtmlConverter {
       ? this.options.orderedListTag + ''
       : op.isBulletList()
       ? this.options.bulletListTag + ''
+      : op.isToggledList()
+      ? this.options.bulletListTag + ''
       : op.isCheckedList()
       ? this.options.bulletListTag + ''
       : op.isUncheckedList()

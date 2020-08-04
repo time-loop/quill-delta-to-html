@@ -97,6 +97,7 @@ var OpAttributeSanitizer = (function () {
         if (list &&
             (list.list === value_types_1.ListType.Bullet ||
                 list.list === value_types_1.ListType.Ordered ||
+                list.list === value_types_1.ListType.Toggled ||
                 list.list === value_types_1.ListType.Checked ||
                 list.list === value_types_1.ListType.Unchecked)) {
             cleanAttrs.list = list;

@@ -8,6 +8,7 @@ var ListType;
     ListType["Bullet"] = "bullet";
     ListType["Checked"] = "checked";
     ListType["Unchecked"] = "unchecked";
+    ListType["Toggled"] = "toggled";
 })(ListType || (ListType = {}));
 exports.ListType = ListType;
 var ScriptType;

@@ -262,6 +262,10 @@ class OpToHtmlConverter {
       );
     }
 
+    if (this.op.isToggledList()) {
+      return tagAttrs.concat(makeAttr('data-toggled', 'true'));
+    }
+
     if (this.op.isFormula()) {
       return tagAttrs;
     }

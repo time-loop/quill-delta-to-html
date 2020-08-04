@@ -80,6 +80,7 @@ var DeltaInsertOp = (function () {
         return (this.isOrderedList() ||
             this.isBulletList() ||
             this.isCheckedList() ||
+            this.isToggledList() ||
             this.isUncheckedList());
     };
     DeltaInsertOp.prototype.isOrderedList = function () {
@@ -90,6 +91,9 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isCheckedList = function () {
         return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Checked);
+    };
+    DeltaInsertOp.prototype.isToggledList = function () {
+        return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Toggled);
     };
     DeltaInsertOp.prototype.isUncheckedList = function () {
         return (!!this.attributes.list &&
@@ -102,7 +106,8 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isSameListAs = function (op) {
         return (!!op.attributes.list &&
-            (this.attributes.list.list === op.attributes.list.list || (op.isACheckList() && this.isACheckList())) &&
+            (this.attributes.list.list === op.attributes.list.list ||
+                (op.isACheckList() && this.isACheckList())) &&
             this.attributes.list.cell === op.attributes.list.cell);
     };
     DeltaInsertOp.prototype.isSameTableCellAs = function (op) {
@@ -378,6 +383,7 @@ var OpAttributeSanitizer = (function () {
         if (list &&
             (list.list === value_types_1.ListType.Bullet ||
                 list.list === value_types_1.ListType.Ordered ||
+                list.list === value_types_1.ListType.Toggled ||
                 list.list === value_types_1.ListType.Checked ||
                 list.list === value_types_1.ListType.Unchecked)) {
             cleanAttrs.list = list;
@@ -640,6 +646,9 @@ var OpToHtmlConverter = (function () {
         if (this.op.isACheckList()) {
             return tagAttrs.concat(makeAttr('data-checked', this.op.isCheckedList() ? 'true' : 'false'));
         }
+        if (this.op.isToggledList()) {
+            return tagAttrs.concat(makeAttr('data-toggled', 'true'));
+        }
         if (this.op.isFormula()) {
             return tagAttrs;
         }
@@ -865,11 +874,13 @@ var QuillDeltaToHtmlConverter = (function () {
             ? this.options.orderedListTag + ''
             : op.isBulletList()
                 ? this.options.bulletListTag + ''
-                : op.isCheckedList()
+                : op.isToggledList()
                     ? this.options.bulletListTag + ''
-                    : op.isUncheckedList()
+                    : op.isCheckedList()
                         ? this.options.bulletListTag + ''
-                        : '';
+                        : op.isUncheckedList()
+                            ? this.options.bulletListTag + ''
+                            : '';
     };
     QuillDeltaToHtmlConverter.prototype.getGroupedOps = function () {
         var deltaOps = InsertOpsConverter_1.InsertOpsConverter.convert(this.rawDeltaOps, this.options);
@@ -1915,6 +1926,7 @@ var ListType;
     ListType["Bullet"] = "bullet";
     ListType["Checked"] = "checked";
     ListType["Unchecked"] = "unchecked";
+    ListType["Toggled"] = "toggled";
 })(ListType || (ListType = {}));
 exports.ListType = ListType;
 var ScriptType;

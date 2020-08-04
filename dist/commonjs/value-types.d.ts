@@ -5,6 +5,7 @@ declare enum ListType {
   Bullet = 'bullet',
   Checked = 'checked',
   Unchecked = 'unchecked',
+  Toggled = 'toggled',
 }
 declare enum ScriptType {
   Sub = 'sub',

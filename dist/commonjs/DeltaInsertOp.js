@@ -79,6 +79,7 @@ var DeltaInsertOp = (function () {
         return (this.isOrderedList() ||
             this.isBulletList() ||
             this.isCheckedList() ||
+            this.isToggledList() ||
             this.isUncheckedList());
     };
     DeltaInsertOp.prototype.isOrderedList = function () {
@@ -89,6 +90,9 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isCheckedList = function () {
         return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Checked);
+    };
+    DeltaInsertOp.prototype.isToggledList = function () {
+        return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Toggled);
     };
     DeltaInsertOp.prototype.isUncheckedList = function () {
         return (!!this.attributes.list &&
@@ -101,7 +105,8 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isSameListAs = function (op) {
         return (!!op.attributes.list &&
-            (this.attributes.list.list === op.attributes.list.list || (op.isACheckList() && this.isACheckList())) &&
+            (this.attributes.list.list === op.attributes.list.list ||
+                (op.isACheckList() && this.isACheckList())) &&
             this.attributes.list.cell === op.attributes.list.cell);
     };
     DeltaInsertOp.prototype.isSameTableCellAs = function (op) {
