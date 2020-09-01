@@ -71,11 +71,13 @@ var QuillDeltaToHtmlConverter = (function () {
                 ? this.options.bulletListTag + ''
                 : op.isToggledList()
                     ? this.options.bulletListTag + ''
-                    : op.isCheckedList()
+                    : op.isNoneTypeList()
                         ? this.options.bulletListTag + ''
-                        : op.isUncheckedList()
+                        : op.isCheckedList()
                             ? this.options.bulletListTag + ''
-                            : '';
+                            : op.isUncheckedList()
+                                ? this.options.bulletListTag + ''
+                                : '';
     };
     QuillDeltaToHtmlConverter.prototype.getGroupedOps = function () {
         var deltaOps = InsertOpsConverter_1.InsertOpsConverter.convert(this.rawDeltaOps, this.options);

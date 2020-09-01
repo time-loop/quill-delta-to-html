@@ -9,6 +9,7 @@ var ListType;
     ListType["Checked"] = "checked";
     ListType["Unchecked"] = "unchecked";
     ListType["Toggled"] = "toggled";
+    ListType["NoneType"] = "none";
 })(ListType || (ListType = {}));
 exports.ListType = ListType;
 var ScriptType;

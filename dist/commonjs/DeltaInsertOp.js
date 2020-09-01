@@ -80,6 +80,7 @@ var DeltaInsertOp = (function () {
             this.isBulletList() ||
             this.isCheckedList() ||
             this.isToggledList() ||
+            this.isNoneTypeList() ||
             this.isUncheckedList());
     };
     DeltaInsertOp.prototype.isOrderedList = function () {
@@ -93,6 +94,9 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isToggledList = function () {
         return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Toggled);
+    };
+    DeltaInsertOp.prototype.isNoneTypeList = function () {
+        return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.NoneType);
     };
     DeltaInsertOp.prototype.isUncheckedList = function () {
         return (!!this.attributes.list &&

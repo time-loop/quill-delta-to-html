@@ -6,6 +6,7 @@ declare enum ListType {
   Checked = 'checked',
   Unchecked = 'unchecked',
   Toggled = 'toggled',
+  NoneType = 'none',
 }
 declare enum ScriptType {
   Sub = 'sub',

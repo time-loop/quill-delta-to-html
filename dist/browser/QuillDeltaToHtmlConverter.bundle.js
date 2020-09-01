@@ -81,6 +81,7 @@ var DeltaInsertOp = (function () {
             this.isBulletList() ||
             this.isCheckedList() ||
             this.isToggledList() ||
+            this.isNoneTypeList() ||
             this.isUncheckedList());
     };
     DeltaInsertOp.prototype.isOrderedList = function () {
@@ -94,6 +95,9 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isToggledList = function () {
         return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.Toggled);
+    };
+    DeltaInsertOp.prototype.isNoneTypeList = function () {
+        return (!!this.attributes.list && this.attributes.list.list === value_types_1.ListType.NoneType);
     };
     DeltaInsertOp.prototype.isUncheckedList = function () {
         return (!!this.attributes.list &&
@@ -384,6 +388,7 @@ var OpAttributeSanitizer = (function () {
             (list.list === value_types_1.ListType.Bullet ||
                 list.list === value_types_1.ListType.Ordered ||
                 list.list === value_types_1.ListType.Toggled ||
+                list.list === value_types_1.ListType.NoneType ||
                 list.list === value_types_1.ListType.Checked ||
                 list.list === value_types_1.ListType.Unchecked)) {
             cleanAttrs.list = list;
@@ -876,11 +881,13 @@ var QuillDeltaToHtmlConverter = (function () {
                 ? this.options.bulletListTag + ''
                 : op.isToggledList()
                     ? this.options.bulletListTag + ''
-                    : op.isCheckedList()
+                    : op.isNoneTypeList()
                         ? this.options.bulletListTag + ''
-                        : op.isUncheckedList()
+                        : op.isCheckedList()
                             ? this.options.bulletListTag + ''
-                            : '';
+                            : op.isUncheckedList()
+                                ? this.options.bulletListTag + ''
+                                : '';
     };
     QuillDeltaToHtmlConverter.prototype.getGroupedOps = function () {
         var deltaOps = InsertOpsConverter_1.InsertOpsConverter.convert(this.rawDeltaOps, this.options);
@@ -1927,6 +1934,7 @@ var ListType;
     ListType["Checked"] = "checked";
     ListType["Unchecked"] = "unchecked";
     ListType["Toggled"] = "toggled";
+    ListType["NoneType"] = "none";
 })(ListType || (ListType = {}));
 exports.ListType = ListType;
 var ScriptType;
