@@ -193,6 +193,7 @@ class OpAttributeSanitizer {
       (list!.list === ListType.Bullet ||
         list!.list === ListType.Ordered ||
         list!.list === ListType.Toggled ||
+        list!.list === ListType.NoneType ||
         list!.list === ListType.Checked ||
         list!.list === ListType.Unchecked)
     ) {

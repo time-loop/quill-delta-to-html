@@ -83,6 +83,9 @@ describe('DeltaInsertOp', function () {
 
       op = new DeltaInsertOp('fds ', { list: { list: ListType.Toggled } });
       assert.equal(op.isList(), true);
+
+      op = new DeltaInsertOp('fds ', { list: { list: ListType.NoneType } });
+      assert.equal(op.isList(), true);
     });
   });
 
@@ -133,6 +136,16 @@ describe('DeltaInsertOp', function () {
 
       op = new DeltaInsertOp('fds ', { list: { list: ListType.Toggled } });
       assert.equal(op.isToggledList(), true);
+    });
+  });
+
+  describe('isNoneTypeList()', function () {
+    it('should return true if op is an none-type list', function () {
+      var op = new DeltaInsertOp('\n', { list: { list: ListType.Bullet } });
+      assert.equal(op.isToggledList(), false);
+
+      op = new DeltaInsertOp('fds ', { list: { list: ListType.NoneType } });
+      assert.equal(op.isNoneTypeList(), true);
     });
   });
 

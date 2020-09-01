@@ -7,6 +7,7 @@ enum ListType {
   Checked = 'checked',
   Unchecked = 'unchecked',
   Toggled = 'toggled',
+  NoneType = 'none',
 }
 
 enum ScriptType {
