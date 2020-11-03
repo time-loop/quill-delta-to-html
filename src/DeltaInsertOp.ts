@@ -2,6 +2,7 @@ import { NewLine, ListType, DataType } from './value-types';
 import { IOpAttributes } from './OpAttributeSanitizer';
 import { InsertData, InsertDataCustom, InsertDataQuill } from './InsertData';
 import isEqual from 'lodash.isequal';
+import find from 'lodash.find';
 
 class DeltaInsertOp {
   readonly insert: InsertData;
@@ -66,19 +67,49 @@ class DeltaInsertOp {
     );
   }
 
-  hasSameIndentationAs(op: DeltaInsertOp) {
-    return this.attributes.indent === op.attributes.indent;
+  hasSameIndentationAs(
+    op: DeltaInsertOp,
+    blocksCanBeWrappedWithList: string[] = []
+  ) {
+    const getIndent = (insertOp: DeltaInsertOp) => {
+      if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+        const attrKey =
+          find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) ||
+          '';
+        return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+      } else {
+        return insertOp.attributes.indent;
+      }
+    };
+
+    const thisIndent = getIndent(this);
+    const opIndent = getIndent(op);
+    return thisIndent === opIndent;
   }
 
   hasSameAttr(op: DeltaInsertOp) {
     return isEqual(this.attributes, op.attributes);
   }
 
-  hasHigherIndentThan(op: DeltaInsertOp) {
-    return (
-      (Number(this.attributes.indent) || 0) >
-      (Number(op.attributes.indent) || 0)
-    );
+  hasHigherIndentThan(
+    op: DeltaInsertOp,
+    blocksCanBeWrappedWithList: string[] = []
+  ) {
+    const getIndent = (insertOp: DeltaInsertOp) => {
+      if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+        const attrKey =
+          find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) ||
+          '';
+        return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+      } else {
+        return insertOp.attributes.indent;
+      }
+    };
+
+    const thisIndent = getIndent(this);
+    const opIndent = getIndent(op);
+
+    return (Number(thisIndent) || 0) > (Number(opIndent) || 0);
   }
 
   isInline() {
@@ -159,6 +190,7 @@ class DeltaInsertOp {
 
   isSameListAs(op: DeltaInsertOp): boolean {
     return (
+      !!this.attributes.list &&
       !!op.attributes.list &&
       (this.attributes.list!.list === op.attributes.list!.list ||
         (op.isACheckList() && this.isACheckList())) &&
@@ -166,32 +198,30 @@ class DeltaInsertOp {
     );
   }
 
-  isSameTableCellAs(op: DeltaInsertOp): boolean {
-    return (
-      (!!op.isTableCellLine() &&
-        this.isTableCellLine() &&
-        !!this.attributes['table-cell-line'] &&
-        !!op.attributes['table-cell-line'] &&
-        this.attributes['table-cell-line']!.cell ===
-          op.attributes['table-cell-line']!.cell) ||
-      (op.isList() &&
-        this.isTableCellLine() &&
-        !!this.attributes['table-cell-line'] &&
-        !!op.attributes['list'] &&
-        this.attributes['table-cell-line']!.cell ===
-          op.attributes['list']!.cell) ||
-      (op.isTableCellLine() &&
-        this.isList() &&
-        !!op.attributes['table-cell-line'] &&
-        !!this.attributes['list'] &&
-        op.attributes['table-cell-line']!.cell ===
-          this.attributes['list']!.cell) ||
-      (op.isList() &&
-        this.isList() &&
-        !!this.attributes['list'] &&
-        !!op.attributes['list'] &&
-        this.attributes['list']!.cell === op.attributes['list']!.cell)
-    );
+  isSameTableCellAs(
+    op: DeltaInsertOp,
+    blocksCanBeWrappedWithList: string[] = []
+  ): boolean {
+    const getCellId = (insertOp: DeltaInsertOp) => {
+      if (insertOp.isTableCellLine()) {
+        return insertOp.attributes['table-cell-line']!.cell;
+      } else {
+        if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+          const attrKey: string =
+            blocksCanBeWrappedWithList.find(
+              (key) => !!insertOp.attributes[key]
+            ) || '';
+          return insertOp.attributes[attrKey].cell;
+        } else {
+          return insertOp.attributes['list']!.cell;
+        }
+      }
+    };
+
+    const thisCell = getCellId(this);
+    const opCell = getCellId(op);
+
+    return thisCell && opCell && thisCell === opCell;
   }
 
   isText() {
@@ -228,6 +258,19 @@ class DeltaInsertOp {
 
   isMentions() {
     return this.isText() && !!this.attributes.mentions;
+  }
+
+  isListBlockWrapper(blocksCanBeWrappedWithList: string[] = []) {
+    const attrKey = find(
+      blocksCanBeWrappedWithList,
+      (key) => !!this.attributes[key]
+    );
+    return !!(
+      attrKey &&
+      this.attributes &&
+      this.attributes[attrKey] &&
+      this.attributes[attrKey]['in-list']
+    );
   }
 }
 

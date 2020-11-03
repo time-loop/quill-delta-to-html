@@ -19,7 +19,7 @@ describe('Grouper', function () {
       new DeltaInsertOp('how are you?'),
       new DeltaInsertOp('\n'),
       new DeltaInsertOp('Time is money'),
-      new DeltaInsertOp('\n', { blockquote: true }),
+      new DeltaInsertOp('\n', { blockquote: {} }),
     ];
     it('should return ops grouped by group type', function () {
       var act = Grouper.pairOpsWithTheirBlock(ops);
@@ -39,8 +39,8 @@ describe('Grouper', function () {
         new DeltaInsertOp('\n', { 'code-block': true }),
         new DeltaInsertOp('this is code TOO!'),
         new DeltaInsertOp('\n', { 'code-block': true }),
-        new DeltaInsertOp('\n', { blockquote: true }),
-        new DeltaInsertOp('\n', { blockquote: true }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n'),
         new DeltaInsertOp('\n', { header: 1 }),
         new DeltaInsertOp('\n', { header: 1 }),
@@ -74,8 +74,8 @@ describe('Grouper', function () {
         new DeltaInsertOp('\n', { 'code-block': true }),
         new DeltaInsertOp('this is code TOO!'),
         new DeltaInsertOp('\n', { 'code-block': true }),
-        new DeltaInsertOp('\n', { blockquote: true }),
-        new DeltaInsertOp('\n', { blockquote: true }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n'),
         new DeltaInsertOp('\n', { header: 1 }),
       ];

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var value_types_1 = require("./value-types");
 var InsertData_1 = require("./InsertData");
 var lodash_isequal_1 = __importDefault(require("lodash.isequal"));
+var lodash_find_1 = __importDefault(require("lodash.find"));
 var DeltaInsertOp = (function () {
     function DeltaInsertOp(insertVal, attrs) {
         if (typeof insertVal === 'string') {
@@ -51,15 +52,41 @@ var DeltaInsertOp = (function () {
             this.attributes.direction === op.attributes.direction &&
             this.attributes.indent === op.attributes.indent);
     };
-    DeltaInsertOp.prototype.hasSameIndentationAs = function (op) {
-        return this.attributes.indent === op.attributes.indent;
+    DeltaInsertOp.prototype.hasSameIndentationAs = function (op, blocksCanBeWrappedWithList) {
+        var _this = this;
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
+        var getIndent = function (insertOp) {
+            if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+            }
+            else {
+                return insertOp.attributes.indent;
+            }
+        };
+        var thisIndent = getIndent(this);
+        var opIndent = getIndent(op);
+        return thisIndent === opIndent;
     };
     DeltaInsertOp.prototype.hasSameAttr = function (op) {
         return lodash_isequal_1.default(this.attributes, op.attributes);
     };
-    DeltaInsertOp.prototype.hasHigherIndentThan = function (op) {
-        return ((Number(this.attributes.indent) || 0) >
-            (Number(op.attributes.indent) || 0));
+    DeltaInsertOp.prototype.hasHigherIndentThan = function (op, blocksCanBeWrappedWithList) {
+        var _this = this;
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
+        var getIndent = function (insertOp) {
+            if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+            }
+            else {
+                return insertOp.attributes.indent;
+            }
+        };
+        var thisIndent = getIndent(this);
+        var opIndent = getIndent(op);
+        return ((Number(thisIndent) || 0) >
+            (Number(opIndent) || 0));
     };
     DeltaInsertOp.prototype.isInline = function () {
         return !(this.isContainerBlock() ||
@@ -108,35 +135,33 @@ var DeltaInsertOp = (function () {
                 this.attributes.list.list === value_types_1.ListType.Checked));
     };
     DeltaInsertOp.prototype.isSameListAs = function (op) {
-        return (!!op.attributes.list &&
+        return (!!this.attributes.list &&
+            !!op.attributes.list &&
             (this.attributes.list.list === op.attributes.list.list ||
                 (op.isACheckList() && this.isACheckList())) &&
             this.attributes.list.cell === op.attributes.list.cell);
     };
-    DeltaInsertOp.prototype.isSameTableCellAs = function (op) {
-        return ((!!op.isTableCellLine() &&
-            this.isTableCellLine() &&
-            !!this.attributes['table-cell-line'] &&
-            !!op.attributes['table-cell-line'] &&
-            this.attributes['table-cell-line'].cell ===
-                op.attributes['table-cell-line'].cell) ||
-            (op.isList() &&
-                this.isTableCellLine() &&
-                !!this.attributes['table-cell-line'] &&
-                !!op.attributes['list'] &&
-                this.attributes['table-cell-line'].cell ===
-                    op.attributes['list'].cell) ||
-            (op.isTableCellLine() &&
-                this.isList() &&
-                !!op.attributes['table-cell-line'] &&
-                !!this.attributes['list'] &&
-                op.attributes['table-cell-line'].cell ===
-                    this.attributes['list'].cell) ||
-            (op.isList() &&
-                this.isList() &&
-                !!this.attributes['list'] &&
-                !!op.attributes['list'] &&
-                this.attributes['list'].cell === op.attributes['list'].cell));
+    DeltaInsertOp.prototype.isSameTableCellAs = function (op, blocksCanBeWrappedWithList) {
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
+        var getCellId = function (insertOp) {
+            if (insertOp.isTableCellLine()) {
+                return insertOp.attributes['table-cell-line'].cell;
+            }
+            else {
+                if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+                    var attrKey = blocksCanBeWrappedWithList.find(function (key) { return !!insertOp.attributes[key]; }) || '';
+                    return insertOp.attributes[attrKey].cell;
+                }
+                else {
+                    return insertOp.attributes['list'].cell;
+                }
+            }
+        };
+        var thisCell = getCellId(this);
+        var opCell = getCellId(op);
+        return thisCell &&
+            opCell &&
+            thisCell === opCell;
     };
     DeltaInsertOp.prototype.isText = function () {
         return this.insert.type === value_types_1.DataType.Text;
@@ -164,6 +189,15 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.isMentions = function () {
         return this.isText() && !!this.attributes.mentions;
+    };
+    DeltaInsertOp.prototype.isListBlockWrapper = function (blocksCanBeWrappedWithList) {
+        var _this = this;
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
+        var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; });
+        return !!(attrKey &&
+            this.attributes &&
+            this.attributes[attrKey] &&
+            this.attributes[attrKey]['in-list']);
     };
     return DeltaInsertOp;
 }());

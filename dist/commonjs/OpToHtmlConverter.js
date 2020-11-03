@@ -77,6 +77,10 @@ var OpToHtmlConverter = (function () {
             if (isImageLink(tag)) {
                 beginTags.push(funcs_html_1.makeStartTag('a', this.getLinkAttrs()));
             }
+            if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
+                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-list', 'none')]));
+                endTags.push(funcs_html_1.makeEndTag('li'));
+            }
             beginTags.push(funcs_html_1.makeStartTag(tag, attrs));
             endTags.push(tag === 'img' ? '' : funcs_html_1.makeEndTag(tag));
             if (isImageLink(tag)) {

@@ -24,6 +24,15 @@ interface ListAttributes {
   list: ListType;
 }
 
+interface BlockquoteAttributes {
+  row?: string | undefined;
+  cell?: string | undefined;
+  rowspan?: string | undefined;
+  colspan?: string | undefined;
+  'in-list'?: string | undefined;
+  'wrapper-indent'?: string | undefined;
+}
+
 interface IOpAttributes {
   background?: string | undefined;
   color?: string | undefined;
@@ -41,7 +50,7 @@ interface IOpAttributes {
   code?: boolean | undefined;
 
   list?: ListAttributes;
-  blockquote?: boolean | undefined;
+  blockquote?: BlockquoteAttributes;
   'code-block'?: string | boolean | undefined;
   header?: number | undefined;
   align?: AlignType;
@@ -87,7 +96,6 @@ class OpAttributeSanitizer {
       'underline',
       'strike',
       'code',
-      'blockquote',
       'code-block',
       'renderAsBlock',
     ];
@@ -109,6 +117,7 @@ class OpAttributeSanitizer {
       width,
       target,
       rel,
+      blockquote,
     } = dirtyAttrs;
     let codeBlock = dirtyAttrs['code-block'];
 
@@ -120,6 +129,7 @@ class OpAttributeSanitizer {
       'link',
       'script',
       'list',
+      'blockquote',
       'header',
       'align',
       'direction',
@@ -198,6 +208,10 @@ class OpAttributeSanitizer {
         list!.list === ListType.Unchecked)
     ) {
       cleanAttrs.list = list;
+    }
+
+    if (blockquote) {
+      cleanAttrs.blockquote = blockquote;
     }
 
     if (Number(header)) {

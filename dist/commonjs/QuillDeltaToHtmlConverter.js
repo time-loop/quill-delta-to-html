@@ -57,6 +57,7 @@ var QuillDeltaToHtmlConverter = (function () {
             linkRel: this.options.linkRel,
             linkTarget: this.options.linkTarget,
             allowBackgroundClasses: this.options.allowBackgroundClasses,
+            blocksCanBeWrappedWithList: this.options.blocksCanBeWrappedWithList || [],
             customTag: this.options.customTag,
             customTagAttributes: this.options.customTagAttributes,
             customCssClasses: this.options.customCssClasses,
@@ -77,7 +78,9 @@ var QuillDeltaToHtmlConverter = (function () {
                             ? this.options.bulletListTag + ''
                             : op.isUncheckedList()
                                 ? this.options.bulletListTag + ''
-                                : '';
+                                : op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)
+                                    ? this.options.bulletListTag + ''
+                                    : '';
     };
     QuillDeltaToHtmlConverter.prototype.getGroupedOps = function () {
         var deltaOps = InsertOpsConverter_1.InsertOpsConverter.convert(this.rawDeltaOps, this.options);
@@ -89,14 +92,15 @@ var QuillDeltaToHtmlConverter = (function () {
             customBlocks: !!this.options.multiLineCustomBlock,
         });
         var groupedOps = Grouper_1.Grouper.reduceConsecutiveSameStyleBlocksToOne(groupedSameStyleBlocks);
-        var listNester = new ListNester_1.ListNester();
+        var listNester = new ListNester_1.ListNester(this.options.blocksCanBeWrappedWithList);
         groupedOps = listNester.nest(groupedOps);
-        var tableGrouper = new TableGrouper_1.TableGrouper();
+        var tableGrouper = new TableGrouper_1.TableGrouper(this.options.blocksCanBeWrappedWithList);
         return tableGrouper.group(groupedOps);
     };
     QuillDeltaToHtmlConverter.prototype.convert = function () {
         var _this = this;
         var groups = this.getGroupedOps();
+        console.log(groups);
         return groups
             .map(function (group) {
             if (group instanceof group_types_1.ListGroup) {
@@ -159,7 +163,6 @@ var QuillDeltaToHtmlConverter = (function () {
                 { key: 'data-cell', value: list.headOp.attributes.cell },
                 { key: 'data-rowspan', value: list.headOp.attributes.rowspan },
                 { key: 'data-colspan', value: list.headOp.attributes.colspan },
-                { key: 'data-list', value: list.headOp.attributes.list.list },
             ]
             : [];
         return (funcs_html_1.makeStartTag(this._getListTag(firstItem.item.op), attrsOfList) +

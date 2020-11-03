@@ -1366,7 +1366,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         { insert: '\n', attributes: { bold: true } },
         { insert: 'how r u?' },
         { insert: 'r u fine' },
-        { insert: '\n', attributes: { blockquote: true } },
+        { insert: '\n', attributes: { blockquote: {} } },
         { insert: { video: 'http://' } },
         { insert: 'list item 1' },
         { insert: '\n', attributes: { list: { list: 'bullet' } } },
@@ -1462,6 +1462,67 @@ describe('QuillDeltaToHtmlConverter', function () {
         c.afterRender(dummy);
         v = c.convert();
         assert.ok(v === '');
+      });
+
+      it('should create blockquote within list', function () {
+        var qdc = new QuillDeltaToHtmlConverter(
+          [
+            { insert: 'first line\nfirst list item parent' },
+            { attributes: { list: { list: 'ordered' } }, insert: '\n' },
+            { insert: 'child list item' },
+            {
+              attributes: { indent: 1, list: { list: 'ordered' } },
+              insert: '\n',
+            },
+            { insert: 'blockq' },
+            {
+              attributes: {
+                blockquote: { 'in-list': 'true', 'wrapper-indent': '1' },
+              },
+              insert: '\n',
+            },
+            { insert: 'aaa' },
+            { attributes: { list: { list: 'ordered' } }, insert: '\n' },
+            { insert: 'bbb' },
+            {
+              attributes: {
+                blockquote: { 'in-list': 'true', 'wrapper-indent': '3' },
+              },
+              insert: '\n',
+            },
+            { insert: 'ccc' },
+            {
+              attributes: {
+                blockquote: { 'in-list': 'true', 'wrapper-indent': '3' },
+              },
+              insert: '\n',
+            },
+            { insert: '\n' },
+          ],
+          {
+            blocksCanBeWrappedWithList: ['blockquote'],
+          }
+        );
+
+        var html = qdc.convert();
+        assert.equal(
+          html,
+          [
+            '<p>first line</p>',
+            '<ol>',
+            '<li>first list item parent',
+            '<ol>',
+            '<li>child list item</li>',
+            '<li data-list="none">',
+            '<blockquote>blockq</blockquote>',
+            '</li>',
+            '</ol>',
+            '</li>',
+            '<li>aaa<ul><li data-list="none"><blockquote>bbb<br/>ccc</blockquote></li></ul></li>',
+            '</ol>',
+            '<p><br/></p>',
+          ].join('')
+        );
       });
     });
   });

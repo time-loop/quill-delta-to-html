@@ -60,6 +60,7 @@ interface IOpToHtmlConverterOptions {
   linkRel?: string;
   linkTarget?: string;
   allowBackgroundClasses?: boolean;
+  blocksCanBeWrappedWithList?: string[];
   customTag?: (format: string, op: DeltaInsertOp) => string | void;
   customTagAttributes?: (op: DeltaInsertOp) => { [key: string]: string } | void;
   customCssClasses?: (op: DeltaInsertOp) => string | string[] | void;
@@ -124,6 +125,14 @@ class OpToHtmlConverter {
       if (isImageLink(tag)) {
         beginTags.push(makeStartTag('a', this.getLinkAttrs()));
       }
+      // Add li tag before when the block wrapped by list
+      if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
+        beginTags.push(
+          makeStartTag('li', [this.makeAttr('data-list', 'none')])
+        );
+        endTags.push(makeEndTag('li'));
+      }
+
       beginTags.push(makeStartTag(tag, attrs));
       endTags.push(tag === 'img' ? '' : makeEndTag(tag));
       if (isImageLink(tag)) {

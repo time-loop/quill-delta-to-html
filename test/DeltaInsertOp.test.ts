@@ -27,7 +27,7 @@ describe('DeltaInsertOp', function () {
       var op = new DeltaInsertOp('test');
       assert.equal(op.isContainerBlock(), false);
 
-      op = new DeltaInsertOp('test', { blockquote: true });
+      op = new DeltaInsertOp('test', { blockquote: {} });
       assert.equal(op.isContainerBlock(), true);
     });
   });
@@ -200,6 +200,17 @@ describe('DeltaInsertOp', function () {
 
       op = new DeltaInsertOp('http', { link: 'http://' });
       assert.equal(op.isLink(), true);
+    });
+  });
+
+  describe('isListBlockWrapper', function () {
+    it('should correctly identify if op is a list block wrapper', function () {
+      var blocksCanBeWrappedWithList = ['blockquote'];
+      var op = new DeltaInsertOp('\n', { blockquote: {} });
+      var op2 = new DeltaInsertOp('\n', { blockquote: { 'in-list': 'true' } });
+
+      assert.equal(op.isListBlockWrapper(blocksCanBeWrappedWithList), false);
+      assert.equal(op2.isListBlockWrapper(blocksCanBeWrappedWithList), true);
     });
   });
 });

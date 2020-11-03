@@ -22,6 +22,7 @@ interface IOpToHtmlConverterOptions {
   linkRel?: string;
   linkTarget?: string;
   allowBackgroundClasses?: boolean;
+  blocksCanBeWrappedWithList?: string[];
   customTag?: (format: string, op: DeltaInsertOp) => string | void;
   customTagAttributes?: (
     op: DeltaInsertOp

@@ -16,6 +16,14 @@ interface ListAttributes {
   colspan?: string | undefined;
   list: ListType;
 }
+interface BlockquoteAttributes {
+  row?: string | undefined;
+  cell?: string | undefined;
+  rowspan?: string | undefined;
+  colspan?: string | undefined;
+  'in-list'?: string | undefined;
+  'wrapper-indent'?: string | undefined;
+}
 interface IOpAttributes {
   background?: string | undefined;
   color?: string | undefined;
@@ -30,7 +38,7 @@ interface IOpAttributes {
   script?: ScriptType;
   code?: boolean | undefined;
   list?: ListAttributes;
-  blockquote?: boolean | undefined;
+  blockquote?: BlockquoteAttributes;
   'code-block'?: string | boolean | undefined;
   header?: number | undefined;
   align?: AlignType;

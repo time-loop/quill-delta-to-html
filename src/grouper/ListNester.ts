@@ -1,11 +1,17 @@
 import { ListGroup, ListItem, BlockGroup, TDataGroup } from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
+import find from 'lodash.find';
 
 class ListNester {
+  blocksCanBeWrappedWithList: string[];
+
+  constructor(blocksCanBeWrappedWithList: string[] = []) {
+    this.blocksCanBeWrappedWithList = blocksCanBeWrappedWithList;
+  }
+
   nest(groups: TDataGroup[]): TDataGroup[] {
     var listBlocked = this.convertListBlocksToListGroups(groups);
     var groupedByListGroups = this.groupConsecutiveListGroups(listBlocked);
-
     // convert grouped ones into listgroup
     var nested = flatten(
       groupedByListGroups.map((group: TDataGroup) => {
@@ -23,9 +29,18 @@ class ListNester {
           return false;
         }
 
-        return curr.items[0].item.op.isSameListAs(prev.items[0].item.op);
+        return (
+          curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
+          curr.items[0].item.op.isListBlockWrapper(
+            this.blocksCanBeWrappedWithList
+          ) ||
+          prev.items[0].item.op.isListBlockWrapper(
+            this.blocksCanBeWrappedWithList
+          )
+        );
       }
     );
+
     return groupRootLists.map((v: TDataGroup | ListGroup[]) => {
       if (!Array.isArray(v)) {
         return v;
@@ -38,23 +53,62 @@ class ListNester {
   private convertListBlocksToListGroups(
     items: TDataGroup[]
   ): Array<TDataGroup> {
+    const hasSameIndentation = (g: BlockGroup, gPrev: BlockGroup): boolean => {
+      const gAttrKey = find(
+        this.blocksCanBeWrappedWithList,
+        (key) => !!g.op.attributes[key]
+      );
+      const gIndent =
+        gAttrKey && g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
+          ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10)
+          : g.op.attributes.indent;
+      const gPrevAttrKey = find(
+        this.blocksCanBeWrappedWithList,
+        (key) => !!gPrev.op.attributes[key]
+      );
+      const gPrevIndent =
+        gPrevAttrKey &&
+        gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
+          ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10)
+          : gPrev.op.attributes.indent;
+      return gIndent === gPrevIndent;
+    };
+
     var grouped = groupConsecutiveElementsWhile(
       items,
       (g: TDataGroup, gPrev: TDataGroup) => {
         return (
-          g instanceof BlockGroup &&
-          gPrev instanceof BlockGroup &&
-          g.op.isList() &&
-          gPrev.op.isList() &&
-          g.op.isSameListAs(gPrev.op) &&
-          g.op.hasSameIndentationAs(gPrev.op)
+          (g instanceof BlockGroup &&
+            gPrev instanceof BlockGroup &&
+            g.op.isList() &&
+            gPrev.op.isList() &&
+            g.op.isSameListAs(gPrev.op) &&
+            g.op.hasSameIndentationAs(
+              gPrev.op,
+              this.blocksCanBeWrappedWithList
+            )) ||
+          (g instanceof BlockGroup &&
+            gPrev instanceof BlockGroup &&
+            ((g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
+              gPrev.op.isList()) ||
+              (g.op.isList() &&
+                gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)) ||
+              (g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
+                gPrev.op.isListBlockWrapper(
+                  this.blocksCanBeWrappedWithList
+                ))) &&
+            hasSameIndentation(g, gPrev))
         );
       }
     );
 
     return grouped.map((item: TDataGroup | BlockGroup[]) => {
       if (!Array.isArray(item)) {
-        if (item instanceof BlockGroup && item.op.isList()) {
+        if (
+          item instanceof BlockGroup &&
+          (item.op.isList() ||
+            item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))
+        ) {
           return new ListGroup([new ListItem(item)]);
         }
         return item;
@@ -95,7 +149,25 @@ class ListNester {
   private groupByIndent(items: ListGroup[]): { [index: number]: ListGroup[] } {
     return items.reduce(
       (pv: { [index: number]: ListGroup[] }, cv: ListGroup) => {
-        var indent = cv.items[0].item.op.attributes.indent;
+        let indent;
+        if (
+          cv.items[0].item.op.isListBlockWrapper(
+            this.blocksCanBeWrappedWithList
+          )
+        ) {
+          const attrKey: string =
+            find(
+              this.blocksCanBeWrappedWithList,
+              (key) => !!cv.items[0].item.op.attributes[key]
+            ) || '';
+          indent = parseInt(
+            cv.items[0].item.op.attributes[attrKey]['wrapper-indent'],
+            10
+          );
+        } else {
+          indent = cv.items[0].item.op.attributes.indent;
+        }
+
         if (indent) {
           pv[indent] = pv[indent] || [];
           pv[indent].push(cv);
@@ -109,7 +181,12 @@ class ListNester {
   private placeUnderParent(target: ListGroup, items: ListGroup[]) {
     for (var i = items.length - 1; i >= 0; i--) {
       var elm = items[i];
-      if (target.items[0].item.op.hasHigherIndentThan(elm.items[0].item.op)) {
+      if (
+        target.items[0].item.op.hasHigherIndentThan(
+          elm.items[0].item.op,
+          this.blocksCanBeWrappedWithList
+        )
+      ) {
         var parent = elm.items[elm.items.length - 1];
         if (parent.innerList) {
           parent.innerList.items = parent.innerList.items.concat(target.items);

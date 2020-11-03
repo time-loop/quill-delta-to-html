@@ -26,12 +26,11 @@ var OpAttributeSanitizer = (function () {
             'underline',
             'strike',
             'code',
-            'blockquote',
             'code-block',
             'renderAsBlock',
         ];
         var colorAttrs = ['background', 'color'];
-        var font = dirtyAttrs.font, size = dirtyAttrs.size, link = dirtyAttrs.link, script = dirtyAttrs.script, list = dirtyAttrs.list, header = dirtyAttrs.header, align = dirtyAttrs.align, direction = dirtyAttrs.direction, indent = dirtyAttrs.indent, mentions = dirtyAttrs.mentions, mention = dirtyAttrs.mention, width = dirtyAttrs.width, target = dirtyAttrs.target, rel = dirtyAttrs.rel;
+        var font = dirtyAttrs.font, size = dirtyAttrs.size, link = dirtyAttrs.link, script = dirtyAttrs.script, list = dirtyAttrs.list, header = dirtyAttrs.header, align = dirtyAttrs.align, direction = dirtyAttrs.direction, indent = dirtyAttrs.indent, mentions = dirtyAttrs.mentions, mention = dirtyAttrs.mention, width = dirtyAttrs.width, target = dirtyAttrs.target, rel = dirtyAttrs.rel, blockquote = dirtyAttrs.blockquote;
         var codeBlock = dirtyAttrs['code-block'];
         var sanitizedAttrs = booleanAttrs.concat(colorAttrs, [
             'font',
@@ -39,6 +38,7 @@ var OpAttributeSanitizer = (function () {
             'link',
             'script',
             'list',
+            'blockquote',
             'header',
             'align',
             'direction',
@@ -102,6 +102,9 @@ var OpAttributeSanitizer = (function () {
                 list.list === value_types_1.ListType.Checked ||
                 list.list === value_types_1.ListType.Unchecked)) {
             cleanAttrs.list = list;
+        }
+        if (blockquote) {
+            cleanAttrs.blockquote = blockquote;
         }
         if (Number(header)) {
             cleanAttrs.header = Math.min(Number(header), 6);

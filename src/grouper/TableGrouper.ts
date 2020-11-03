@@ -15,6 +15,12 @@ import { IOpAttributes } from '../OpAttributeSanitizer';
 import { DeltaInsertOp } from '../DeltaInsertOp';
 
 export class TableGrouper {
+  blocksCanBeWrappedWithList: string[];
+
+  constructor(blocksCanBeWrappedWithList: string[] = []) {
+    this.blocksCanBeWrappedWithList = blocksCanBeWrappedWithList;
+  }
+
   group(groups: TDataGroup[]): TDataGroup[] {
     var tableColBlocked = this.convertTableColBlocksToTableColGroup(groups);
     var tableBlocked = this.convertTableBlocksToTableGroups(tableColBlocked);
@@ -176,22 +182,34 @@ export class TableGrouper {
             gPrev instanceof BlockGroup &&
             g.op.isTableCellLine() &&
             gPrev.op.isTableCellLine() &&
-            g.op.isSameTableCellAs(gPrev.op)) ||
+            g.op.isSameTableCellAs(
+              gPrev.op,
+              this.blocksCanBeWrappedWithList
+            )) ||
           (g instanceof BlockGroup &&
             gPrev instanceof ListGroup &&
             g.op.isTableCellLine() &&
             !!gPrev.headOp &&
-            g.op.isSameTableCellAs(gPrev.headOp)) ||
+            g.op.isSameTableCellAs(
+              gPrev.headOp,
+              this.blocksCanBeWrappedWithList
+            )) ||
           (g instanceof ListGroup &&
             gPrev instanceof BlockGroup &&
             gPrev.op.isTableCellLine() &&
             !!g.headOp &&
-            g.headOp.isSameTableCellAs(gPrev.op)) ||
+            g.headOp.isSameTableCellAs(
+              gPrev.op,
+              this.blocksCanBeWrappedWithList
+            )) ||
           (g instanceof ListGroup &&
             gPrev instanceof ListGroup &&
             !!g.headOp &&
             !!gPrev.headOp &&
-            g.headOp.isSameTableCellAs(gPrev.headOp))
+            g.headOp.isSameTableCellAs(
+              gPrev.headOp,
+              this.blocksCanBeWrappedWithList
+            ))
         );
       }
     );

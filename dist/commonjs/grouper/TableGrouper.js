@@ -5,7 +5,9 @@ var array_1 = require("../helpers/array");
 var util_1 = require("util");
 var DeltaInsertOp_1 = require("../DeltaInsertOp");
 var TableGrouper = (function () {
-    function TableGrouper() {
+    function TableGrouper(blocksCanBeWrappedWithList) {
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
+        this.blocksCanBeWrappedWithList = blocksCanBeWrappedWithList;
     }
     TableGrouper.prototype.group = function (groups) {
         var tableColBlocked = this.convertTableColBlocksToTableColGroup(groups);
@@ -104,27 +106,28 @@ var TableGrouper = (function () {
         });
     };
     TableGrouper.prototype.convertTableBlocksToTableCells = function (items) {
+        var _this = this;
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
             return ((g instanceof group_types_1.BlockGroup &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isTableCellLine() &&
                 gPrev.op.isTableCellLine() &&
-                g.op.isSameTableCellAs(gPrev.op)) ||
+                g.op.isSameTableCellAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
                 (g instanceof group_types_1.BlockGroup &&
                     gPrev instanceof group_types_1.ListGroup &&
                     g.op.isTableCellLine() &&
                     !!gPrev.headOp &&
-                    g.op.isSameTableCellAs(gPrev.headOp)) ||
+                    g.op.isSameTableCellAs(gPrev.headOp, _this.blocksCanBeWrappedWithList)) ||
                 (g instanceof group_types_1.ListGroup &&
                     gPrev instanceof group_types_1.BlockGroup &&
                     gPrev.op.isTableCellLine() &&
                     !!g.headOp &&
-                    g.headOp.isSameTableCellAs(gPrev.op)) ||
+                    g.headOp.isSameTableCellAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
                 (g instanceof group_types_1.ListGroup &&
                     gPrev instanceof group_types_1.ListGroup &&
                     !!g.headOp &&
                     !!gPrev.headOp &&
-                    g.headOp.isSameTableCellAs(gPrev.headOp)));
+                    g.headOp.isSameTableCellAs(gPrev.headOp, _this.blocksCanBeWrappedWithList)));
         });
         return grouped.map(function (item) {
             var head = util_1.isArray(item) ? item[0] : item;

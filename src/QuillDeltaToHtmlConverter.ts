@@ -39,6 +39,7 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineCodeblock?: boolean;
   multiLineParagraph?: boolean;
   multiLineCustomBlock?: boolean;
+  blocksCanBeWrappedWithList?: string[] | undefined;
 }
 
 const BrTag = '<br/>';
@@ -92,6 +93,7 @@ class QuillDeltaToHtmlConverter {
       linkRel: this.options.linkRel,
       linkTarget: this.options.linkTarget,
       allowBackgroundClasses: this.options.allowBackgroundClasses,
+      blocksCanBeWrappedWithList: this.options.blocksCanBeWrappedWithList || [],
       customTag: this.options.customTag,
       customTagAttributes: this.options.customTagAttributes,
       customCssClasses: this.options.customCssClasses,
@@ -112,6 +114,8 @@ class QuillDeltaToHtmlConverter {
       : op.isCheckedList()
       ? this.options.bulletListTag + ''
       : op.isUncheckedList()
+      ? this.options.bulletListTag + ''
+      : op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)
       ? this.options.bulletListTag + ''
       : '';
   }
@@ -134,16 +138,18 @@ class QuillDeltaToHtmlConverter {
       groupedSameStyleBlocks
     );
 
-    var listNester = new ListNester();
+    var listNester = new ListNester(this.options.blocksCanBeWrappedWithList);
     groupedOps = listNester.nest(groupedOps);
 
-    var tableGrouper = new TableGrouper();
+    var tableGrouper = new TableGrouper(
+      this.options.blocksCanBeWrappedWithList
+    );
     return tableGrouper.group(groupedOps);
   }
 
   convert() {
     let groups = this.getGroupedOps();
-
+    console.log(groups);
     return groups
       .map((group) => {
         if (group instanceof ListGroup) {
@@ -211,7 +217,6 @@ class QuillDeltaToHtmlConverter {
           { key: 'data-cell', value: list.headOp.attributes!.cell },
           { key: 'data-rowspan', value: list.headOp.attributes!.rowspan },
           { key: 'data-colspan', value: list.headOp.attributes!.colspan },
-          { key: 'data-list', value: list.headOp.attributes!.list!.list },
         ]
       : [];
     return (
@@ -246,7 +251,6 @@ class QuillDeltaToHtmlConverter {
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
     var liElementsHtml = this._renderInlines(li.item.ops, false);
-
     return (
       parts.openingTag +
       liElementsHtml +
