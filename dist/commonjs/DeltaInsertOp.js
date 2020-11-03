@@ -57,7 +57,8 @@ var DeltaInsertOp = (function () {
         if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         var getIndent = function (insertOp) {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
-                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
+                    '';
                 return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
             }
             else {
@@ -76,7 +77,8 @@ var DeltaInsertOp = (function () {
         if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         var getIndent = function (insertOp) {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
-                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
+                    '';
                 return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
             }
             else {
@@ -85,8 +87,7 @@ var DeltaInsertOp = (function () {
         };
         var thisIndent = getIndent(this);
         var opIndent = getIndent(op);
-        return ((Number(thisIndent) || 0) >
-            (Number(opIndent) || 0));
+        return (Number(thisIndent) || 0) > (Number(opIndent) || 0);
     };
     DeltaInsertOp.prototype.isInline = function () {
         return !(this.isContainerBlock() ||
@@ -159,9 +160,7 @@ var DeltaInsertOp = (function () {
         };
         var thisCell = getCellId(this);
         var opCell = getCellId(op);
-        return thisCell &&
-            opCell &&
-            thisCell === opCell;
+        return thisCell && opCell && thisCell === opCell;
     };
     DeltaInsertOp.prototype.isText = function () {
         return this.insert.type === value_types_1.DataType.Text;

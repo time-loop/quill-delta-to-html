@@ -128,7 +128,7 @@ class OpToHtmlConverter {
       // Add li tag before when the block wrapped by list
       if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
         beginTags.push(
-          makeStartTag('li', [this.makeAttr('data-list', 'none')])
+          makeStartTag('li', [this.makeAttr('data-none-type', 'true')])
         );
         endTags.push(makeEndTag('li'));
       }

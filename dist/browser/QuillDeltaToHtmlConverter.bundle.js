@@ -58,7 +58,8 @@ var DeltaInsertOp = (function () {
         if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         var getIndent = function (insertOp) {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
-                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
+                    '';
                 return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
             }
             else {
@@ -77,7 +78,8 @@ var DeltaInsertOp = (function () {
         if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         var getIndent = function (insertOp) {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
-                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) || '';
+                var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
+                    '';
                 return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
             }
             else {
@@ -86,8 +88,7 @@ var DeltaInsertOp = (function () {
         };
         var thisIndent = getIndent(this);
         var opIndent = getIndent(op);
-        return ((Number(thisIndent) || 0) >
-            (Number(opIndent) || 0));
+        return (Number(thisIndent) || 0) > (Number(opIndent) || 0);
     };
     DeltaInsertOp.prototype.isInline = function () {
         return !(this.isContainerBlock() ||
@@ -160,9 +161,7 @@ var DeltaInsertOp = (function () {
         };
         var thisCell = getCellId(this);
         var opCell = getCellId(op);
-        return thisCell &&
-            opCell &&
-            thisCell === opCell;
+        return thisCell && opCell && thisCell === opCell;
     };
     DeltaInsertOp.prototype.isText = function () {
         return this.insert.type === value_types_1.DataType.Text;
@@ -582,7 +581,7 @@ var OpToHtmlConverter = (function () {
                 beginTags.push(funcs_html_1.makeStartTag('a', this.getLinkAttrs()));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
-                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-list', 'none')]));
+                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
             beginTags.push(funcs_html_1.makeStartTag(tag, attrs));
@@ -1410,9 +1409,9 @@ var ListNester = (function () {
             if (!(curr instanceof group_types_1.ListGroup && prev instanceof group_types_1.ListGroup)) {
                 return false;
             }
-            return curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
+            return (curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
                 curr.items[0].item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) ||
-                prev.items[0].item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList);
+                prev.items[0].item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList));
         });
         return groupRootLists.map(function (v) {
             if (!Array.isArray(v)) {
@@ -1430,28 +1429,34 @@ var ListNester = (function () {
                 ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10)
                 : g.op.attributes.indent;
             var gPrevAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!gPrev.op.attributes[key]; });
-            var gPrevIndent = gPrevAttrKey && gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
+            var gPrevIndent = gPrevAttrKey &&
+                gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
                 ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10)
                 : gPrev.op.attributes.indent;
             return gIndent === gPrevIndent;
         };
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
-            return (g instanceof group_types_1.BlockGroup &&
+            return ((g instanceof group_types_1.BlockGroup &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
                 g.op.isSameListAs(gPrev.op) &&
-                g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) || (g instanceof group_types_1.BlockGroup &&
-                gPrev instanceof group_types_1.BlockGroup &&
-                ((g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) && gPrev.op.isList()) ||
-                    (g.op.isList() && gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)) ||
-                    (g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) && gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) &&
-                hasSameIndentation(g, gPrev));
+                g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
+                (g instanceof group_types_1.BlockGroup &&
+                    gPrev instanceof group_types_1.BlockGroup &&
+                    ((g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
+                        gPrev.op.isList()) ||
+                        (g.op.isList() &&
+                            gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)) ||
+                        (g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
+                            gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) &&
+                    hasSameIndentation(g, gPrev)));
         });
         return grouped.map(function (item) {
             if (!Array.isArray(item)) {
                 if (item instanceof group_types_1.BlockGroup &&
-                    (item.op.isList() || item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) {
+                    (item.op.isList() ||
+                        item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) {
                     return new group_types_1.ListGroup([new group_types_1.ListItem(item)]);
                 }
                 return item;

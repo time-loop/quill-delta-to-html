@@ -78,7 +78,7 @@ var OpToHtmlConverter = (function () {
                 beginTags.push(funcs_html_1.makeStartTag('a', this.getLinkAttrs()));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
-                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-list', 'none')]));
+                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
             beginTags.push(funcs_html_1.makeStartTag(tag, attrs));
