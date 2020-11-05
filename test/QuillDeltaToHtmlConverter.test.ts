@@ -196,7 +196,7 @@ describe('QuillDeltaToHtmlConverter', function () {
       var html = qdc.convert();
 
       assert.equal(html.indexOf('<p>mr') > -1, true);
-      assert.equal(html.indexOf('</ol><ul><li>there') > -1, true);
+      assert.equal(html.indexOf('</li></ol>') > -1, true);
     });
 
     it('should render as separate paragraphs', function () {

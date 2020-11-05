@@ -82,7 +82,6 @@ class ListNester {
             gPrev instanceof BlockGroup &&
             g.op.isList() &&
             gPrev.op.isList() &&
-            g.op.isSameListAs(gPrev.op) &&
             g.op.hasSameIndentationAs(
               gPrev.op,
               this.blocksCanBeWrappedWithList

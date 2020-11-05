@@ -14,7 +14,42 @@ import { ListType } from './../../src/value-types';
 
 describe('ListNester', function () {
   describe('nest()', function () {
-    it('should not nest different types of lists', function () {
+    // clickup need nest different types of lists, so remove this test case.
+    // it('should not nest different types of lists', function () {
+    //   var ops = [
+    //     new DeltaInsertOp('ordered list 1 item 1'),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Ordered } }),
+    //     new DeltaInsertOp('bullet list 1 item 1'),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Bullet } }),
+    //     new DeltaInsertOp('bullet list 1 item 2'),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Bullet } }),
+    //     new DeltaInsertOp('haha'),
+    //     new DeltaInsertOp('\n'),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Bullet } }),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Checked } }),
+    //     new DeltaInsertOp('\n', { list: { list: ListType.Unchecked } }),
+    //   ];
+
+    //   var groups = Grouper.pairOpsWithTheirBlock(ops);
+    //   var nester = new ListNester();
+    //   var act = nester.nest(groups);
+    //   //console.log(JSON.stringify(act, null, 3));
+    //   assert.deepEqual(act, [
+    //     new ListGroup([new ListItem(<BlockGroup>groups[0])]),
+    //     new ListGroup([
+    //       new ListItem(<BlockGroup>groups[1]),
+    //       new ListItem(<BlockGroup>groups[2]),
+    //     ]),
+    //     new InlineGroup([ops[6], ops[7]]),
+    //     new ListGroup([new ListItem(new BlockGroup(ops[8], []))]),
+    //     new ListGroup([
+    //       new ListItem(new BlockGroup(ops[9], [])),
+    //       new ListItem(new BlockGroup(ops[10], [])),
+    //     ]),
+    //   ]);
+    // });
+
+    it('should nest different types of lists', function () {
       var ops = [
         new DeltaInsertOp('ordered list 1 item 1'),
         new DeltaInsertOp('\n', { list: { list: ListType.Ordered } }),
@@ -34,14 +69,14 @@ describe('ListNester', function () {
       var act = nester.nest(groups);
       //console.log(JSON.stringify(act, null, 3));
       assert.deepEqual(act, [
-        new ListGroup([new ListItem(<BlockGroup>groups[0])]),
         new ListGroup([
+          new ListItem(<BlockGroup>groups[0]),
           new ListItem(<BlockGroup>groups[1]),
           new ListItem(<BlockGroup>groups[2]),
         ]),
         new InlineGroup([ops[6], ops[7]]),
-        new ListGroup([new ListItem(new BlockGroup(ops[8], []))]),
         new ListGroup([
+          new ListItem(new BlockGroup(ops[8], [])),
           new ListItem(new BlockGroup(ops[9], [])),
           new ListItem(new BlockGroup(ops[10], [])),
         ]),
