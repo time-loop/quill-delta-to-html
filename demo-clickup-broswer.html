@@ -23,9 +23,11 @@
     var togglelistDelta = {"ops":[{"insert":"dsfsfsfs"},{"attributes":{"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfdsfsf"},{"attributes":{"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfsdfdf"},{"attributes":{"indent":1,"list":{"list":"toggled"}},"insert":"\n"},{"insert":"dsfdsfdsf"},{"attributes":{"indent":1,"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfdsfdsf"},{"attributes":{"indent":2,"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfsfsdf"},{"attributes":{"indent":2,"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfdsfsdf"},{"attributes":{"indent":1,"list":{"list":"toggled"}},"insert":"\n"},{"insert":"sdfsdfdsf"},{"attributes":{"indent":1,"list":{"list":"toggled"}},"insert":"\n"}]}
     // list within blockquote
     var listWithinBlockquote = {"ops":[{"insert":"first line\nfirst list item parent"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"child list item"},{"attributes":{"indent":1,"list":{"list":"ordered"}},"insert":"\n"},{"insert":"blockq"},{"attributes":{"blockquote":{"in-list":"true","wrapper-indent":"1"}},"insert":"\n"},{"insert":"aaa"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"bbb"},{"attributes":{"blockquote":{"in-list":"true","wrapper-indent":"3"}},"insert":"\n"},{"insert":"ccc"},{"attributes":{"blockquote":{"in-list":"true","wrapper-indent":"3"}},"insert":"\n"},{"insert":"\n"}]};
+    // list within code blocks
+    var listWithinCodeBlock = {"ops":[{"insert":"function foo() { return false; }"},{"attributes":{"code-block":{"code-block":"javascript"}},"insert":"\n"},{"insert":"dsfdsfdsf"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"}]}
 
-    var qdc = new window.QuillDeltaToHtmlConverter(listWithinBlockquote.ops, {
-      blocksCanBeWrappedWithList: ['blockquote']
+    var qdc = new window.QuillDeltaToHtmlConverter(listWithinCodeBlock.ops, {
+      blocksCanBeWrappedWithList: ['blockquote', 'code-block']
     });
     var html = qdc.convert();
     document.getElementById('converted-view').innerHTML = html;

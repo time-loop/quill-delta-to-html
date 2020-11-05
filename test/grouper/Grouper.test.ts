@@ -36,9 +36,9 @@ describe('Grouper', function () {
     it('should compine blocks with same type and style into an []', function () {
       var ops = [
         new DeltaInsertOp('this is code'),
-        new DeltaInsertOp('\n', { 'code-block': true }),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
         new DeltaInsertOp('this is code TOO!'),
-        new DeltaInsertOp('\n', { 'code-block': true }),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
         new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n'),
@@ -71,9 +71,9 @@ describe('Grouper', function () {
     it('should return ops of combined groups moved to 1st group', function () {
       var ops = [
         new DeltaInsertOp('this is code'),
-        new DeltaInsertOp('\n', { 'code-block': true }),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
         new DeltaInsertOp('this is code TOO!'),
-        new DeltaInsertOp('\n', { 'code-block': true }),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
         new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n', { blockquote: {} }),
         new DeltaInsertOp('\n'),

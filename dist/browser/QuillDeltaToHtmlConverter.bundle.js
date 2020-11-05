@@ -99,7 +99,11 @@ var DeltaInsertOp = (function () {
         return !!this.attributes['code-block'];
     };
     DeltaInsertOp.prototype.hasSameLangAs = function (op) {
-        return this.attributes['code-block'] === op.attributes['code-block'];
+        var thisCodeLang = (this.attributes['code-block'] &&
+            this.attributes['code-block']['code-block']) || true;
+        var opCodeLang = (op.attributes['code-block'] &&
+            op.attributes['code-block']['code-block']) || true;
+        return thisCodeLang === opCodeLang;
     };
     DeltaInsertOp.prototype.isJustNewline = function () {
         return this.insert.value === value_types_1.NewLine;
@@ -407,7 +411,14 @@ var OpAttributeSanitizer = (function () {
             cleanAttrs.rel = rel;
         }
         if (codeBlock) {
-            if (OpAttributeSanitizer.IsValidLang(codeBlock)) {
+            var codeBlockLang = '';
+            if (typeof codeBlock === 'object') {
+                codeBlockLang = codeBlock['code-block'] || true;
+            }
+            else {
+                codeBlockLang = codeBlock;
+            }
+            if (OpAttributeSanitizer.IsValidLang(codeBlockLang)) {
                 cleanAttrs['code-block'] = codeBlock;
             }
             else {
@@ -721,8 +732,9 @@ var OpToHtmlConverter = (function () {
             tagAttrs.push(makeAttr('style', styles.join(';')));
         }
         if (this.op.isCodeBlock() &&
-            typeof this.op.attributes['code-block'] === 'string') {
-            return tagAttrs.concat(makeAttr('data-language', this.op.attributes['code-block']));
+            typeof this.op.attributes['code-block'] === 'object' &&
+            typeof this.op.attributes['code-block']['code-block'] === 'string') {
+            return tagAttrs.concat(makeAttr('data-language', this.op.attributes['code-block']['code-block']));
         }
         if (this.op.isContainerBlock()) {
             return tagAttrs;

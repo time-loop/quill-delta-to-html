@@ -33,6 +33,16 @@ interface BlockquoteAttributes {
   'wrapper-indent'?: string | undefined;
 }
 
+interface CodeBlockAttributes {
+  row?: string | undefined;
+  cell?: string | undefined;
+  rowspan?: string | undefined;
+  colspan?: string | undefined;
+  'in-list'?: string | undefined;
+  'wrapper-indent'?: string | undefined;
+  'code-block'?: string | boolean | undefined;
+}
+
 interface IOpAttributes {
   background?: string | undefined;
   color?: string | undefined;
@@ -51,7 +61,7 @@ interface IOpAttributes {
 
   list?: ListAttributes;
   blockquote?: BlockquoteAttributes;
-  'code-block'?: string | boolean | undefined;
+  'code-block'?: CodeBlockAttributes;
   header?: number | undefined;
   align?: AlignType;
   direction?: DirectionType;
@@ -187,7 +197,14 @@ class OpAttributeSanitizer {
     }
 
     if (codeBlock) {
-      if (OpAttributeSanitizer.IsValidLang(codeBlock)) {
+      let codeBlockLang: string | boolean = '';
+      if (typeof codeBlock === 'object') {
+        codeBlockLang = codeBlock['code-block'] || true;
+      } else {
+        codeBlockLang = codeBlock;
+      }
+
+      if (OpAttributeSanitizer.IsValidLang(codeBlockLang)) {
         cleanAttrs['code-block'] = codeBlock;
       } else {
         cleanAttrs['code-block'] = !!codeBlock;

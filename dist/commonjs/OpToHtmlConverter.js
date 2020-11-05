@@ -218,8 +218,9 @@ var OpToHtmlConverter = (function () {
             tagAttrs.push(makeAttr('style', styles.join(';')));
         }
         if (this.op.isCodeBlock() &&
-            typeof this.op.attributes['code-block'] === 'string') {
-            return tagAttrs.concat(makeAttr('data-language', this.op.attributes['code-block']));
+            typeof this.op.attributes['code-block'] === 'object' &&
+            typeof this.op.attributes['code-block']['code-block'] === 'string') {
+            return tagAttrs.concat(makeAttr('data-language', this.op.attributes['code-block']['code-block']));
         }
         if (this.op.isContainerBlock()) {
             return tagAttrs;

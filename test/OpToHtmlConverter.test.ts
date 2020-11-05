@@ -427,13 +427,15 @@ describe('OpToHtmlConverter', function () {
         { key: 'rel', value: 'nofollow' },
       ]);
 
-      var o = new DeltaInsertOp('', { 'code-block': 'javascript' });
+      var o = new DeltaInsertOp('', {
+        'code-block': { 'code-block': 'javascript' },
+      });
       var c = new OpToHtmlConverter(o);
       assert.deepEqual(c.getTagAttributes(), [
         { key: 'data-language', value: 'javascript' },
       ]);
 
-      var o = new DeltaInsertOp('', { 'code-block': true });
+      var o = new DeltaInsertOp('', { 'code-block': { 'code-block': true } });
       var c = new OpToHtmlConverter(o);
       assert.deepEqual(c.getTagAttributes(), []);
     });
@@ -514,7 +516,9 @@ describe('OpToHtmlConverter', function () {
         c1 = new OpToHtmlConverter(op);
         assert.equal(c1.getHtml(), '\n');
 
-        var op = new DeltaInsertOp('\n', { 'code-block': 'javascript' });
+        var op = new DeltaInsertOp('\n', {
+          'code-block': { 'code-block': 'javascript' },
+        });
         c1 = new OpToHtmlConverter(op);
         assert.equal(c1.getHtml(), '<pre data-language="javascript"></pre>');
 

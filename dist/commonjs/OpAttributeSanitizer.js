@@ -84,7 +84,14 @@ var OpAttributeSanitizer = (function () {
             cleanAttrs.rel = rel;
         }
         if (codeBlock) {
-            if (OpAttributeSanitizer.IsValidLang(codeBlock)) {
+            var codeBlockLang = '';
+            if (typeof codeBlock === 'object') {
+                codeBlockLang = codeBlock['code-block'] || true;
+            }
+            else {
+                codeBlockLang = codeBlock;
+            }
+            if (OpAttributeSanitizer.IsValidLang(codeBlockLang)) {
                 cleanAttrs['code-block'] = codeBlock;
             }
             else {

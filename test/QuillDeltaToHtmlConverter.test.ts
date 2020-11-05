@@ -1177,7 +1177,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           },
           {
             attributes: {
-              'code-block': true,
+              'code-block': { 'code-block': true },
             },
             insert: '\n',
           },
@@ -1186,7 +1186,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           },
           {
             attributes: {
-              'code-block': true,
+              'code-block': { 'code-block': true },
             },
             insert: '\n',
           },
@@ -1195,7 +1195,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           },
           {
             attributes: {
-              'code-block': 'javascript',
+              'code-block': { 'code-block': 'javascript' },
             },
             insert: '\n',
           },
@@ -1213,7 +1213,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           },
           {
             attributes: {
-              'code-block': 'ja"va',
+              'code-block': { 'code-block': 'ja"va' },
             },
             insert: '\n',
           },

@@ -125,7 +125,17 @@ class DeltaInsertOp {
   }
 
   hasSameLangAs(op: DeltaInsertOp) {
-    return this.attributes['code-block'] === op.attributes['code-block'];
+    const thisCodeLang =
+      (this.attributes['code-block'] &&
+        this.attributes['code-block']!['code-block']) ||
+      true;
+
+    const opCodeLang =
+      (op.attributes['code-block'] &&
+        op.attributes['code-block']!['code-block']) ||
+      true;
+
+    return thisCodeLang === opCodeLang;
   }
 
   isJustNewline() {

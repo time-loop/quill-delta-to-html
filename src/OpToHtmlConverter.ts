@@ -312,10 +312,14 @@ class OpToHtmlConverter {
 
     if (
       this.op.isCodeBlock() &&
-      typeof this.op.attributes['code-block'] === 'string'
+      typeof this.op.attributes['code-block'] === 'object' &&
+      typeof this.op.attributes['code-block']!['code-block'] === 'string'
     ) {
       return tagAttrs.concat(
-        makeAttr('data-language', this.op.attributes['code-block'])
+        makeAttr(
+          'data-language',
+          this.op.attributes['code-block']!['code-block']
+        )
       );
     }
 
