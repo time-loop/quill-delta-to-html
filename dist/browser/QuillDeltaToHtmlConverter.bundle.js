@@ -100,9 +100,11 @@ var DeltaInsertOp = (function () {
     };
     DeltaInsertOp.prototype.hasSameLangAs = function (op) {
         var thisCodeLang = (this.attributes['code-block'] &&
-            this.attributes['code-block']['code-block']) || true;
+            this.attributes['code-block']['code-block']) ||
+            true;
         var opCodeLang = (op.attributes['code-block'] &&
-            op.attributes['code-block']['code-block']) || true;
+            op.attributes['code-block']['code-block']) ||
+            true;
         return thisCodeLang === opCodeLang;
     };
     DeltaInsertOp.prototype.isJustNewline = function () {
