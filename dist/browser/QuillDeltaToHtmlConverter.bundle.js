@@ -1454,7 +1454,6 @@ var ListNester = (function () {
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
-                g.op.isSameListAs(gPrev.op) &&
                 g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
                 (g instanceof group_types_1.BlockGroup &&
                     gPrev instanceof group_types_1.BlockGroup &&
