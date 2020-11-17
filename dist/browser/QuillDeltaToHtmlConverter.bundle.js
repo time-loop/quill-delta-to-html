@@ -1457,7 +1457,7 @@ var ListNester = (function () {
             return gIndent === gPrevIndent;
         };
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
-            return (((g instanceof group_types_1.BlockGroup) &&
+            return ((g instanceof group_types_1.BlockGroup &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
