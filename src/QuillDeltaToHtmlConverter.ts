@@ -149,7 +149,6 @@ class QuillDeltaToHtmlConverter {
 
   convert() {
     let groups = this.getGroupedOps();
-    console.log(groups);
     return groups
       .map((group) => {
         if (group instanceof ListGroup) {
@@ -250,7 +249,14 @@ class QuillDeltaToHtmlConverter {
 
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
-    var liElementsHtml = this._renderInlines(li.item.ops, false);
+
+    var liElementsHtml;
+    if (li.item instanceof BlockGroup) {
+      liElementsHtml = this._renderInlines(li.item.ops, false);
+    } else if (li.item instanceof BlotBlock) {
+      liElementsHtml = this._renderCustom(li.item.op, null);
+    }
+
     return (
       parts.openingTag +
       liElementsHtml +

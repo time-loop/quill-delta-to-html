@@ -20,7 +20,7 @@ class DeltaInsertOp {
     return new DeltaInsertOp(NewLine);
   }
 
-  isContainerBlock() {
+  isContainerBlock(blocksCanBeWrappedWithList: string[] = []) {
     return (
       this.isBlockquote() ||
       this.isList() ||
@@ -29,7 +29,8 @@ class DeltaInsertOp {
       this.isCodeBlock() ||
       this.isHeader() ||
       this.isBlockAttribute() ||
-      this.isCustomTextBlock()
+      this.isCustomTextBlock() ||
+      this.isListBlockWrapper(blocksCanBeWrappedWithList)
     );
   }
 

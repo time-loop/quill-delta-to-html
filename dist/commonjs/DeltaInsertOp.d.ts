@@ -5,7 +5,7 @@ declare class DeltaInsertOp {
   readonly attributes: IOpAttributes;
   constructor(insertVal: InsertData | string, attrs?: IOpAttributes);
   static createNewLineOp(): DeltaInsertOp;
-  isContainerBlock(): boolean;
+  isContainerBlock(blocksCanBeWrappedWithList?: string[]): boolean;
   isBlockAttribute(): boolean;
   isBlockquote(): boolean;
   isHeader(): boolean;

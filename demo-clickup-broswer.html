@@ -26,11 +26,31 @@
     // list within code blocks
     var listWithinCodeBlock = {"ops":[{"insert":"function foo() { return false; }"},{"attributes":{"code-block":{"code-block":"javascript"}},"insert":"\n"},{"insert":"dsfdsfdsf"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"}]}
     // Mixing various lists
-    var mixingList = {"ops":[{"insert":"sdfdlskjfdslkjf"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"dfsdfsdf"},{"attributes":{"list":{"list":"none"}},"insert":"\n"},{"insert":"dsfsdfsdf"},{"attributes":{"list":{"list":"bullet"}},"insert":"\n"},{"insert":"sdfdsfdsfdsfsdf"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"dsfdsfsdfsdf"},{"attributes":{"list":{"list":"none"}},"insert":"\n"},{"insert":"dsfdsfsdf"},{"attributes":{"list":{"list":"unchecked"}},"insert":"\n"},{"insert":"dsfsdfsdfds"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"sdfdsfdsfds"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"sd"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"\n"}]}
+    var mixingList = {"ops":[{"insert":"sdfsdf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"1t582p16h"}},{"insert":"dsfdfdsfdsfd"},{"insert":"\n","attributes":{"banner":{"banner":"success","in-list":"ordered"}, 'renderAsBlock': true}},{"insert":"sdfdsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"xqsmv5der"}},{"insert":{"bookmark":{"url":"https://www.google.com/","service":"custom","title":"Google","description":"undefined","thumbnail":null,"favicon":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.google.com%2F","updated":"true"}},"attributes":{"bookmark": { "in-list":"ordered" }, "renderAsBlock": true}},{"insert":"dsfdfsfsdfsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"48spy2qd1"}}]}
+    // test
+    var testNestList = {
+      ops: [
+        { insert: '\n', attributes: { list: { list: 'ordered' } } },
+        { insert: { bookmark: {} } , attributes: { bookmark: { 'in-list': 'ordered' }, renderAsBlock: true } },
+        { insert: '\n', attributes: { list: { list: 'bullet' } } },
+      ]
+    }
 
-    var qdc = new window.QuillDeltaToHtmlConverter(mixingList.ops, {
-      blocksCanBeWrappedWithList: ['blockquote', 'code-block']
+
+    var qdc = new window.QuillDeltaToHtmlConverter(testNestList.ops, {
+      blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark']
     });
+
+    qdc.renderCustomWith((customOp, contextOp) => {
+      if (customOp.insert.type === 'bookmark') {
+        return [
+          '<div class="ql-bookmark">',
+          `bookmark`,
+          '</div>',
+        ].join('')
+      }
+    })
+
     var html = qdc.convert();
     document.getElementById('converted-view').innerHTML = html;
   </script>

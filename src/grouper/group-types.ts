@@ -44,9 +44,12 @@ class ListGroup {
 }
 
 class ListItem {
-  readonly item: BlockGroup;
+  readonly item: BlockGroup | BlotBlock;
   innerList: ListGroup | null;
-  constructor(item: BlockGroup, innerList: ListGroup | null = null) {
+  constructor(
+    item: BlockGroup | BlotBlock,
+    innerList: ListGroup | null = null
+  ) {
     this.item = item;
     this.innerList = innerList;
   }

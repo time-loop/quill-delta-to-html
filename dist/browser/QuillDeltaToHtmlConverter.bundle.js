@@ -19,7 +19,8 @@ var DeltaInsertOp = (function () {
     DeltaInsertOp.createNewLineOp = function () {
         return new DeltaInsertOp(value_types_1.NewLine);
     };
-    DeltaInsertOp.prototype.isContainerBlock = function () {
+    DeltaInsertOp.prototype.isContainerBlock = function (blocksCanBeWrappedWithList) {
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         return (this.isBlockquote() ||
             this.isList() ||
             this.isTableCellLine() ||
@@ -27,7 +28,8 @@ var DeltaInsertOp = (function () {
             this.isCodeBlock() ||
             this.isHeader() ||
             this.isBlockAttribute() ||
-            this.isCustomTextBlock());
+            this.isCustomTextBlock() ||
+            this.isListBlockWrapper(blocksCanBeWrappedWithList));
     };
     DeltaInsertOp.prototype.isBlockAttribute = function () {
         var attrs = this.attributes;
@@ -964,7 +966,6 @@ var QuillDeltaToHtmlConverter = (function () {
     QuillDeltaToHtmlConverter.prototype.convert = function () {
         var _this = this;
         var groups = this.getGroupedOps();
-        console.log(groups);
         return groups
             .map(function (group) {
             if (group instanceof group_types_1.ListGroup) {
@@ -1051,7 +1052,13 @@ var QuillDeltaToHtmlConverter = (function () {
         }
         var converter = new OpToHtmlConverter_1.OpToHtmlConverter(li.item.op, this.converterOptions);
         var parts = converter.getHtmlParts();
-        var liElementsHtml = this._renderInlines(li.item.ops, false);
+        var liElementsHtml;
+        if (li.item instanceof group_types_1.BlockGroup) {
+            liElementsHtml = this._renderInlines(li.item.ops, false);
+        }
+        else if (li.item instanceof group_types_1.BlotBlock) {
+            liElementsHtml = this._renderCustom(li.item.op, null);
+        }
         return (parts.openingTag +
             liElementsHtml +
             (li.innerList ? this._renderList(li.innerList) : '') +
@@ -1450,13 +1457,13 @@ var ListNester = (function () {
             return gIndent === gPrevIndent;
         };
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
-            return ((g instanceof group_types_1.BlockGroup &&
+            return (((g instanceof group_types_1.BlockGroup) &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
                 g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
-                (g instanceof group_types_1.BlockGroup &&
-                    gPrev instanceof group_types_1.BlockGroup &&
+                ((g instanceof group_types_1.BlockGroup || g instanceof group_types_1.BlotBlock) &&
+                    (gPrev instanceof group_types_1.BlockGroup || gPrev instanceof group_types_1.BlotBlock) &&
                     ((g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
                         gPrev.op.isList()) ||
                         (g.op.isList() &&
@@ -1467,7 +1474,7 @@ var ListNester = (function () {
         });
         return grouped.map(function (item) {
             if (!Array.isArray(item)) {
-                if (item instanceof group_types_1.BlockGroup &&
+                if ((item instanceof group_types_1.BlockGroup || item instanceof group_types_1.BlotBlock) &&
                     (item.op.isList() ||
                         item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) {
                     return new group_types_1.ListGroup([new group_types_1.ListItem(item)]);

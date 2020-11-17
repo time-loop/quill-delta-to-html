@@ -21,9 +21,9 @@ declare class ListGroup {
   constructor(items: ListItem[]);
 }
 declare class ListItem {
-  readonly item: BlockGroup;
+  readonly item: BlockGroup | BlotBlock;
   innerList: ListGroup | null;
-  constructor(item: BlockGroup, innerList?: ListGroup | null);
+  constructor(item: BlockGroup | BlotBlock, innerList?: ListGroup | null);
 }
 declare class TableGroup {
   rows: TableRow[];

@@ -18,7 +18,8 @@ var DeltaInsertOp = (function () {
     DeltaInsertOp.createNewLineOp = function () {
         return new DeltaInsertOp(value_types_1.NewLine);
     };
-    DeltaInsertOp.prototype.isContainerBlock = function () {
+    DeltaInsertOp.prototype.isContainerBlock = function (blocksCanBeWrappedWithList) {
+        if (blocksCanBeWrappedWithList === void 0) { blocksCanBeWrappedWithList = []; }
         return (this.isBlockquote() ||
             this.isList() ||
             this.isTableCellLine() ||
@@ -26,7 +27,8 @@ var DeltaInsertOp = (function () {
             this.isCodeBlock() ||
             this.isHeader() ||
             this.isBlockAttribute() ||
-            this.isCustomTextBlock());
+            this.isCustomTextBlock() ||
+            this.isListBlockWrapper(blocksCanBeWrappedWithList));
     };
     DeltaInsertOp.prototype.isBlockAttribute = function () {
         var attrs = this.attributes;

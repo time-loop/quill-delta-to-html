@@ -1,4 +1,10 @@
-import { ListGroup, ListItem, BlockGroup, TDataGroup } from './group-types';
+import {
+  ListGroup,
+  ListItem,
+  BlockGroup,
+  TDataGroup,
+  BlotBlock,
+} from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
 import find from 'lodash.find';
 
@@ -53,7 +59,10 @@ class ListNester {
   private convertListBlocksToListGroups(
     items: TDataGroup[]
   ): Array<TDataGroup> {
-    const hasSameIndentation = (g: BlockGroup, gPrev: BlockGroup): boolean => {
+    const hasSameIndentation = (
+      g: BlockGroup | BlotBlock,
+      gPrev: BlockGroup | BlotBlock
+    ): boolean => {
       const gAttrKey = find(
         this.blocksCanBeWrappedWithList,
         (key) => !!g.op.attributes[key]
@@ -86,8 +95,8 @@ class ListNester {
               gPrev.op,
               this.blocksCanBeWrappedWithList
             )) ||
-          (g instanceof BlockGroup &&
-            gPrev instanceof BlockGroup &&
+          ((g instanceof BlockGroup || g instanceof BlotBlock) &&
+            (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
             ((g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
               gPrev.op.isList()) ||
               (g.op.isList() &&
@@ -101,10 +110,10 @@ class ListNester {
       }
     );
 
-    return grouped.map((item: TDataGroup | BlockGroup[]) => {
+    return grouped.map((item: TDataGroup | (BlockGroup | BlotBlock)[]) => {
       if (!Array.isArray(item)) {
         if (
-          item instanceof BlockGroup &&
+          (item instanceof BlockGroup || item instanceof BlotBlock) &&
           (item.op.isList() ||
             item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))
         ) {

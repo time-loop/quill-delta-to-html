@@ -52,13 +52,13 @@ var ListNester = (function () {
             return gIndent === gPrevIndent;
         };
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
-            return ((g instanceof group_types_1.BlockGroup &&
+            return (((g instanceof group_types_1.BlockGroup) &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
                 g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
-                (g instanceof group_types_1.BlockGroup &&
-                    gPrev instanceof group_types_1.BlockGroup &&
+                ((g instanceof group_types_1.BlockGroup || g instanceof group_types_1.BlotBlock) &&
+                    (gPrev instanceof group_types_1.BlockGroup || gPrev instanceof group_types_1.BlotBlock) &&
                     ((g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
                         gPrev.op.isList()) ||
                         (g.op.isList() &&
@@ -69,7 +69,7 @@ var ListNester = (function () {
         });
         return grouped.map(function (item) {
             if (!Array.isArray(item)) {
-                if (item instanceof group_types_1.BlockGroup &&
+                if ((item instanceof group_types_1.BlockGroup || item instanceof group_types_1.BlotBlock) &&
                     (item.op.isList() ||
                         item.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) {
                     return new group_types_1.ListGroup([new group_types_1.ListItem(item)]);

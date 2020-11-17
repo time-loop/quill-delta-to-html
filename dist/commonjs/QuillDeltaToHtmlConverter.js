@@ -100,7 +100,6 @@ var QuillDeltaToHtmlConverter = (function () {
     QuillDeltaToHtmlConverter.prototype.convert = function () {
         var _this = this;
         var groups = this.getGroupedOps();
-        console.log(groups);
         return groups
             .map(function (group) {
             if (group instanceof group_types_1.ListGroup) {
@@ -187,7 +186,13 @@ var QuillDeltaToHtmlConverter = (function () {
         }
         var converter = new OpToHtmlConverter_1.OpToHtmlConverter(li.item.op, this.converterOptions);
         var parts = converter.getHtmlParts();
-        var liElementsHtml = this._renderInlines(li.item.ops, false);
+        var liElementsHtml;
+        if (li.item instanceof group_types_1.BlockGroup) {
+            liElementsHtml = this._renderInlines(li.item.ops, false);
+        }
+        else if (li.item instanceof group_types_1.BlotBlock) {
+            liElementsHtml = this._renderCustom(li.item.op, null);
+        }
         return (parts.openingTag +
             liElementsHtml +
             (li.innerList ? this._renderList(li.innerList) : '') +

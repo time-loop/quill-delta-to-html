@@ -9,8 +9,10 @@ import {
   ListItem,
   InlineGroup,
   BlockGroup,
+  BlotBlock,
 } from './../../src/grouper/group-types';
 import { ListType } from './../../src/value-types';
+import { InsertDataCustom } from '../../src/InsertData';
 
 describe('ListNester', function () {
   describe('nest()', function () {
@@ -48,6 +50,27 @@ describe('ListNester', function () {
     //     ]),
     //   ]);
     // });
+    it('should nest defined custom blotBlock', function () {
+      var ops = [
+        new DeltaInsertOp('\n', { list: { list: ListType.Ordered } }),
+        new DeltaInsertOp(new InsertDataCustom('bookmark', {}), {
+          bookmark: { 'in-list': 'ordered' },
+          renderAsBlock: true,
+        }),
+        new DeltaInsertOp('\n', { list: { list: ListType.Bullet } }),
+      ];
+
+      var groups = Grouper.pairOpsWithTheirBlock(ops);
+      var nester = new ListNester(['bookmark']);
+      var act = nester.nest(groups);
+      assert.deepEqual(act, [
+        new ListGroup([
+          new ListItem(<BlockGroup>groups[0]),
+          new ListItem(<BlotBlock>groups[1]),
+          new ListItem(<BlockGroup>groups[2]),
+        ]),
+      ]);
+    });
 
     it('should nest different types of lists', function () {
       var ops = [
