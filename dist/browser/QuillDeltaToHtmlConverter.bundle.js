@@ -526,12 +526,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     result["default"] = mod;
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var funcs_html_1 = require("./funcs-html");
 var value_types_1 = require("./value-types");
 var obj = __importStar(require("./helpers/object"));
 var arr = __importStar(require("./helpers/array"));
 var OpAttributeSanitizer_1 = require("./OpAttributeSanitizer");
+var lodash_find_1 = __importDefault(require("lodash.find"));
 var DEFAULT_INLINE_FONTS = {
     serif: 'font-family: Georgia, Times New Roman, serif',
     monospace: 'font-family: Monaco, Courier New, monospace',
@@ -598,7 +602,15 @@ var OpToHtmlConverter = (function () {
                 beginTags.push(funcs_html_1.makeStartTag('a', this.getLinkAttrs()));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
-                beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
+                var attrKey = lodash_find_1.default(this.options.blocksCanBeWrappedWithList, function (key) { return !!_this.op.attributes[key]; });
+                beginTags.push(attrKey && this.op.attributes[attrKey]['in-list'] === value_types_1.ListType.Ordered
+                    ? funcs_html_1.makeStartTag('li', [
+                        this.makeAttr('data-none-type', 'true'),
+                        this.makeAttr('class', 'ql-rendered-ordered-list'),
+                    ])
+                    : funcs_html_1.makeStartTag('li', [
+                        this.makeAttr('data-none-type', 'true'),
+                    ]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList) &&
@@ -872,7 +884,7 @@ var OpToHtmlConverter = (function () {
 }());
 exports.OpToHtmlConverter = OpToHtmlConverter;
 
-},{"./OpAttributeSanitizer":5,"./funcs-html":8,"./helpers/array":13,"./helpers/object":14,"./value-types":18}],7:[function(require,module,exports){
+},{"./OpAttributeSanitizer":5,"./funcs-html":8,"./helpers/array":13,"./helpers/object":14,"./value-types":18,"lodash.find":20}],7:[function(require,module,exports){
 "use strict";
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;

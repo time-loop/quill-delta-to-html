@@ -5,11 +5,12 @@ import {
   ITagKeyValue,
 } from './funcs-html';
 import { DeltaInsertOp } from './DeltaInsertOp';
-import { ScriptType, NewLine } from './value-types';
+import { ScriptType, NewLine, ListType } from './value-types';
 import * as obj from './helpers/object';
 import { IMention } from './mentions/MentionSanitizer';
 import * as arr from './helpers/array';
 import { OpAttributeSanitizer } from './OpAttributeSanitizer';
+import find from 'lodash.find';
 
 export type InlineStyleType =
   | ((value: string, op: DeltaInsertOp) => string | undefined)
@@ -127,8 +128,18 @@ class OpToHtmlConverter {
       }
       // Add li tag before when the block wrapped by list
       if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
+        const attrKey = find(
+          this.options.blocksCanBeWrappedWithList,
+          (key) => !!this.op.attributes[key]
+        );
+
         beginTags.push(
-          makeStartTag('li', [this.makeAttr('data-none-type', 'true')])
+          attrKey && this.op.attributes[attrKey]['in-list'] === ListType.Ordered
+            ? makeStartTag('li', [
+                this.makeAttr('data-none-type', 'true'),
+                this.makeAttr('class', 'ql-rendered-ordered-list'),
+              ])
+            : makeStartTag('li', [this.makeAttr('data-none-type', 'true')])
         );
         endTags.push(makeEndTag('li'));
       }
