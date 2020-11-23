@@ -101,7 +101,11 @@ class DeltaInsertOp {
         const attrKey =
           find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) ||
           '';
-        return parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+        return (
+          attrKey &&
+          insertOp.attributes[attrKey] &&
+          parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10)
+        );
       } else {
         return insertOp.attributes.indent;
       }
