@@ -81,8 +81,9 @@ var DeltaInsertOp = (function () {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
                 var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
                     '';
-                return attrKey && insertOp.attributes[attrKey] &&
-                    parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+                return (attrKey &&
+                    insertOp.attributes[attrKey] &&
+                    parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10));
             }
             else {
                 return insertOp.attributes.indent;

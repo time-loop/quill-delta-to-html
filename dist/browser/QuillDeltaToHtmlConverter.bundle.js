@@ -82,8 +82,9 @@ var DeltaInsertOp = (function () {
             if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
                 var attrKey = lodash_find_1.default(blocksCanBeWrappedWithList, function (key) { return !!_this.attributes[key]; }) ||
                     '';
-                return attrKey && insertOp.attributes[attrKey] &&
-                    parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10);
+                return (attrKey &&
+                    insertOp.attributes[attrKey] &&
+                    parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10));
             }
             else {
                 return insertOp.attributes.indent;
@@ -600,8 +601,15 @@ var OpToHtmlConverter = (function () {
                 beginTags.push(funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
-            beginTags.push(funcs_html_1.makeStartTag(tag, attrs));
-            endTags.push(tag === 'img' ? '' : funcs_html_1.makeEndTag(tag));
+            if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList) &&
+                this.op.isCustomEmbedBlock()) {
+                beginTags.push('');
+                endTags.push('');
+            }
+            else {
+                beginTags.push(funcs_html_1.makeStartTag(tag, attrs));
+                endTags.push(tag === 'img' ? '' : funcs_html_1.makeEndTag(tag));
+            }
             if (isImageLink(tag)) {
                 endTags.push(funcs_html_1.makeEndTag('a'));
             }

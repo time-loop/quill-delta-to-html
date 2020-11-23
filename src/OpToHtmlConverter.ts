@@ -133,8 +133,17 @@ class OpToHtmlConverter {
         endTags.push(makeEndTag('li'));
       }
 
-      beginTags.push(makeStartTag(tag, attrs));
-      endTags.push(tag === 'img' ? '' : makeEndTag(tag));
+      if (
+        this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList) &&
+        this.op.isCustomEmbedBlock()
+      ) {
+        beginTags.push('');
+        endTags.push('');
+      } else {
+        beginTags.push(makeStartTag(tag, attrs));
+        endTags.push(tag === 'img' ? '' : makeEndTag(tag));
+      }
+
       if (isImageLink(tag)) {
         endTags.push(makeEndTag('a'));
       }

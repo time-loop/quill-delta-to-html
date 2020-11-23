@@ -249,7 +249,6 @@ class QuillDeltaToHtmlConverter {
 
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
-
     var liElementsHtml;
     if (li.item instanceof BlockGroup) {
       liElementsHtml = this._renderInlines(li.item.ops, false);
