@@ -69,8 +69,8 @@ class ListNester {
       );
       const gIndent =
         gAttrKey && g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
-          ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10)
-          : g.op.attributes.indent;
+          ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10) || 0
+          : g.op.attributes.indent || 0;
       const gPrevAttrKey = find(
         this.blocksCanBeWrappedWithList,
         (key) => !!gPrev.op.attributes[key]
@@ -78,8 +78,9 @@ class ListNester {
       const gPrevIndent =
         gPrevAttrKey &&
         gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
-          ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10)
-          : gPrev.op.attributes.indent;
+          ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10) ||
+            0
+          : gPrev.op.attributes.indent || 0;
       return gIndent === gPrevIndent;
     };
 

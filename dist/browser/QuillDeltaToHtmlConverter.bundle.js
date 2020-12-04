@@ -1466,13 +1466,13 @@ var ListNester = (function () {
         var hasSameIndentation = function (g, gPrev) {
             var gAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!g.op.attributes[key]; });
             var gIndent = gAttrKey && g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
-                ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10)
-                : g.op.attributes.indent;
+                ? (parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10) || 0)
+                : (g.op.attributes.indent || 0);
             var gPrevAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!gPrev.op.attributes[key]; });
             var gPrevIndent = gPrevAttrKey &&
                 gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
-                ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10)
-                : gPrev.op.attributes.indent;
+                ? (parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10) || 0)
+                : (gPrev.op.attributes.indent || 0);
             return gIndent === gPrevIndent;
         };
         var listInSameTableCell = function (g, gPrev) {
@@ -1506,8 +1506,8 @@ var ListNester = (function () {
                             gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)) ||
                         (g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
                             gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) &&
-                    hasSameIndentation(g, gPrev)) &&
-                    listInSameTableCell(g, gPrev));
+                    hasSameIndentation(g, gPrev) &&
+                    listInSameTableCell(g, gPrev)));
         });
         return grouped.map(function (item) {
             if (!Array.isArray(item)) {
