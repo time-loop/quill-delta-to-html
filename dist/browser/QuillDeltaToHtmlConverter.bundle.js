@@ -608,9 +608,7 @@ var OpToHtmlConverter = (function () {
                         this.makeAttr('data-none-type', 'true'),
                         this.makeAttr('class', 'ql-rendered-ordered-list'),
                     ])
-                    : funcs_html_1.makeStartTag('li', [
-                        this.makeAttr('data-none-type', 'true'),
-                    ]));
+                    : funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList) &&
@@ -1477,12 +1475,29 @@ var ListNester = (function () {
                 : gPrev.op.attributes.indent;
             return gIndent === gPrevIndent;
         };
+        var listInSameTableCell = function (g, gPrev) {
+            var gAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!g.op.attributes[key]; });
+            var gCellId = gAttrKey && g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
+                ? g.op.attributes[gAttrKey]['cell']
+                : g.op.isList()
+                    ? g.op.attributes.list.cell
+                    : '';
+            var gPrevAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!gPrev.op.attributes[key]; });
+            var gPrevCellId = gPrevAttrKey &&
+                gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
+                ? gPrev.op.attributes[gPrevAttrKey]['cell']
+                : gPrev.op.isList()
+                    ? gPrev.op.attributes.list.cell
+                    : '';
+            return gCellId === gPrevCellId;
+        };
         var grouped = array_1.groupConsecutiveElementsWhile(items, function (g, gPrev) {
             return ((g instanceof group_types_1.BlockGroup &&
                 gPrev instanceof group_types_1.BlockGroup &&
                 g.op.isList() &&
                 gPrev.op.isList() &&
-                g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList)) ||
+                g.op.hasSameIndentationAs(gPrev.op, _this.blocksCanBeWrappedWithList) &&
+                g.op.attributes.list.cell === gPrev.op.attributes.list.cell) ||
                 ((g instanceof group_types_1.BlockGroup || g instanceof group_types_1.BlotBlock) &&
                     (gPrev instanceof group_types_1.BlockGroup || gPrev instanceof group_types_1.BlotBlock) &&
                     ((g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
@@ -1491,7 +1506,8 @@ var ListNester = (function () {
                             gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)) ||
                         (g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList) &&
                             gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList))) &&
-                    hasSameIndentation(g, gPrev)));
+                    hasSameIndentation(g, gPrev)) &&
+                    listInSameTableCell(g, gPrev));
         });
         return grouped.map(function (item) {
             if (!Array.isArray(item)) {

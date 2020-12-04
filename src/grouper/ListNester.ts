@@ -83,6 +83,34 @@ class ListNester {
       return gIndent === gPrevIndent;
     };
 
+    const listInSameTableCell = (
+      g: BlockGroup | BlotBlock,
+      gPrev: BlockGroup | BlotBlock
+    ): boolean => {
+      const gAttrKey = find(
+        this.blocksCanBeWrappedWithList,
+        (key) => !!g.op.attributes[key]
+      );
+      const gCellId =
+        gAttrKey && g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
+          ? g.op.attributes[gAttrKey]['cell']
+          : g.op.isList()
+          ? g.op.attributes.list!.cell
+          : '';
+      const gPrevAttrKey = find(
+        this.blocksCanBeWrappedWithList,
+        (key) => !!gPrev.op.attributes[key]
+      );
+      const gPrevCellId =
+        gPrevAttrKey &&
+        gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)
+          ? gPrev.op.attributes[gPrevAttrKey]['cell']
+          : gPrev.op.isList()
+          ? gPrev.op.attributes.list!.cell
+          : '';
+      return gCellId === gPrevCellId;
+    };
+
     var grouped = groupConsecutiveElementsWhile(
       items,
       (g: TDataGroup, gPrev: TDataGroup) => {
@@ -94,7 +122,8 @@ class ListNester {
             g.op.hasSameIndentationAs(
               gPrev.op,
               this.blocksCanBeWrappedWithList
-            )) ||
+            ) &&
+            g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell) ||
           ((g instanceof BlockGroup || g instanceof BlotBlock) &&
             (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
             ((g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
@@ -105,7 +134,8 @@ class ListNester {
                 gPrev.op.isListBlockWrapper(
                   this.blocksCanBeWrappedWithList
                 ))) &&
-            hasSameIndentation(g, gPrev))
+            hasSameIndentation(g, gPrev) &&
+            listInSameTableCell(g, gPrev))
         );
       }
     );

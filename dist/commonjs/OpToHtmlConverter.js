@@ -88,9 +88,7 @@ var OpToHtmlConverter = (function () {
                         this.makeAttr('data-none-type', 'true'),
                         this.makeAttr('class', 'ql-rendered-ordered-list'),
                     ])
-                    : funcs_html_1.makeStartTag('li', [
-                        this.makeAttr('data-none-type', 'true'),
-                    ]));
+                    : funcs_html_1.makeStartTag('li', [this.makeAttr('data-none-type', 'true')]));
                 endTags.push(funcs_html_1.makeEndTag('li'));
             }
             if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList) &&
