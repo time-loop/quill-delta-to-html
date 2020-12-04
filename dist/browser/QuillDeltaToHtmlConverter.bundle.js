@@ -1055,20 +1055,6 @@ var QuillDeltaToHtmlConverter = (function () {
     };
     QuillDeltaToHtmlConverter.prototype._renderListItem = function (li) {
         li.item.op.attributes.indent = 0;
-        if (li.item.op.attributes.cell) {
-            var userCustomTagAttrs_1 = this.converterOptions.customTagAttributes;
-            this.converterOptions.customTagAttributes = function (param) {
-                var userAttrs = typeof userCustomTagAttrs_1 === 'function'
-                    ? userCustomTagAttrs_1(param)
-                    : {};
-                return Object.assign({}, userAttrs, {
-                    'data-row': li.item.op.attributes.row,
-                    'data-cell': li.item.op.attributes.cell,
-                    'data-rowspan': li.item.op.attributes.rowspan,
-                    'data-colspan': li.item.op.attributes.colspan,
-                });
-            };
-        }
         var converter = new OpToHtmlConverter_1.OpToHtmlConverter(li.item.op, this.converterOptions);
         var parts = converter.getHtmlParts();
         var liElementsHtml;
@@ -1466,13 +1452,14 @@ var ListNester = (function () {
         var hasSameIndentation = function (g, gPrev) {
             var gAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!g.op.attributes[key]; });
             var gIndent = gAttrKey && g.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
-                ? (parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10) || 0)
-                : (g.op.attributes.indent || 0);
+                ? parseInt(g.op.attributes[gAttrKey]['wrapper-indent'], 10) || 0
+                : g.op.attributes.indent || 0;
             var gPrevAttrKey = lodash_find_1.default(_this.blocksCanBeWrappedWithList, function (key) { return !!gPrev.op.attributes[key]; });
             var gPrevIndent = gPrevAttrKey &&
                 gPrev.op.isListBlockWrapper(_this.blocksCanBeWrappedWithList)
-                ? (parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10) || 0)
-                : (gPrev.op.attributes.indent || 0);
+                ? parseInt(gPrev.op.attributes[gPrevAttrKey]['wrapper-indent'], 10) ||
+                    0
+                : gPrev.op.attributes.indent || 0;
             return gIndent === gPrevIndent;
         };
         var listInSameTableCell = function (g, gPrev) {

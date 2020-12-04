@@ -229,24 +229,6 @@ class QuillDeltaToHtmlConverter {
     //if (!isOuterMost) {
     li.item.op.attributes.indent = 0;
     //}
-    // if (list in table cell)
-    if (li.item.op.attributes.cell) {
-      const userCustomTagAttrs = this.converterOptions.customTagAttributes;
-      this.converterOptions.customTagAttributes = (param) => {
-        const userAttrs =
-          typeof userCustomTagAttrs === 'function'
-            ? userCustomTagAttrs(param)
-            : {};
-
-        return Object.assign({}, userAttrs, {
-          'data-row': li.item.op.attributes.row,
-          'data-cell': li.item.op.attributes.cell,
-          'data-rowspan': li.item.op.attributes.rowspan,
-          'data-colspan': li.item.op.attributes.colspan,
-        });
-      };
-    }
-
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
     var liElementsHtml;
