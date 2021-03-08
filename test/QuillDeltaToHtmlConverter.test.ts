@@ -1,13 +1,13 @@
-import 'mocha';
 import * as assert from 'assert';
-
+import isEqual from 'lodash.isequal';
+import 'mocha';
+import { BlockGroup } from '../src/grouper/group-types';
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
-import { QuillDeltaToHtmlConverter } from './../src/QuillDeltaToHtmlConverter';
-import { callWhenXEqualY } from './_helper';
-
-import { delta1 } from './data/delta1';
-import { GroupType, ListType } from './../src/value-types';
 import { encodeHtml } from './../src/funcs-html';
+import { QuillDeltaToHtmlConverter } from './../src/QuillDeltaToHtmlConverter';
+import { GroupType, ListType } from './../src/value-types';
+import { delta1 } from './data/delta1';
+import { callWhenXEqualY } from './_helper';
 
 describe('QuillDeltaToHtmlConverter', function () {
   describe('constructor()', function () {
@@ -1303,6 +1303,28 @@ describe('QuillDeltaToHtmlConverter', function () {
           },
           insert: '\n',
         },
+        {
+          insert: 'line 6',
+        },
+        {
+          attributes: {
+            renderAsBlock: true,
+            attr1: true,
+            ignore: 1,
+          },
+          insert: '\n',
+        },
+        {
+          insert: 'line 7',
+        },
+        {
+          attributes: {
+            renderAsBlock: true,
+            attr1: true,
+            ignore: 2,
+          },
+          insert: '\n',
+        },
       ];
       //console.log(encodeHtml("<p>line 4</p>"));
       var qdc = new QuillDeltaToHtmlConverter(ops, {
@@ -1328,6 +1350,22 @@ describe('QuillDeltaToHtmlConverter', function () {
             return ['color:red'];
           }
         },
+        customBlockIsEqual: (g: BlockGroup, gOther: BlockGroup) => {
+          return (
+            g.op.isCustomTextBlock() &&
+            gOther.op.isCustomTextBlock() &&
+            isEqual(
+              {
+                ...g.op.attributes,
+                ignore: undefined,
+              },
+              {
+                ...gOther.op.attributes,
+                ignore: undefined,
+              }
+            )
+          );
+        },
       });
       let html = qdc.convert();
       assert.equal(
@@ -1339,6 +1377,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           encodeHtml('<p>line 4</p>'),
           '</p>',
           '<test attr1="test" class="ql-test" style="color:red">line 5</test>',
+          '<p>line 6<br/>line 7</p>',
         ].join('')
       );
 
@@ -1352,7 +1391,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           '<p>' +
           encodeHtml('<p>line 4</p>') +
           '</p>' +
-          '<p>line 5</p>',
+          '<p>line 5</p><p>line 6</p><p>line 7</p>',
         html
       );
       qdc = new QuillDeltaToHtmlConverter([ops[0], ops[1]]);

@@ -1,16 +1,16 @@
-import 'mocha';
 import * as assert from 'assert';
-
-import { Grouper } from './../../src/grouper/Grouper';
-import { DeltaInsertOp } from './../../src/DeltaInsertOp';
-import { InsertDataQuill } from './../../src/InsertData';
-import {
-  VideoItem,
-  InlineGroup,
-  BlockGroup,
-} from './../../src/grouper/group-types';
-import { DataType } from './../../src/value-types';
 import isEqual from 'lodash.isequal';
+import 'mocha';
+import { DeltaInsertOp } from './../../src/DeltaInsertOp';
+import {
+  BlockGroup,
+  InlineGroup,
+  VideoItem,
+} from './../../src/grouper/group-types';
+import { Grouper } from './../../src/grouper/Grouper';
+import { InsertDataQuill } from './../../src/InsertData';
+import { DataType } from './../../src/value-types';
+
 describe('Grouper', function () {
   describe('#pairOpsWithTheirBlock()', function () {
     var ops = [
