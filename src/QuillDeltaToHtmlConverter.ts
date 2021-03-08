@@ -193,7 +193,7 @@ class QuillDeltaToHtmlConverter {
     var beforeCb = this.callbacks['beforeRender_cb'];
     html =
       typeof beforeCb === 'function'
-        ? beforeCb.apply(null, [groupType, group])
+        ? beforeCb.apply(null, [groupType, group, myRenderFn])
         : '';
 
     if (!html) {
@@ -203,7 +203,7 @@ class QuillDeltaToHtmlConverter {
     var afterCb = this.callbacks['afterRender_cb'];
     html =
       typeof afterCb === 'function'
-        ? afterCb.apply(null, [groupType, html])
+        ? afterCb.apply(null, [groupType, group, html])
         : html;
 
     return html;
@@ -410,13 +410,17 @@ class QuillDeltaToHtmlConverter {
     return '';
   }
 
-  beforeRender(cb: (group: GroupType, data: TDataGroup) => string) {
+  beforeRender(
+    cb: (group: GroupType, data: TDataGroup, renderFn: () => string) => string
+  ) {
     if (typeof cb === 'function') {
       this.callbacks['beforeRender_cb'] = cb;
     }
   }
 
-  afterRender(cb: (group: GroupType, html: string) => string) {
+  afterRender(
+    cb: (group: GroupType, data: TDataGroup, html: string) => string
+  ) {
     if (typeof cb === 'function') {
       this.callbacks['afterRender_cb'] = cb;
     }

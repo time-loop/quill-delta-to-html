@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import isEqual from 'lodash.isequal';
 import 'mocha';
-import { BlockGroup } from '../src/grouper/group-types';
+import { BlockGroup, InlineGroup } from '../src/grouper/group-types';
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
 import { encodeHtml } from './../src/funcs-html';
 import { QuillDeltaToHtmlConverter } from './../src/QuillDeltaToHtmlConverter';
@@ -1433,13 +1433,15 @@ describe('QuillDeltaToHtmlConverter', function () {
           status.x++;
           return '';
         });
-        qdc.afterRender((groupType, html) => {
+        qdc.afterRender((groupType, data, html) => {
           if (groupType === GroupType.InlineGroup) {
             assert.ok(html.indexOf('<strong>hello') > -1);
           } else if (groupType === GroupType.Video) {
             assert.ok(html.indexOf('<iframe') > -1);
           } else if (groupType === GroupType.Block) {
             assert.ok(html.indexOf('<blockquote') > -1);
+            var d = <any>data;
+            assert.ok(d.op.attributes.blockquote && d.ops.length === 2);
           } else {
             assert.ok(html.indexOf('list item 1<ul><li') > -1);
           }
@@ -1480,6 +1482,21 @@ describe('QuillDeltaToHtmlConverter', function () {
         });
         var v = c.convert();
         assert.ok(v.indexOf('<my custom') > -1);
+      });
+
+      it('use default renderer in custom renderer', function () {
+        var ops = [
+          { insert: 'bb', attributes: { bold: true } },
+          { insert: 'aa' },
+        ];
+        var c1 = new QuillDeltaToHtmlConverter(ops);
+        c1.beforeRender((t, d, renderer) => {
+          return t == 'inline-group' && d instanceof InlineGroup
+            ? '<custom>' + renderer() + '</custom>'
+            : renderer();
+        });
+        var c2 = new QuillDeltaToHtmlConverter(ops);
+        assert.equal(c1.convert(), '<custom>' + c2.convert() + '</custom>');
       });
 
       it('should register and use callbacks if they are functions', function () {
