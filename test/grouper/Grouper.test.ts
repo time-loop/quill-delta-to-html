@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import isEqual from 'lodash.isequal';
+import isEqual from 'lodash-es/isEqual';
 import 'mocha';
 import { DeltaInsertOp } from './../../src/DeltaInsertOp';
 import {

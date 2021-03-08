@@ -6,7 +6,7 @@ import {
   BlotBlock,
 } from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
-import find from 'lodash.find';
+import find from 'lodash-es/find';
 
 class ListNester {
   blocksCanBeWrappedWithList: string[];

@@ -38,7 +38,7 @@ function groupConsecutiveElementsWhile(
   arr: any[],
   predicate: (currElm: any, prevElm: any) => boolean
 ): any[] {
-  var groups = [];
+  var groups: any[] = [];
 
   var currElm, currGroup;
   for (var i = 0; i < arr.length; i++) {

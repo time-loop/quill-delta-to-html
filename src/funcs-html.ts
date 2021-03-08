@@ -11,7 +11,7 @@ enum EncodeTarget {
 function makeStartTag(
   tag: any,
   attrs: ITagKeyValue | ITagKeyValue[] | undefined = undefined
-) {
+): string {
   if (!tag) {
     return '';
   }
@@ -33,28 +33,28 @@ function makeStartTag(
   return attrsStr ? `<${tag} ${attrsStr}${closing}` : `<${tag}${closing}`;
 }
 
-function makeEndTag(tag: any = '') {
+function makeEndTag(tag: any = ''): string {
   return (tag && `</${tag}>`) || '';
 }
 
-function decodeHtml(str: string) {
+function decodeHtml(str: string): string {
   return encodeMappings(EncodeTarget.Html).reduce(decodeMapping, str);
 }
 
-function encodeHtml(str: string, preventDoubleEncoding = true) {
+function encodeHtml(str: string, preventDoubleEncoding = true): string {
   if (preventDoubleEncoding) {
     str = decodeHtml(str);
   }
   return encodeMappings(EncodeTarget.Html).reduce(encodeMapping, str);
 }
 
-function encodeLink(str: string) {
+function encodeLink(str: string): string {
   let linkMaps = encodeMappings(EncodeTarget.Url);
   let decoded = linkMaps.reduce(decodeMapping, str);
   return linkMaps.reduce(encodeMapping, decoded);
 }
 
-function encodeMappings(mtype: EncodeTarget) {
+function encodeMappings(mtype: EncodeTarget): string[][] {
   let maps = [
     ['&', '&amp;'],
     ['<', '&lt;'],
@@ -74,10 +74,10 @@ function encodeMappings(mtype: EncodeTarget) {
     return maps.filter(([v, _]) => v.indexOf('/') === -1);
   }
 }
-function encodeMapping(str: string, mapping: string[]) {
+function encodeMapping(str: string, mapping: string[]): string {
   return str.replace(new RegExp(mapping[0], 'g'), mapping[1]);
 }
-function decodeMapping(str: string, mapping: string[]) {
+function decodeMapping(str: string, mapping: string[]): string {
   return str.replace(new RegExp(mapping[1], 'g'), mapping[0].replace('\\', ''));
 }
 export {

@@ -10,7 +10,7 @@ import * as obj from './helpers/object';
 import { IMention } from './mentions/MentionSanitizer';
 import * as arr from './helpers/array';
 import { OpAttributeSanitizer } from './OpAttributeSanitizer';
-import find from 'lodash.find';
+import find from 'lodash-es/find';
 
 export type InlineStyleType =
   | ((value: string, op: DeltaInsertOp) => string | undefined)
@@ -117,8 +117,8 @@ class OpToHtmlConverter {
       tags.push('span');
     }
 
-    let beginTags = [],
-      endTags = [];
+    const beginTags: string[] = [];
+    const endTags: string[] = [];
     const imgTag = 'img';
     const isImageLink = (tag: any) =>
       tag === imgTag && !!this.op.attributes.link;

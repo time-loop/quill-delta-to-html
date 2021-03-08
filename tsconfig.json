@@ -1,10 +1,10 @@
 {
    "compilerOptions": {
-      "module": "commonjs",
+      "module": "es6",
       "removeComments": true,
       "preserveConstEnums": true,
       "sourceMap": false,
-      "target": "es5",
+      "target": "es6",
       "outDir": "dist/",
       "lib": [
          "es6"
@@ -15,7 +15,7 @@
       ],
       "declaration": true,
       "noImplicitThis": true,
-      "noImplicitAny": true,
+      "noImplicitAny": false,
       "strictNullChecks": true,
       "alwaysStrict": true,
       "noUnusedParameters": true,
