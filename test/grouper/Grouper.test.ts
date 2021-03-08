@@ -10,6 +10,7 @@ import {
   BlockGroup,
 } from './../../src/grouper/group-types';
 import { DataType } from './../../src/value-types';
+import isEqual from 'lodash.isequal';
 describe('Grouper', function () {
   describe('#pairOpsWithTheirBlock()', function () {
     var ops = [
@@ -66,7 +67,75 @@ describe('Grouper', function () {
         new BlockGroup(ops[12], []),
       ]);
     });
+
+    it('should compine blocks with same type and style into an [] using custom function', function () {
+      var ops = [
+        new DeltaInsertOp('this is code'),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
+        new DeltaInsertOp('this is code TOO!'),
+        new DeltaInsertOp('\n', { 'code-block': {} }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
+        new DeltaInsertOp('\n', { blockquote: {} }),
+        new DeltaInsertOp('\n'),
+        new DeltaInsertOp('\n', { header: 1 }),
+        new DeltaInsertOp('\n', { header: 1 }),
+        new DeltaInsertOp('\n', { attr1: true, renderAsBlock: true }),
+        new DeltaInsertOp('\n', { attr1: true, renderAsBlock: true }),
+        new DeltaInsertOp('\n', { attr1: 'test', renderAsBlock: true }),
+        new DeltaInsertOp('\n', { attr2: 'test', renderAsBlock: true }),
+        new DeltaInsertOp('\n', {
+          attr1: true,
+          ignore: 1,
+          renderAsBlock: true,
+        }),
+        new DeltaInsertOp('\n', {
+          attr1: true,
+          ignore: 2,
+          renderAsBlock: true,
+        }),
+        new DeltaInsertOp('\n', {
+          attr2: true,
+          ignore: 1,
+          renderAsBlock: true,
+        }),
+        new DeltaInsertOp('\n', {
+          attr2: false,
+          ignore: 2,
+          renderAsBlock: true,
+        }),
+      ];
+      var pairs = Grouper.pairOpsWithTheirBlock(ops);
+      var groups = Grouper.groupConsecutiveSameStyleBlocks(
+        pairs,
+        {
+          header: true,
+          codeBlocks: true,
+          blockquotes: true,
+          customBlocks: true,
+        },
+        (g, gOther) =>
+          g.op.isCustomTextBlock() &&
+          gOther.op.isCustomTextBlock() &&
+          isEqual(
+            { ...g.op.attributes, ignore: undefined },
+            { ...gOther.op.attributes, ignore: undefined }
+          )
+      );
+      assert.deepEqual(groups, [
+        [new BlockGroup(ops[1], [ops[0]]), new BlockGroup(ops[1], [ops[2]])],
+        [new BlockGroup(ops[4], []), new BlockGroup(ops[4], [])],
+        new InlineGroup([ops[6]]),
+        [new BlockGroup(ops[7], []), new BlockGroup(ops[8], [])],
+        [new BlockGroup(ops[9], []), new BlockGroup(ops[10], [])],
+        new BlockGroup(ops[11], []),
+        new BlockGroup(ops[12], []),
+        [new BlockGroup(ops[13], []), new BlockGroup(ops[14], [])],
+        new BlockGroup(ops[15], []),
+        new BlockGroup(ops[16], []),
+      ]);
+    });
   });
+
   describe('#reduceConsecutiveSameStyleBlocksToOne()', function () {
     it('should return ops of combined groups moved to 1st group', function () {
       var ops = [

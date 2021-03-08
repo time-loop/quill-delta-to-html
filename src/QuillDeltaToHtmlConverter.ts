@@ -33,13 +33,13 @@ interface IQuillDeltaToHtmlConverterOptions
     IOpToHtmlConverterOptions {
   orderedListTag?: string;
   bulletListTag?: string;
-
   multiLineBlockquote?: boolean;
   multiLineHeader?: boolean;
   multiLineCodeblock?: boolean;
   multiLineParagraph?: boolean;
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
+  customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
 }
 
 const BrTag = '<br/>';
@@ -131,7 +131,8 @@ class QuillDeltaToHtmlConverter {
         header: !!this.options.multiLineHeader,
         codeBlocks: !!this.options.multiLineCodeblock,
         customBlocks: !!this.options.multiLineCustomBlock,
-      }
+      },
+      this.options.customBlockIsEqual
     );
 
     var groupedOps = Grouper.reduceConsecutiveSameStyleBlocksToOne(

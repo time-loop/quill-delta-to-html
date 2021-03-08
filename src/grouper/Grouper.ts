@@ -59,7 +59,8 @@ class Grouper {
       codeBlocks: true,
       blockquotes: true,
       customBlocks: true,
-    }
+    },
+    customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean
   ): Array<TDataGroup | BlockGroup[]> {
     return groupConsecutiveElementsWhile(
       groups,
@@ -76,7 +77,10 @@ class Grouper {
           (blocksOf.header &&
             Grouper.areBothSameHeadersWithSameAdi(g, gPrev)) ||
           (blocksOf.customBlocks &&
-            Grouper.areBothCustomBlockWithSameAttr(g, gPrev))
+            (customBlockIsEqual || Grouper.areBothCustomBlockWithSameAttr)(
+              g,
+              gPrev
+            ))
         );
       }
     );
