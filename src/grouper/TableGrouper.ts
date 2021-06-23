@@ -10,7 +10,6 @@ import {
   ListGroup,
 } from './group-types';
 import { groupConsecutiveElementsWhile } from '../helpers/array';
-import { isArray } from 'util';
 import { IOpAttributes } from '../OpAttributeSanitizer';
 import { DeltaInsertOp } from '../DeltaInsertOp';
 
@@ -153,7 +152,7 @@ export class TableGrouper {
 
     return grouped.map((item: TableCell | TableCell[]) => {
       let row;
-      if (isArray(item)) {
+      if (Array.isArray(item)) {
         const firstCell = item[0];
         if (firstCell) {
           row = firstCell.attrs ? firstCell.attrs.row : undefined;
@@ -216,7 +215,7 @@ export class TableGrouper {
 
     return grouped.map(
       (item: (BlockGroup | ListGroup) | (BlockGroup | ListGroup)[]) => {
-        const head = isArray(item) ? item[0] : item;
+        const head = Array.isArray(item) ? item[0] : item;
         let attrs: IOpAttributes;
         if (head instanceof BlockGroup) {
           attrs = head.op.attributes;
@@ -225,7 +224,7 @@ export class TableGrouper {
         }
 
         let children: (TableCellLine | ListGroup)[];
-        if (isArray(item)) {
+        if (Array.isArray(item)) {
           children = item.map((it) => {
             return it instanceof BlockGroup ? new TableCellLine(it) : it;
           });
@@ -266,7 +265,7 @@ export class TableGrouper {
       }
 
       return new TableColGroup(
-        isArray(item)
+        Array.isArray(item)
           ? item.map((it) => new TableCol(it))
           : [new TableCol(item)]
       );
