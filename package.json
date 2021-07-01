@@ -1,9 +1,10 @@
 {
   "name": "@clickup/quill-delta-to-html",
-  "version": "0.12.0-25",
+  "version": "0.12.0-26",
   "description": "Converts Quill's delta ops to HTML",
-  "main": "./dist/main.js",
-  "types": "./dist/main.d.ts",
+  "main": "./dist/commonjs/main.js",
+  "types": "./dist/esm/main.d.ts",
+  "module": "./dist/esm/main.js",
   "dependencies": {
     "lodash-es": "^4.17.21"
   },
@@ -26,7 +27,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.commonjs.json",
     "test": "npx nyc ./node_modules/mocha/bin/mocha --require ts-node/register -b \"./test/**/*.ts\"  ",
     "coverage": "npx nyc report --reporter=text-lcov | coveralls ",
     "coveragehtml": "npx nyc report --reporter=html "

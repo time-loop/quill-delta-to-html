@@ -8,6 +8,7 @@ export {
   ListGroup,
   ListItem,
   BlotBlock,
+  TDataGroup,
 } from './grouper/group-types';
 export { DeltaInsertOp } from './DeltaInsertOp';
 export { InsertDataQuill, InsertDataCustom } from './InsertData';
