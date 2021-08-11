@@ -5,10 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quill delta to HTML</title>
   <style>
+    body {
+      max-width: 100%;
+    }
+
     table,
     td {
       border: 1px solid #000;
       border-collapse: collapse;
+    }
+
+    .ql-layout-row-container {
+      display: flex;
+    }
+
+    .ql-layout-row-container .ql-layout-col-container {
+      flex: 1;
+      width: 0;
+      padding: 0 10px;
+      line-break: anywhere;
+    }
+
+    .ql-layout-row-container .ql-layout-col-container:first-child {
+      padding-left: 0;
+    }
+
+    .ql-layout-row-container .ql-layout-col-container:last-child {
+      padding-right: 0;
     }
   </style>
 </head>
