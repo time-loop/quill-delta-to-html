@@ -20,6 +20,8 @@ import {
   TableCol,
   TableColGroup,
   TableCellLine,
+  LayoutRow,
+  LayoutColumn,
 } from './grouper/group-types';
 import { ListNester } from './grouper/ListNester';
 import { makeStartTag, makeEndTag, encodeHtml } from './funcs-html';
@@ -27,6 +29,7 @@ import * as obj from './helpers/object';
 import { GroupType } from './value-types';
 import { IOpAttributeSanitizerOptions } from './OpAttributeSanitizer';
 import { TableGrouper } from './grouper/TableGrouper';
+import { ColumnsNester } from './grouper/ColumnsNester';
 
 interface IQuillDeltaToHtmlConverterOptions
   extends IOpAttributeSanitizerOptions,
@@ -145,7 +148,12 @@ class QuillDeltaToHtmlConverter {
     var tableGrouper = new TableGrouper(
       this.options.blocksCanBeWrappedWithList
     );
-    return tableGrouper.group(groupedOps);
+    groupedOps = tableGrouper.group(groupedOps);
+
+    var columnsNester = new ColumnsNester();
+    groupedOps = columnsNester.nest(groupedOps);
+
+    return groupedOps;
   }
 
   convert() {
@@ -174,6 +182,10 @@ class QuillDeltaToHtmlConverter {
             var converter = new OpToHtmlConverter(g.op, this.converterOptions);
             return converter.getHtml();
           });
+        } else if (group instanceof LayoutRow) {
+          return this._renderWithCallbacks(GroupType.LayoutRow, group, () =>
+            this._renderLayoutRow(<LayoutRow>group)
+          );
         } else {
           // InlineGroup
           return this._renderWithCallbacks(GroupType.InlineGroup, group, () => {
@@ -336,6 +348,68 @@ class QuillDeltaToHtmlConverter {
       cellElementsHtml +
       parts.closingTag +
       makeEndTag('p')
+    );
+  }
+
+  _renderLayoutRow(row: LayoutRow): string {
+    return (
+      makeStartTag('div', [
+        { key: 'class', value: 'ql-layout-row-container' },
+      ]) +
+      row.columns
+        .map((col: LayoutColumn) => this._renderLayoutColumn(col))
+        .join('') +
+      makeEndTag('div')
+    );
+  }
+
+  _renderLayoutColumn(column: LayoutColumn): string {
+    return (
+      makeStartTag('div', [
+        { key: 'class', value: 'ql-layout-col-container' },
+      ]) +
+      column.items
+        .map((group) => {
+          if (group instanceof ListGroup) {
+            return this._renderWithCallbacks(GroupType.List, group, () =>
+              this._renderList(<ListGroup>group)
+            );
+          } else if (group instanceof TableGroup) {
+            return this._renderWithCallbacks(
+              GroupType.TableCellLine,
+              group,
+              () => this._renderTable(<TableGroup>group)
+            );
+          } else if (group instanceof BlockGroup) {
+            var g = <BlockGroup>group;
+
+            return this._renderWithCallbacks(GroupType.Block, group, () =>
+              this._renderBlock(g.op, g.ops)
+            );
+          } else if (group instanceof BlotBlock) {
+            return this._renderCustom(group.op, null);
+          } else if (group instanceof VideoItem) {
+            return this._renderWithCallbacks(GroupType.Video, group, () => {
+              var g = <VideoItem>group;
+              var converter = new OpToHtmlConverter(
+                g.op,
+                this.converterOptions
+              );
+              return converter.getHtml();
+            });
+          } else {
+            // InlineGroup
+            return this._renderWithCallbacks(
+              GroupType.InlineGroup,
+              group,
+              () => {
+                return this._renderInlines((<InlineGroup>group).ops, true);
+              }
+            );
+          }
+        })
+        .join('') +
+      makeEndTag('div')
     );
   }
 

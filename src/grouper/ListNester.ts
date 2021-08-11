@@ -36,13 +36,14 @@ class ListNester {
         }
 
         return (
-          curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
-          curr.items[0].item.op.isListBlockWrapper(
-            this.blocksCanBeWrappedWithList
-          ) ||
-          prev.items[0].item.op.isListBlockWrapper(
-            this.blocksCanBeWrappedWithList
-          )
+          curr.layout === prev.layout &&
+          (curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
+            curr.items[0].item.op.isListBlockWrapper(
+              this.blocksCanBeWrappedWithList
+            ) ||
+            prev.items[0].item.op.isListBlockWrapper(
+              this.blocksCanBeWrappedWithList
+            ))
         );
       }
     );
@@ -124,6 +125,7 @@ class ListNester {
               gPrev.op,
               this.blocksCanBeWrappedWithList
             ) &&
+            g.op.isSameColumnAs(gPrev.op) &&
             g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell) ||
           ((g instanceof BlockGroup || g instanceof BlotBlock) &&
             (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
@@ -136,7 +138,8 @@ class ListNester {
                   this.blocksCanBeWrappedWithList
                 ))) &&
             hasSameIndentation(g, gPrev) &&
-            listInSameTableCell(g, gPrev))
+            listInSameTableCell(g, gPrev) &&
+            g.op.isSameColumnAs(gPrev.op))
         );
       }
     );
@@ -162,7 +165,11 @@ class ListNester {
     return groupConsecutiveElementsWhile(
       items,
       (curr: TDataGroup, prev: TDataGroup) => {
-        return curr instanceof ListGroup && prev instanceof ListGroup;
+        return (
+          curr instanceof ListGroup &&
+          prev instanceof ListGroup &&
+          curr.layout === prev.layout
+        );
       }
     );
   }
