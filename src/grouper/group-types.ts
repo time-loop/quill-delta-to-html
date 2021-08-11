@@ -29,6 +29,7 @@ class BlockGroup {
 class ListGroup {
   items: ListItem[];
   readonly headOp: DeltaInsertOp | undefined;
+  readonly layout: string;
   constructor(items: ListItem[]) {
     this.items = items;
 
@@ -40,18 +41,28 @@ class ListGroup {
     ) {
       this.headOp = headListItem.item.op;
     }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes.layout
+    ) {
+      this.layout = headListItem.item.op.attributes.layout;
+    }
   }
 }
 
 class ListItem {
   readonly item: BlockGroup | BlotBlock;
   innerList: ListGroup | null;
+  readonly layout: string;
   constructor(
     item: BlockGroup | BlotBlock,
     innerList: ListGroup | null = null
   ) {
     this.item = item;
     this.innerList = innerList;
+    this.layout = item.op.attributes.layout || '';
   }
 }
 
@@ -105,6 +116,22 @@ class TableCellLine {
   }
 }
 
+class LayoutColumn {
+  items: any[];
+  readonly layout: string;
+  constructor(items: any[], layout: string) {
+    this.items = items;
+    this.layout = layout;
+  }
+}
+
+class LayoutRow {
+  columns: LayoutColumn[];
+  constructor(columns: any[]) {
+    this.columns = columns;
+  }
+}
+
 type TDataGroup =
   | VideoItem
   | InlineGroup
@@ -116,7 +143,9 @@ type TDataGroup =
   | TableCol
   | TableRow
   | TableCell
-  | TableCellLine;
+  | TableCellLine
+  | LayoutColumn
+  | LayoutRow;
 
 export {
   VideoItem,
@@ -131,5 +160,7 @@ export {
   TableRow,
   TableCell,
   TableCellLine,
+  LayoutColumn,
+  LayoutRow,
   TDataGroup,
 };

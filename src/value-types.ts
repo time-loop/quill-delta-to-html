@@ -40,6 +40,7 @@ enum GroupType {
   Video = 'video',
   TableCellLine = 'table-cell-line',
   TableCol = 'table-col',
+  LayoutRow = 'layout',
 }
 
 export {

@@ -30,7 +30,8 @@ class DeltaInsertOp {
       this.isHeader() ||
       this.isBlockAttribute() ||
       this.isCustomTextBlock() ||
-      this.isListBlockWrapper(blocksCanBeWrappedWithList)
+      this.isListBlockWrapper(blocksCanBeWrappedWithList) ||
+      this.isLayoutColumnBlock()
     );
   }
 
@@ -53,6 +54,10 @@ class DeltaInsertOp {
 
   isTableCol(): boolean {
     return !!this.attributes['table-col'];
+  }
+
+  isLayoutColumnBlock(): boolean {
+    return !!this.attributes['layout'];
   }
 
   isSameHeaderAs(op: DeltaInsertOp): boolean {
@@ -286,6 +291,10 @@ class DeltaInsertOp {
       this.attributes[attrKey] &&
       this.attributes[attrKey]['in-list']
     );
+  }
+
+  isSameColumnAs(op: DeltaInsertOp) {
+    return this.attributes.layout === op.attributes.layout;
   }
 }
 

@@ -921,6 +921,116 @@ describe('QuillDeltaToHtmlConverter', function () {
         ].join('')
       );
     });
+
+    it('should render columns with list', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container">column 1</div>`,
+          `<div class="ql-layout-col-container">`,
+          `<ol><li>column 2</li></ol>`,
+          `</div>`,
+          `</div>`,
+          `<ol><li>column 1</li></ol>`,
+        ].join('')
+      );
+    });
+
+    it('should render columns with different lists', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+          },
+        },
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container">`,
+          `column 1`,
+          `<ol><li>column 1</li></ol>`,
+          `</div>`,
+          `<div class="ql-layout-col-container">`,
+          `<ol><li>column 2</li></ol>`,
+          `</div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
   });
 
   describe('custom types', () => {
