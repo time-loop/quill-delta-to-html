@@ -33,12 +33,20 @@ export class ColumnsNester {
     return grouped.map((item: TDataGroup | TDataGroup[]) => {
       if (!Array.isArray(item)) {
         if (getLayoutId(item)) {
-          return new LayoutColumn([item], getLayoutId(item));
+          return new LayoutColumn(
+            [item],
+            getLayoutId(item),
+            getLayoutWidth(item)
+          );
         }
         return item;
       }
 
-      return new LayoutColumn(item, getLayoutId(item[0]));
+      return new LayoutColumn(
+        item,
+        getLayoutId(item[0]),
+        getLayoutWidth(item[0])
+      );
     });
   }
 
@@ -74,9 +82,20 @@ function getLayoutId(g: TDataGroup) {
   if (g instanceof BlockGroup) {
     return g.op.attributes.layout || '';
   } else if (g instanceof ListGroup) {
-    return g.layout;
+    return g.layout || '';
   } else if (g instanceof BlotBlock) {
     return g.op.attributes.layout || '';
+  }
+  return '';
+}
+
+function getLayoutWidth(g: TDataGroup) {
+  if (g instanceof BlockGroup) {
+    return g.op.attributes['layout-width'] || '';
+  } else if (g instanceof ListGroup) {
+    return g.layoutWidth || '';
+  } else if (g instanceof BlotBlock) {
+    return g.op.attributes['layout-width'] || '';
   }
   return '';
 }
