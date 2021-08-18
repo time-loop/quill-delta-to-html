@@ -364,10 +364,17 @@ class QuillDeltaToHtmlConverter {
   }
 
   _renderLayoutColumn(column: LayoutColumn): string {
+    const columnAttrs = [{ key: 'class', value: 'ql-layout-col-container' }];
+
+    if (!!column.width) {
+      columnAttrs.push({
+        key: 'style',
+        value: `flex: initial; width: calc(100% * ${column.width})`,
+      });
+    }
+
     return (
-      makeStartTag('div', [
-        { key: 'class', value: 'ql-layout-col-container' },
-      ]) +
+      makeStartTag('div', columnAttrs) +
       column.items
         .map((group) => {
           if (group instanceof ListGroup) {

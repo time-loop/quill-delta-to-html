@@ -30,6 +30,7 @@ class ListGroup {
   items: ListItem[];
   readonly headOp: DeltaInsertOp | undefined;
   readonly layout: string;
+  readonly layoutWidth: string;
   constructor(items: ListItem[]) {
     this.items = items;
 
@@ -48,6 +49,14 @@ class ListGroup {
       headListItem.item.op.attributes.layout
     ) {
       this.layout = headListItem.item.op.attributes.layout;
+    }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes.layoutWidth
+    ) {
+      this.layoutWidth = headListItem.item.op.attributes.layoutWidth;
     }
   }
 }
@@ -119,9 +128,11 @@ class TableCellLine {
 class LayoutColumn {
   items: any[];
   readonly layout: string;
-  constructor(items: any[], layout: string) {
+  readonly width: string;
+  constructor(items: any[], layout: string, width: string) {
     this.items = items;
     this.layout = layout;
+    this.width = width;
   }
 }
 
