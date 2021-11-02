@@ -64,6 +64,9 @@ describe('OpAttributeSanitizer', function () {
       assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgb(0,0,0)'));
       assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgb(255, 99, 1)'));
       assert.ok(OpAttributeSanitizer.IsValidRGBColor('RGB(254, 249, 109)'));
+      assert.ok(
+        OpAttributeSanitizer.IsValidRGBColor('RGB(254, 249, 109, 0.4)')
+      );
       assert.equal(OpAttributeSanitizer.IsValidRGBColor('yellow'), false);
       assert.equal(OpAttributeSanitizer.IsValidRGBColor('#FFF'), false);
       assert.equal(OpAttributeSanitizer.IsValidRGBColor('rgb(256,0,0)'), false);
