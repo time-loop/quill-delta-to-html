@@ -165,7 +165,8 @@ class OpAttributeSanitizer {
         val &&
         (OpAttributeSanitizer.IsValidHexColor(val + '') ||
           OpAttributeSanitizer.IsValidColorLiteral(val + '') ||
-          OpAttributeSanitizer.IsValidRGBColor(val + ''))
+          OpAttributeSanitizer.IsValidRGBColor(val + '') ||
+          OpAttributeSanitizer.IsValidRGBAColor(val + ''))
       ) {
         cleanAttrs[prop] = val;
       }
@@ -295,6 +296,11 @@ class OpAttributeSanitizer {
 
   static IsValidRGBColor(colorStr: string) {
     const re = /^rgb\(((0|25[0-5]|2[0-4]\d|1\d\d|0?\d?\d),\s*){2}(0|25[0-5]|2[0-4]\d|1\d\d|0?\d?\d)\)$/i;
+    return !!colorStr.match(re);
+  }
+
+  static IsValidRGBAColor(colorStr: string) {
+    const re = /^rgba\(((0|25[0-5]|2[0-4]\d|1\d\d|0?\d?\d),\s*){3}([01].?(\d+)?)\)$/i;
     return !!colorStr.match(re);
   }
 

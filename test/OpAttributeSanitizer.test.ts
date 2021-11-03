@@ -74,6 +74,29 @@ describe('OpAttributeSanitizer', function () {
       );
     });
   });
+  describe('#IsValidRGBAColor()', function () {
+    it('should return true if rgba color is valid', function () {
+      assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgba(0,0,0,0)'));
+      assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgba(255, 99, 1, 1)'));
+      assert.ok(
+        OpAttributeSanitizer.IsValidRGBColor('RGBA(254, 249, 109, 0.5)')
+      );
+      assert.equal(OpAttributeSanitizer.IsValidRGBColor('yellow'), false);
+      assert.equal(OpAttributeSanitizer.IsValidRGBColor('#FFF'), false);
+      assert.equal(
+        OpAttributeSanitizer.IsValidRGBColor('rgba(260,0,0,0.2)'),
+        false
+      );
+      assert.equal(
+        OpAttributeSanitizer.IsValidRGBColor('rgba(253,0,0,2)'),
+        false
+      );
+      assert.equal(
+        OpAttributeSanitizer.IsValidRGBColor('rgba(2000,0,0,0)'),
+        false
+      );
+    });
+  });
   describe('#IsValidRel()', function () {
     it('should return true if rel is valid', function () {
       assert.ok(OpAttributeSanitizer.IsValidRel('nofollow'));
