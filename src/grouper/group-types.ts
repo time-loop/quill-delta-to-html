@@ -31,6 +31,7 @@ class ListGroup {
   readonly headOp: DeltaInsertOp | undefined;
   readonly layout: string;
   readonly layoutWidth: string;
+  readonly layoutAlign: string;
   constructor(items: ListItem[]) {
     this.items = items;
 
@@ -57,6 +58,14 @@ class ListGroup {
       headListItem.item.op.attributes.layoutWidth
     ) {
       this.layoutWidth = headListItem.item.op.attributes.layoutWidth;
+    }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes.layoutAlign
+    ) {
+      this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
     }
   }
 }
@@ -129,10 +138,17 @@ class LayoutColumn {
   items: any[];
   readonly layout: string;
   readonly width: string;
-  constructor(items: any[], layout: string, width: string) {
+  readonly align: string;
+  constructor(
+    items: any[],
+    layout: string,
+    width: string,
+    align: string = 'top'
+  ) {
     this.items = items;
     this.layout = layout;
     this.width = width;
+    this.align = align;
   }
 }
 

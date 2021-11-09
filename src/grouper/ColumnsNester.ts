@@ -36,7 +36,8 @@ export class ColumnsNester {
           return new LayoutColumn(
             [item],
             getLayoutId(item),
-            getLayoutWidth(item)
+            getLayoutWidth(item),
+            getLayoutAlign(item)
           );
         }
         return item;
@@ -45,7 +46,8 @@ export class ColumnsNester {
       return new LayoutColumn(
         item,
         getLayoutId(item[0]),
-        getLayoutWidth(item[0])
+        getLayoutWidth(item[0]),
+        getLayoutAlign(item[0])
       );
     });
   }
@@ -96,6 +98,17 @@ function getLayoutWidth(g: TDataGroup) {
     return g.layoutWidth || '';
   } else if (g instanceof BlotBlock) {
     return g.op.attributes['layout-width'] || '';
+  }
+  return '';
+}
+
+function getLayoutAlign(g: TDataGroup) {
+  if (g instanceof BlockGroup) {
+    return g.op.attributes['layout-align'] || 'top';
+  } else if (g instanceof ListGroup) {
+    return g.layoutAlign || 'top';
+  } else if (g instanceof BlotBlock) {
+    return g.op.attributes['layout-align'] || 'top';
   }
   return '';
 }

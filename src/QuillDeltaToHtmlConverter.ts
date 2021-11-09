@@ -373,6 +373,13 @@ class QuillDeltaToHtmlConverter {
       });
     }
 
+    if (!!column.align) {
+      columnAttrs.push({
+        key: 'data-layout-align',
+        value: column.align,
+      });
+    }
+
     return (
       makeStartTag('div', columnAttrs) +
       column.items
