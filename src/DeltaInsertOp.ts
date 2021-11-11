@@ -294,7 +294,11 @@ class DeltaInsertOp {
   }
 
   isSameColumnAs(op: DeltaInsertOp) {
-    return this.attributes.layout === op.attributes.layout;
+    return (
+      !!this.attributes.layout &&
+      !!op.attributes.layout &&
+      this.attributes.layout === op.attributes.layout
+    );
   }
 }
 

@@ -26,7 +26,7 @@ export class ColumnsNester {
       (g: TDataGroup, gPrev: TDataGroup) => {
         const gLayout = getLayoutId(g);
         const gPrevLayout = getLayoutId(gPrev);
-        return gLayout === gPrevLayout;
+        return !!gLayout && !!gPrevLayout && gLayout === gPrevLayout;
       }
     );
 
