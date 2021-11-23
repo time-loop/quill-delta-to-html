@@ -37,7 +37,8 @@ class ListNester {
 
         return (
           curr.layout === prev.layout &&
-          (curr.items[0].item.op.isSameListAs(prev.items[0].item.op) ||
+          (curr.items[0].item.op.isList() ||
+            prev.items[0].item.op.isList() ||
             curr.items[0].item.op.isListBlockWrapper(
               this.blocksCanBeWrappedWithList
             ) ||
