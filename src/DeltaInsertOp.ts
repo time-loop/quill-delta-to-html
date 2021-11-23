@@ -295,8 +295,8 @@ class DeltaInsertOp {
 
   isSameColumnAs(op: DeltaInsertOp) {
     return (
-      !!this.attributes.layout &&
-      !!op.attributes.layout &&
+      this.isLayoutColumnBlock() &&
+      op.isLayoutColumnBlock() &&
       this.attributes.layout === op.attributes.layout
     );
   }
