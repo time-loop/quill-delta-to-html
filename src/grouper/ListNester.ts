@@ -125,7 +125,8 @@ class ListNester {
               gPrev.op,
               this.blocksCanBeWrappedWithList
             ) &&
-            g.op.isSameColumnAs(gPrev.op) &&
+            ((!g.op.isLayoutColumnBlock() && !gPrev.op.isLayoutColumnBlock()) ||
+              g.op.isSameColumnAs(gPrev.op)) &&
             g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell) ||
           ((g instanceof BlockGroup || g instanceof BlotBlock) &&
             (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
