@@ -4,6 +4,7 @@ import {
   BlockGroup,
   TDataGroup,
   BlotBlock,
+  EmptyBlock,
 } from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
 import find from 'lodash-es/find';
@@ -235,11 +236,35 @@ class ListNester {
           this.blocksCanBeWrappedWithList
         )
       ) {
-        var parent = elm.items[elm.items.length - 1];
-        if (parent.innerList) {
-          parent.innerList.items = parent.innerList.items.concat(target.items);
-        } else {
-          parent.innerList = target;
+        const childIndent =
+          target.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) ||
+          0;
+        const parentIndent =
+          elm.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
+        let parentRef = elm.items[elm.items.length - 1];
+        for (let i = childIndent - parentIndent; i > 0; i--) {
+          if (i === 1) {
+            if (parentRef.innerList) {
+              parentRef.innerList.items = parentRef.innerList.items.concat(
+                target.items
+              );
+            } else {
+              parentRef.innerList = target;
+            }
+          } else {
+            if (!parentRef.innerList) {
+              parentRef.innerList = new ListGroup([
+                new ListItem(
+                  new EmptyBlock({
+                    list: target.items[0].item.op.attributes.list,
+                  }),
+                  null
+                ),
+              ]);
+            }
+            parentRef =
+              parentRef.innerList.items[parentRef.innerList.items.length - 1];
+          }
         }
         return true;
       }

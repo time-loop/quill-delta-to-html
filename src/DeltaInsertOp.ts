@@ -101,25 +101,24 @@ class DeltaInsertOp {
     op: DeltaInsertOp,
     blocksCanBeWrappedWithList: string[] = []
   ) {
-    const getIndent = (insertOp: DeltaInsertOp) => {
-      if (insertOp.isListBlockWrapper(blocksCanBeWrappedWithList)) {
-        const attrKey =
-          find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) ||
-          '';
-        return (
-          attrKey &&
-          insertOp.attributes[attrKey] &&
-          parseInt(insertOp.attributes[attrKey]['wrapper-indent'], 10)
-        );
-      } else {
-        return insertOp.attributes.indent;
-      }
-    };
-
-    const thisIndent = getIndent(this);
-    const opIndent = getIndent(op);
+    const thisIndent = this.getIndent(blocksCanBeWrappedWithList);
+    const opIndent = op.getIndent(blocksCanBeWrappedWithList);
 
     return (Number(thisIndent) || 0) > (Number(opIndent) || 0);
+  }
+
+  getIndent(blocksCanBeWrappedWithList: string[] = []) {
+    if (this.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+      const attrKey =
+        find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) || '';
+      return (
+        attrKey &&
+        this.attributes[attrKey] &&
+        parseInt(this.attributes[attrKey]['wrapper-indent'], 10)
+      );
+    } else {
+      return this.attributes.indent;
+    }
   }
 
   isInline() {

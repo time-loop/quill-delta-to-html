@@ -21,6 +21,7 @@ interface ListAttributes {
   cell?: string | undefined;
   rowspan?: string | undefined;
   colspan?: string | undefined;
+  counters?: string | undefined;
   list: ListType;
 }
 
