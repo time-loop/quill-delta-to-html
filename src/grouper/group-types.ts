@@ -17,6 +17,12 @@ class SingleItem {
 class VideoItem extends SingleItem {}
 class BlotBlock extends SingleItem {}
 
+class EmptyBlock extends SingleItem {
+  constructor(attrs?: IOpAttributes) {
+    super(new DeltaInsertOp('', attrs));
+  }
+}
+
 class BlockGroup {
   readonly op: DeltaInsertOp;
   ops: DeltaInsertOp[];
@@ -32,6 +38,7 @@ class ListGroup {
   readonly layout: string;
   readonly layoutWidth: string;
   readonly layoutAlign: string;
+  readonly counters: string;
   constructor(items: ListItem[]) {
     this.items = items;
 
@@ -67,11 +74,20 @@ class ListGroup {
     ) {
       this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
     }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes.list &&
+      headListItem.item.op.attributes.list.counters
+    ) {
+      this.counters = headListItem.item.op.attributes.list.counters;
+    }
   }
 }
 
 class ListItem {
-  readonly item: BlockGroup | BlotBlock;
+  readonly item: BlockGroup | BlotBlock | EmptyBlock;
   innerList: ListGroup | null;
   readonly layout: string;
   constructor(
@@ -177,6 +193,7 @@ type TDataGroup =
 export {
   VideoItem,
   BlotBlock,
+  EmptyBlock,
   InlineGroup,
   BlockGroup,
   ListGroup,

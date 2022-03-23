@@ -22,6 +22,7 @@ import {
   TableCellLine,
   LayoutRow,
   LayoutColumn,
+  EmptyBlock,
 } from './grouper/group-types';
 import { ListNester } from './grouper/ListNester';
 import { makeStartTag, makeEndTag, encodeHtml } from './funcs-html';
@@ -231,6 +232,14 @@ class QuillDeltaToHtmlConverter {
           { key: 'data-colspan', value: list.headOp.attributes!.colspan },
         ]
       : [];
+
+    if (list.counters) {
+      attrsOfList.push({
+        key: 'data-counters',
+        value: list.counters,
+      });
+    }
+
     return (
       makeStartTag(this._getListTag(firstItem.item.op), attrsOfList) +
       list.items.map((li: ListItem) => this._renderListItem(li)).join('') +
@@ -249,6 +258,8 @@ class QuillDeltaToHtmlConverter {
       liElementsHtml = this._renderInlines(li.item.ops, false);
     } else if (li.item instanceof BlotBlock) {
       liElementsHtml = this._renderCustom(li.item.op, null);
+    } else if (li.item instanceof EmptyBlock) {
+      liElementsHtml = '';
     }
 
     return (
