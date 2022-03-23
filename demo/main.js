@@ -28,6 +28,23 @@ var continueList = {"ops": [
   {"insert":"\n"},
   {"insert":"222"},
   {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
+var continueList2 = {"ops":[
+  {"insert":"1"},
+  {"insert":"\n","attributes":{"list":{"list":"ordered"}}},
+  {"insert":"1-1"},
+  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},
+  {"insert":"1-1-1"},
+  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered"}}},
+  {"insert":"sdfsdfdsfdsfdsfdsf"},
+  {"insert":"\n"},
+  {"insert":"1-1-2"},
+  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
+  {"insert":"1-2"},
+  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
+  {"insert":"1-2-1"},
+  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
+  {"insert":"2"},
+  {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
 
 
 var qdc = new QuillDeltaToHtmlConverter(continueList.ops, {
@@ -49,6 +66,16 @@ var qdc = new QuillDeltaToHtmlConverter(continueList.ops, {
 
     return attrs;
   },
+  rootListGroupAttrs: (listGroup) => {
+    if (listGroup.counters) {
+      return [{
+        key: 'style',
+        value: 'background: red'
+      }];
+    } else {
+      return [];
+    }
+  }
 });
 
 qdc.renderCustomWith((customOp, contextOp) => {
