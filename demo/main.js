@@ -16,9 +16,21 @@ var listWithinBlockquote = {"ops":[{"insert":"first line\nfirst list item parent
 var listWithinCodeBlock = {"ops":[{"insert":"function foo() { return false; }"},{"attributes":{"code-block":{"code-block":"javascript"}},"insert":"\n"},{"insert":"dsfdsfdsf"},{"attributes":{"list":{"list":"ordered"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"},{"insert":"sdfdsfdsfdsf"},{"attributes":{"code-block":{"code-block":"plain","in-list":"none"}},"insert":"\n"}]}
 // Mixing various lists
 var mixingList = {"ops":[{"insert":"sdfsdf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"1t582p16h"}},{"insert":"dsfdfdsfdsfd"},{"insert":"\n","attributes":{"banner":{"banner":"success","in-list":"ordered"}, 'renderAsBlock': true}},{"insert":"sdfdsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"xqsmv5der"}},{"insert":{"bookmark":{"url":"https://www.google.com/","service":"custom","title":"Google","description":"undefined","thumbnail":null,"favicon":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.google.com%2F","updated":"true"}},"attributes":{"bookmark": { "in-list":"ordered" }, "renderAsBlock": true}},{"insert":"dsfdfsfsdfsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"48spy2qd1"}}]}
+// Continue lists
+var continueList = {"ops": [
+  {"insert":"111"},
+  {"insert":"\n","attributes":{"list":{"list":"ordered"}}},
+  {"insert":"1-1-111"},
+  {"insert":"\n","attributes":{"indent":3,"list":{"list":"ordered"}}},
+  {"insert":"1-111"},
+  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},
+  {"insert":"sdflssdfsdfdsfsf"},
+  {"insert":"\n"},
+  {"insert":"222"},
+  {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
 
 
-var qdc = new QuillDeltaToHtmlConverter(mixingList.ops, {
+var qdc = new QuillDeltaToHtmlConverter(continueList.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
