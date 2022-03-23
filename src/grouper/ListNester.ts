@@ -192,7 +192,29 @@ class ListNester {
           }
         });
       });
-    return sectionItems;
+
+    /**
+     * Wrap listGroup according to indentation.
+     * Supports render: where the indent of the first item of the list is not 0.
+     */
+    const wrappedSectionItems = sectionItems.map((item) => {
+      let wrappedListGroup = item;
+      const indent =
+        item.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
+      for (let i = indent; i > 0; i--) {
+        wrappedListGroup = new ListGroup([
+          new ListItem(
+            new EmptyBlock({
+              list: item.items[0].item.op.attributes.list,
+            }),
+            wrappedListGroup
+          ),
+        ]);
+      }
+      return wrappedListGroup;
+    });
+
+    return wrappedSectionItems;
   }
 
   private groupByIndent(items: ListGroup[]): { [index: number]: ListGroup[] } {
@@ -228,7 +250,7 @@ class ListNester {
   }
 
   private placeUnderParent(target: ListGroup, items: ListGroup[]) {
-    for (var i = items.length - 1; i >= 0; i--) {
+    for (let i = items.length - 1; i >= 0; i--) {
       var elm = items[i];
       if (
         target.items[0].item.op.hasHigherIndentThan(

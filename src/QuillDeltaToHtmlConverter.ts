@@ -25,7 +25,12 @@ import {
   EmptyBlock,
 } from './grouper/group-types';
 import { ListNester } from './grouper/ListNester';
-import { makeStartTag, makeEndTag, encodeHtml } from './funcs-html';
+import {
+  makeStartTag,
+  makeEndTag,
+  encodeHtml,
+  ITagKeyValue,
+} from './funcs-html';
 import * as obj from './helpers/object';
 import { GroupType } from './value-types';
 import { IOpAttributeSanitizerOptions } from './OpAttributeSanitizer';
@@ -44,6 +49,7 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
+  rootListGroupAttrs?: (g: ListGroup) => ITagKeyValue[];
 }
 
 const BrTag = '<br/>';
@@ -163,7 +169,7 @@ class QuillDeltaToHtmlConverter {
       .map((group) => {
         if (group instanceof ListGroup) {
           return this._renderWithCallbacks(GroupType.List, group, () =>
-            this._renderList(<ListGroup>group)
+            this._renderList(<ListGroup>group, true)
           );
         } else if (group instanceof TableGroup) {
           return this._renderWithCallbacks(GroupType.TableCellLine, group, () =>
@@ -222,9 +228,9 @@ class QuillDeltaToHtmlConverter {
     return html;
   }
 
-  _renderList(list: ListGroup): string {
+  _renderList(list: ListGroup, isRoot = false): string {
     var firstItem = list.items[0];
-    const attrsOfList = !!list.headOp
+    let attrsOfList: ITagKeyValue[] = !!list.headOp
       ? [
           { key: 'data-row', value: list.headOp.attributes!.row },
           { key: 'data-cell', value: list.headOp.attributes!.cell },
@@ -233,11 +239,9 @@ class QuillDeltaToHtmlConverter {
         ]
       : [];
 
-    if (list.counters) {
-      attrsOfList.push({
-        key: 'data-counters',
-        value: list.counters,
-      });
+    if (isRoot && this.options.rootListGroupAttrs) {
+      const userAttrs = this.options.rootListGroupAttrs(list);
+      attrsOfList = [...userAttrs, ...attrsOfList];
     }
 
     return (
