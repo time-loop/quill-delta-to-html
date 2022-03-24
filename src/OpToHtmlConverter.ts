@@ -170,6 +170,15 @@ class OpToHtmlConverter {
     };
   }
 
+  getHtmlPartsForEmptyBlock(): IHtmlParts {
+    const { openingTag, content, closingTag } = this.getHtmlParts();
+    return {
+      openingTag: openingTag.replace(/>$/, ' data-empty-block="true">'),
+      content,
+      closingTag,
+    };
+  }
+
   getContent(): string {
     if (this.op.isContainerBlock()) {
       return '';

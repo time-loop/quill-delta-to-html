@@ -202,14 +202,17 @@ class ListNester {
       const indent =
         item.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
       for (let i = indent; i > 0; i--) {
-        wrappedListGroup = new ListGroup([
-          new ListItem(
-            new EmptyBlock({
-              list: item.items[0].item.op.attributes.list,
-            }),
-            wrappedListGroup
-          ),
-        ]);
+        wrappedListGroup = new ListGroup(
+          [
+            new ListItem(
+              new EmptyBlock({
+                list: item.items[0].item.op.attributes.list,
+              }),
+              wrappedListGroup
+            ),
+          ],
+          true
+        );
       }
       return wrappedListGroup;
     });
@@ -275,14 +278,17 @@ class ListNester {
             }
           } else {
             if (!parentRef.innerList) {
-              parentRef.innerList = new ListGroup([
-                new ListItem(
-                  new EmptyBlock({
-                    list: target.items[0].item.op.attributes.list,
-                  }),
-                  null
-                ),
-              ]);
+              parentRef.innerList = new ListGroup(
+                [
+                  new ListItem(
+                    new EmptyBlock({
+                      list: target.items[0].item.op.attributes.list,
+                    }),
+                    null
+                  ),
+                ],
+                true
+              );
             }
             parentRef =
               parentRef.innerList.items[parentRef.innerList.items.length - 1];
