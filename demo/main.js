@@ -21,9 +21,9 @@ var continueList = {"ops": [
   {"insert":"111"},
   {"insert":"\n","attributes":{"list":{"list":"ordered"}}},
   {"insert":"1-1-111"},
-  {"insert":"\n","attributes":{"indent":3,"list":{"list":"ordered"}}},
-  {"insert":"1-111"},
   {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},
+  {"insert":"1-111"},
+  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered"}}},
   {"insert":"sdflssdfsdfdsfsf"},
   {"insert":"\n"},
   {"insert":"222"},
@@ -47,7 +47,7 @@ var continueList2 = {"ops":[
   {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
 
 
-var qdc = new QuillDeltaToHtmlConverter(continueList.ops, {
+var qdc = new QuillDeltaToHtmlConverter(continueList2.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
@@ -66,7 +66,7 @@ var qdc = new QuillDeltaToHtmlConverter(continueList.ops, {
 
     return attrs;
   },
-  rootListGroupAttrs: (listGroup) => {
+  customListGroupAttrs: (listGroup) => {
     if (listGroup.counters) {
       return [{
         key: 'style',
