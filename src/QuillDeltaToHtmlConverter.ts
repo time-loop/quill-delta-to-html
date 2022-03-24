@@ -49,7 +49,7 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
-  rootListGroupAttrs?: (g: ListGroup) => ITagKeyValue[];
+  customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
 }
 
 const BrTag = '<br/>';
@@ -239,8 +239,8 @@ class QuillDeltaToHtmlConverter {
         ]
       : [];
 
-    if (isRoot && this.options.rootListGroupAttrs) {
-      const userAttrs = this.options.rootListGroupAttrs(list);
+    if (this.options.customListGroupAttrs) {
+      const userAttrs = this.options.customListGroupAttrs(list, isRoot);
       attrsOfList = [...userAttrs, ...attrsOfList];
     }
 
@@ -256,7 +256,10 @@ class QuillDeltaToHtmlConverter {
     li.item.op.attributes.indent = 0;
     //}
     var converter = new OpToHtmlConverter(li.item.op, this.converterOptions);
-    var parts = converter.getHtmlParts();
+    var parts =
+      li.item instanceof EmptyBlock
+        ? converter.getHtmlPartsForEmptyBlock()
+        : converter.getHtmlParts();
     var liElementsHtml;
     if (li.item instanceof BlockGroup) {
       liElementsHtml = this._renderInlines(li.item.ops, false);

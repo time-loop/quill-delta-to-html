@@ -39,8 +39,10 @@ class ListGroup {
   readonly layoutWidth: string;
   readonly layoutAlign: string;
   readonly counters: string;
-  constructor(items: ListItem[]) {
+  readonly isEmptyNest: boolean | undefined;
+  constructor(items: ListItem[], isEmptyNest?: boolean) {
     this.items = items;
+    this.isEmptyNest = isEmptyNest;
 
     const headListItem = items[0];
     if (
@@ -91,7 +93,7 @@ class ListItem {
   innerList: ListGroup | null;
   readonly layout: string;
   constructor(
-    item: BlockGroup | BlotBlock,
+    item: BlockGroup | BlotBlock | EmptyBlock,
     innerList: ListGroup | null = null
   ) {
     this.item = item;
