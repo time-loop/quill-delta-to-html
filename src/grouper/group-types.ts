@@ -77,13 +77,13 @@ class ListGroup {
       this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
     }
 
-    if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.list &&
-      headListItem.item.op.attributes.list.counters
-    ) {
-      this.counters = headListItem.item.op.attributes.list.counters;
+    if (headListItem && headListItem.item.op) {
+      this.counters = headListItem.item.op.getListAttributes([
+        'blockquote',
+        'code-block',
+        'banner',
+        'bookmark',
+      ]).counters;
     }
   }
 }

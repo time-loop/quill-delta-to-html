@@ -201,12 +201,21 @@ class ListNester {
       let wrappedListGroup = item;
       const indent =
         item.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
+      const listType =
+        item.items[0].item.op.getListType(this.blocksCanBeWrappedWithList) ||
+        '';
+      const listAttrs =
+        item.items[0].item.op.getListAttributes(
+          this.blocksCanBeWrappedWithList
+        ) || '';
       for (let i = indent; i > 0; i--) {
         wrappedListGroup = new ListGroup(
           [
             new ListItem(
               new EmptyBlock({
-                list: item.items[0].item.op.attributes.list,
+                list: Object.assign({}, listAttrs, {
+                  list: listType,
+                }),
               }),
               wrappedListGroup
             ),
@@ -267,6 +276,12 @@ class ListNester {
         const parentIndent =
           elm.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
         let parentRef = elm.items[elm.items.length - 1];
+        const childListType = target.items[0].item.op.getListType(
+          this.blocksCanBeWrappedWithList
+        );
+        const childListAttrs = target.items[0].item.op.getListAttributes(
+          this.blocksCanBeWrappedWithList
+        );
         for (let i = childIndent - parentIndent; i > 0; i--) {
           if (i === 1) {
             if (parentRef.innerList) {
@@ -282,7 +297,9 @@ class ListNester {
                 [
                   new ListItem(
                     new EmptyBlock({
-                      list: target.items[0].item.op.attributes.list,
+                      list: Object.assign({}, childListAttrs, {
+                        list: childListType,
+                      }),
                     }),
                     null
                   ),
