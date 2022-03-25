@@ -121,6 +121,32 @@ class DeltaInsertOp {
     }
   }
 
+  getListAttributes(blocksCanBeWrappedWithList: string[] = []) {
+    if (this.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+      const attrKey =
+        find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) || '';
+      return attrKey && this.attributes[attrKey];
+    } else if (this.isList()) {
+      return this.attributes.list;
+    }
+    return {};
+  }
+
+  getListType(blocksCanBeWrappedWithList: string[] = []) {
+    if (this.isListBlockWrapper(blocksCanBeWrappedWithList)) {
+      const attrKey =
+        find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) || '';
+      return (
+        attrKey &&
+        this.attributes[attrKey] &&
+        this.attributes[attrKey]['in-list']
+      );
+    } else if (this.isList()) {
+      return this.attributes.list!.list;
+    }
+    return;
+  }
+
   isInline() {
     return !(
       this.isContainerBlock() ||
