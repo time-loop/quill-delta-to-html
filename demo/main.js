@@ -17,37 +17,10 @@ var listWithinCodeBlock = {"ops":[{"insert":"function foo() { return false; }"},
 // Mixing various lists
 var mixingList = {"ops":[{"insert":"sdfsdf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"1t582p16h"}},{"insert":"dsfdfdsfdsfd"},{"insert":"\n","attributes":{"banner":{"banner":"success","in-list":"ordered"}, 'renderAsBlock': true}},{"insert":"sdfdsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"xqsmv5der"}},{"insert":{"bookmark":{"url":"https://www.google.com/","service":"custom","title":"Google","description":"undefined","thumbnail":null,"favicon":"https://www.google.com/s2/favicons?domain_url=https%3A%2F%2Fwww.google.com%2F","updated":"true"}},"attributes":{"bookmark": { "in-list":"ordered" }, "renderAsBlock": true}},{"insert":"dsfdfsfsdfsf"},{"insert":"\n","attributes":{"list":{"list":"ordered"},"id":"48spy2qd1"}}]}
 // Continue lists
-var continueList = {"ops": [
-  {"insert":"111"},
-  {"insert":"\n","attributes":{"list":{"list":"ordered"}}},
-  {"insert":"1-1-111"},
-  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},
-  {"insert":"1-111"},
-  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered"}}},
-  {"insert":"sdflssdfsdfdsfsf"},
-  {"insert":"\n"},
-  {"insert":"222"},
-  {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':0,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
-var continueList2 = {"ops":[
-  {"insert":"1"},
-  {"insert":"\n","attributes":{"list":{"list":"ordered"}}},
-  {"insert":"1-1"},
-  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},
-  {"insert":"1-1-1"},
-  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered"}}},
-  {"insert":"sdfsdfdsfdsfdsfdsf"},
-  {"insert":"\n"},
-  {"insert":"1-1-2"},
-  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
-  {"insert":"1-2"},
-  {"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
-  {"insert":"1-2-1"},
-  {"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}},
-  {"insert":"2"},
-  {"insert":"\n","attributes":{"list":{"list":"ordered","counters":"{'0':1,'1':1,'2':1,'3':0,'4':0,'5':0,'6':0,'7':0,'8':0}"}}}]};
+var continueListWithQuote = {"ops": [{"insert":"dfsfsf","attributes":{}},{"insert":"\n","attributes":{"list":{"list":"ordered"}}},{"insert":"fdsffsdfs","attributes":{}},{"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered"}}},{"insert":"dsfdsfdsf","attributes":{}},{"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered"}}},{"insert":"dsfsdfsdfsdfdsfdsf","attributes":{}},{"insert":"\n"},{"insert":"sdfdsfdsffsdf","attributes":{}},{"insert":"\n","attributes":{"blockquote":{"in-list":"ordered","wrapper-indent":"2","counters":"{\"0\":1,\"1\":1,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0}"}}},{"insert":"dsfdsf","attributes":{}},{"insert":"\n","attributes":{"indent":2,"list":{"list":"ordered","counters":"{\"0\":1,\"1\":1,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0}"}}},{"insert":"sdfdsfdsf","attributes":{}},{"insert":"\n","attributes":{"indent":1,"list":{"list":"ordered","counters":"{\"0\":1,\"1\":1,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0}"}}}]};
 
 
-var qdc = new QuillDeltaToHtmlConverter(continueList2.ops, {
+var qdc = new QuillDeltaToHtmlConverter(continueListWithQuote.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
@@ -66,15 +39,36 @@ var qdc = new QuillDeltaToHtmlConverter(continueList2.ops, {
 
     return attrs;
   },
-  customListGroupAttrs: (listGroup) => {
-    if (listGroup.counters) {
-      return [{
-        key: 'style',
-        value: 'background: red'
-      }];
-    } else {
-      return [];
+  customListGroupAttrs: (g, isRootListGroup) => {
+    const listAttrs = [];
+
+    if (isRootListGroup) {
+      listAttrs.push({
+        key: 'data-is-root',
+        value: 'true',
+      });
     }
+
+    if (isRootListGroup && g.counters) {
+      const countersMap = JSON.parse(g.counters);
+      listAttrs.push({
+        key: 'style',
+        value: `counter-reset:${Object.keys(countersMap)
+          .map((key) => {
+            return ' list-' + key + ' ' + countersMap[key];
+          })
+          .join('')}`,
+      });
+    }
+
+    if (g.isEmptyNest) {
+      listAttrs.push({
+        key: 'data-empty-nest',
+        value: 'true',
+      });
+    }
+
+    return listAttrs;
   }
 });
 
