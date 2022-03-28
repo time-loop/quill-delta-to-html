@@ -85,6 +85,15 @@ class ListGroup {
         'bookmark',
       ]).counters;
     }
+
+    if (
+      headListItem &&
+      headListItem.item instanceof EmptyBlock &&
+      headListItem.innerList &&
+      headListItem.innerList.headOp
+    ) {
+      this.headOp = headListItem.innerList.headOp;
+    }
   }
 }
 
