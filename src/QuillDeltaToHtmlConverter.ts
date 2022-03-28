@@ -342,7 +342,7 @@ class QuillDeltaToHtmlConverter {
         .map((item: TableCellLine | ListGroup) => {
           return item instanceof TableCellLine
             ? this._renderTableCellLine(item)
-            : this._renderList(item);
+            : this._renderList(item, true);
         })
         .join('') +
       makeEndTag('td')
