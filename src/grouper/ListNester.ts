@@ -45,14 +45,13 @@ class ListNester {
 
         return (
           curr.layout === prev.layout &&
-          (curr.items[0].item.op.isList() ||
-            prev.items[0].item.op.isList() ||
-            curr.items[0].item.op.isListBlockWrapper(
-              this.blocksCanBeWrappedWithList
-            ) ||
-            prev.items[0].item.op.isListBlockWrapper(
-              this.blocksCanBeWrappedWithList
-            ))
+          ((!curr.headOp && !prev.headOp) ||
+            (!!curr.headOp &&
+              !!prev.headOp &&
+              curr.headOp.isSameTableCellAs(
+                prev.headOp,
+                this.blocksCanBeWrappedWithList
+              )))
         );
       }
     );
@@ -178,7 +177,14 @@ class ListNester {
         return (
           curr instanceof ListGroup &&
           prev instanceof ListGroup &&
-          curr.layout === prev.layout
+          curr.layout === prev.layout &&
+          ((!curr.headOp && !prev.headOp) ||
+            (!!curr.headOp &&
+              !!prev.headOp &&
+              curr.headOp.isSameTableCellAs(
+                prev.headOp,
+                this.blocksCanBeWrappedWithList
+              )))
         );
       }
     );
