@@ -17,10 +17,10 @@ class ListNester {
   }
 
   nest(groups: TDataGroup[]): TDataGroup[] {
-    var listBlocked = this.convertListBlocksToListGroups(groups);
-    var groupedByListGroups = this.groupConsecutiveListGroups(listBlocked);
+    const listBlocked = this.convertListBlocksToListGroups(groups);
+    const groupedByListGroups = this.groupConsecutiveListGroups(listBlocked);
     // convert grouped ones into listgroup
-    var nested = flatten(
+    const nested = flatten(
       groupedByListGroups.map((group: TDataGroup) => {
         if (!Array.isArray(group)) {
           return group;
@@ -29,8 +29,15 @@ class ListNester {
       })
     );
 
+    const wrappedNested = nested.map((g: TDataGroup) => {
+      if (g instanceof ListGroup) {
+        return this.makeUpForListIndentationForListGroup(g);
+      }
+      return g;
+    });
+
     var groupRootLists = groupConsecutiveElementsWhile(
-      nested,
+      wrappedNested,
       (curr: TDataGroup, prev: TDataGroup) => {
         if (!(curr instanceof ListGroup && prev instanceof ListGroup)) {
           return false;
@@ -193,40 +200,7 @@ class ListNester {
         });
       });
 
-    /**
-     * Wrap listGroup according to indentation.
-     * Supports render: where the indent of the first item of the list is not 0.
-     */
-    const wrappedSectionItems = sectionItems.map((item) => {
-      let wrappedListGroup = item;
-      const indent =
-        item.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
-      const listType =
-        item.items[0].item.op.getListType(this.blocksCanBeWrappedWithList) ||
-        '';
-      const listAttrs =
-        item.items[0].item.op.getListAttributes(
-          this.blocksCanBeWrappedWithList
-        ) || '';
-      for (let i = indent; i > 0; i--) {
-        wrappedListGroup = new ListGroup(
-          [
-            new ListItem(
-              new EmptyBlock({
-                list: Object.assign({}, listAttrs, {
-                  list: listType,
-                }),
-              }),
-              wrappedListGroup
-            ),
-          ],
-          true
-        );
-      }
-      return wrappedListGroup;
-    });
-
-    return wrappedSectionItems;
+    return sectionItems;
   }
 
   private groupByIndent(items: ListGroup[]): { [index: number]: ListGroup[] } {
@@ -315,6 +289,38 @@ class ListNester {
       }
     }
     return false;
+  }
+
+  /**
+   * Wrap listGroup according to indentation.
+   * Supports rendering: where the indent of the first item of the list is not 0.
+   */
+  private makeUpForListIndentationForListGroup(group: ListGroup) {
+    let wrappedListGroup: ListGroup = group;
+    const indent =
+      group.items[0].item.op.getIndent(this.blocksCanBeWrappedWithList) || 0;
+    const listType =
+      group.items[0].item.op.getListType(this.blocksCanBeWrappedWithList) || '';
+    const listAttrs =
+      group.items[0].item.op.getListAttributes(
+        this.blocksCanBeWrappedWithList
+      ) || '';
+    for (let i = indent; i > 0; i--) {
+      wrappedListGroup = new ListGroup(
+        [
+          new ListItem(
+            new EmptyBlock({
+              list: Object.assign({}, listAttrs, {
+                list: listType,
+              }),
+            }),
+            wrappedListGroup
+          ),
+        ],
+        true
+      );
+    }
+    return wrappedListGroup;
   }
 }
 
