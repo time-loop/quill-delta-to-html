@@ -50,6 +50,7 @@ interface IQuillDeltaToHtmlConverterOptions
   blocksCanBeWrappedWithList?: string[] | undefined;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
   customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
+  customTableCellAttrs?: (g: TableCell) => ITagKeyValue[];
 }
 
 const BrTag = '<br/>';
@@ -332,12 +333,25 @@ class QuillDeltaToHtmlConverter {
   }
 
   _renderTableCell(cell: TableCell): string {
+    const customAttributes = this.options.customTableCellAttrs
+      ? this.options.customTableCellAttrs(cell)
+      : [];
+
+    const attributes: ITagKeyValue[] = [
+      { key: 'data-row', value: cell.attrs!.row },
+      { key: 'rowspan', value: cell.attrs!.rowspan },
+      { key: 'colspan', value: cell.attrs!.colspan },
+    ];
+
+    customAttributes.forEach((item) => {
+      const isExisted = attributes.some((attr) => attr.key === item.key);
+      if (!isExisted) {
+        attributes.push(item);
+      }
+    });
+
     return (
-      makeStartTag('td', [
-        { key: 'data-row', value: cell.attrs!.row },
-        { key: 'rowspan', value: cell.attrs!.rowspan },
-        { key: 'colspan', value: cell.attrs!.colspan },
-      ]) +
+      makeStartTag('td', attributes) +
       cell.lines
         .map((item: TableCellLine | ListGroup) => {
           return item instanceof TableCellLine
