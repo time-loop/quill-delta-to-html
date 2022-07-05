@@ -8,6 +8,7 @@ import {
   TableCell,
   TableCellLine,
   ListGroup,
+  BlotBlock,
 } from './group-types';
 import { groupConsecutiveElementsWhile } from '../helpers/array';
 import { IOpAttributes } from '../OpAttributeSanitizer';
@@ -56,7 +57,31 @@ export class TableGrouper {
             !!gPrev.headOp &&
             gPrev.headOp!.attributes &&
             g.headOp!.attributes!.cell &&
-            gPrev.headOp!.attributes!.cell)
+            gPrev.headOp!.attributes!.cell) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof BlockGroup &&
+            g.op.isEmptyTableCell() &&
+            gPrev.op.isTableCellLine()) ||
+          (g instanceof BlockGroup &&
+            gPrev instanceof BlotBlock &&
+            g.op.isTableCellLine() &&
+            gPrev.op.isEmptyTableCell()) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof BlotBlock &&
+            g.op.isEmptyTableCell() &&
+            gPrev.op.isEmptyTableCell()) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof ListGroup &&
+            g.op.isEmptyTableCell() &&
+            gPrev.headOp &&
+            gPrev.headOp!.attributes &&
+            gPrev.headOp!.attributes!.cell) ||
+          (g instanceof ListGroup &&
+            gPrev instanceof BlotBlock &&
+            g.headOp &&
+            g.headOp!.attributes &&
+            g.headOp!.attributes!.cell &&
+            gPrev.op.isEmptyTableCell())
         );
       }
     );
@@ -214,7 +239,13 @@ export class TableGrouper {
     );
 
     return grouped.map(
-      (item: (BlockGroup | ListGroup) | (BlockGroup | ListGroup)[]) => {
+      (
+        item: (BlockGroup | ListGroup | BlotBlock) | (BlockGroup | ListGroup)[]
+      ) => {
+        if (item instanceof BlotBlock) {
+          return new TableCell([], { row: item.op.insert.value });
+        }
+
         const head = Array.isArray(item) ? item[0] : item;
         let attrs: IOpAttributes;
         if (head instanceof BlockGroup) {
