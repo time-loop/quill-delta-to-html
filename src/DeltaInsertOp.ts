@@ -56,6 +56,10 @@ class DeltaInsertOp {
     return !!this.attributes['table-col'];
   }
 
+  isEmptyTableCell(): boolean {
+    return this.insert.type === 'hidden_table_cell';
+  }
+
   isLayoutColumnBlock(): boolean {
     return !!this.attributes['layout'];
   }
