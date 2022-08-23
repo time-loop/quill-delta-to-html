@@ -69,9 +69,11 @@ var tableWithBackgroundColors = {
     {"insert":"\n","attributes":{"block-id":"block-76992c14-79e3-4846-be6a-93b5be5d1d20"}}
   ]
 };
+var advancedBanner = {"ops":[{"insert":"line"},{"insert":"\n","attributes":{"block-id":"block-faab0848-14d2-41a0-97a2-1822060db1b7","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green"}},{"insert":"list"},{"insert":"\n","attributes":{"block-id":"block-8d32ae83-ddd3-486e-81e3-b5bb77439f67","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","list":{"list":"ordered"}}},{"insert":"list"},{"insert":"\n","attributes":{"block-id":"block-c66fda81-0cb5-4ac2-82e8-d764935dee52","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","list":{"list":"ordered"}}},{"insert":"list"},{"insert":"\n","attributes":{"block-id":"block-00344019-f361-4187-a0c8-e3d5ce20f55b","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","indent":1,"list":{"list":"ordered"}}},{"insert":"quote"},{"insert":"\n","attributes":{"block-id":"block-fe1b133a-60ff-4b31-9f92-be934e75fe58","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","blockquote":{"in-list":"ordered","wrapper-indent":"1"}}},{"insert":"list"},{"insert":"\n","attributes":{"block-id":"block-0bc5ca7e-5dd6-4ad0-8a3e-a3a8fe781f27","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","indent":1,"list":{"list":"ordered"}}},{"insert":"list"},{"insert":"\n","attributes":{"block-id":"block-5871f5f9-dc83-4ca5-8187-62bb784fbd91","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green","list":{"list":"ordered"}}},{"insert":"line"},{"insert":"\n","attributes":{"block-id":"block-20f94eea-dac6-4548-a97b-3a5e2adc8333","advanced-banner":"8d02afca-577f-4f8f-87f5-ae2efb8d8772","advanced-banner-color":"green"}}]}
 
 
-var qdc = new QuillDeltaToHtmlConverter(continueListWithQuote.ops, {
+
+var qdc = new QuillDeltaToHtmlConverter(advancedBanner.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
