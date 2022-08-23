@@ -45,6 +45,7 @@ class ListNester {
 
         return (
           curr.layout === prev.layout &&
+          curr.bannerId === prev.bannerId &&
           ((!curr.headOp && !prev.headOp) ||
             (!!curr.headOp &&
               !!prev.headOp &&
@@ -135,6 +136,9 @@ class ListNester {
             ) &&
             ((!g.op.isLayoutColumnBlock() && !gPrev.op.isLayoutColumnBlock()) ||
               g.op.isSameColumnAs(gPrev.op)) &&
+            ((!g.op.isAdvancedBannerBlock() &&
+              !gPrev.op.isAdvancedBannerBlock()) ||
+              g.op.isSameBannerAs(gPrev.op)) &&
             g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell) ||
           ((g instanceof BlockGroup || g instanceof BlotBlock) &&
             (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
@@ -148,7 +152,8 @@ class ListNester {
                 ))) &&
             hasSameIndentation(g, gPrev) &&
             listInSameTableCell(g, gPrev) &&
-            g.op.isSameColumnAs(gPrev.op))
+            g.op.isSameColumnAs(gPrev.op) &&
+            g.op.isSameBannerAs(gPrev.op))
         );
       }
     );
@@ -178,6 +183,7 @@ class ListNester {
           curr instanceof ListGroup &&
           prev instanceof ListGroup &&
           curr.layout === prev.layout &&
+          curr.bannerId === prev.bannerId &&
           ((!curr.headOp && !prev.headOp) ||
             (!!curr.headOp &&
               !!prev.headOp &&
