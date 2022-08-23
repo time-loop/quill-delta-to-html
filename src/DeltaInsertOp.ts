@@ -31,7 +31,8 @@ class DeltaInsertOp {
       this.isBlockAttribute() ||
       this.isCustomTextBlock() ||
       this.isListBlockWrapper(blocksCanBeWrappedWithList) ||
-      this.isLayoutColumnBlock()
+      this.isLayoutColumnBlock() ||
+      this.isAdvancedBannerBlock()
     );
   }
 
@@ -62,6 +63,10 @@ class DeltaInsertOp {
 
   isLayoutColumnBlock(): boolean {
     return !!this.attributes['layout'];
+  }
+
+  isAdvancedBannerBlock(): boolean {
+    return !!this.attributes['advanced-banner'];
   }
 
   isSameHeaderAs(op: DeltaInsertOp): boolean {
@@ -327,6 +332,14 @@ class DeltaInsertOp {
       this.isLayoutColumnBlock() &&
       op.isLayoutColumnBlock() &&
       this.attributes.layout === op.attributes.layout
+    );
+  }
+
+  isSameBannerAs(op: DeltaInsertOp) {
+    return (
+      this.isAdvancedBannerBlock() &&
+      op.isAdvancedBannerBlock() &&
+      this.attributes['advanced-banner'] === op.attributes['advanced-banner']
     );
   }
 }

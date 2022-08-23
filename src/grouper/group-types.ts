@@ -38,6 +38,9 @@ class ListGroup {
   readonly layout: string;
   readonly layoutWidth: string;
   readonly layoutAlign: string;
+  readonly bannerId: string;
+  readonly bannerColor: string;
+  readonly bannerIcon: string;
   readonly counters: string;
   readonly isEmptyNest: boolean | undefined;
   constructor(items: ListItem[], isEmptyNest?: boolean) {
@@ -77,6 +80,31 @@ class ListGroup {
       this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
     }
 
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes['advanced-banner']
+    ) {
+      this.bannerId = headListItem.item.op.attributes['advanced-banner'] || '';
+    }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes['advanced-banner-color']
+    ) {
+      this.bannerColor =
+        headListItem.item.op.attributes['advanced-banner-color'];
+    }
+
+    if (
+      headListItem &&
+      headListItem.item.op.attributes &&
+      headListItem.item.op.attributes['advanced-banner-icon']
+    ) {
+      this.bannerIcon = headListItem.item.op.attributes['advanced-banner-icon'];
+    }
+
     if (headListItem && headListItem.item.op) {
       this.counters = headListItem.item.op.getListAttributes([
         'blockquote',
@@ -101,6 +129,7 @@ class ListItem {
   readonly item: BlockGroup | BlotBlock | EmptyBlock;
   innerList: ListGroup | null;
   readonly layout: string;
+  readonly bannerId: string;
   constructor(
     item: BlockGroup | BlotBlock | EmptyBlock,
     innerList: ListGroup | null = null
@@ -108,6 +137,7 @@ class ListItem {
     this.item = item;
     this.innerList = innerList;
     this.layout = item.op.attributes.layout || '';
+    this.bannerId = item.op.attributes['advanced-banner'] || '';
   }
 }
 
@@ -186,6 +216,24 @@ class LayoutRow {
   }
 }
 
+class AdvancedBanner {
+  items: any[];
+  readonly banner: string;
+  readonly color: string;
+  readonly icon: string;
+  constructor(
+    items: any[],
+    banner: string,
+    color: string,
+    icon: string = 'top'
+  ) {
+    this.items = items;
+    this.banner = banner;
+    this.color = color;
+    this.icon = icon;
+  }
+}
+
 type TDataGroup =
   | VideoItem
   | InlineGroup
@@ -199,7 +247,8 @@ type TDataGroup =
   | TableCell
   | TableCellLine
   | LayoutColumn
-  | LayoutRow;
+  | LayoutRow
+  | AdvancedBanner;
 
 export {
   VideoItem,
@@ -218,4 +267,5 @@ export {
   LayoutColumn,
   LayoutRow,
   TDataGroup,
+  AdvancedBanner,
 };

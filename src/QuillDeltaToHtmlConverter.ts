@@ -23,6 +23,7 @@ import {
   LayoutRow,
   LayoutColumn,
   EmptyBlock,
+  AdvancedBanner,
 } from './grouper/group-types';
 import { ListNester } from './grouper/ListNester';
 import {
@@ -36,6 +37,7 @@ import { GroupType } from './value-types';
 import { IOpAttributeSanitizerOptions } from './OpAttributeSanitizer';
 import { TableGrouper } from './grouper/TableGrouper';
 import { ColumnsNester } from './grouper/ColumnsNester';
+import { BannerNester } from './grouper/BannerNester';
 
 interface IQuillDeltaToHtmlConverterOptions
   extends IOpAttributeSanitizerOptions,
@@ -158,6 +160,9 @@ class QuillDeltaToHtmlConverter {
     );
     groupedOps = tableGrouper.group(groupedOps);
 
+    var bannerNester = new BannerNester();
+    groupedOps = bannerNester.nest(groupedOps);
+
     var columnsNester = new ColumnsNester();
     groupedOps = columnsNester.nest(groupedOps);
 
@@ -193,6 +198,12 @@ class QuillDeltaToHtmlConverter {
         } else if (group instanceof LayoutRow) {
           return this._renderWithCallbacks(GroupType.LayoutRow, group, () =>
             this._renderLayoutRow(<LayoutRow>group)
+          );
+        } else if (group instanceof AdvancedBanner) {
+          return this._renderWithCallbacks(
+            GroupType.AdvancedBanner,
+            group,
+            () => this._renderAdvancedBanner(<AdvancedBanner>group)
           );
         } else {
           // InlineGroup
@@ -415,6 +426,70 @@ class QuillDeltaToHtmlConverter {
     return (
       makeStartTag('div', columnAttrs) +
       column.items
+        .map((group) => {
+          if (group instanceof ListGroup) {
+            return this._renderWithCallbacks(GroupType.List, group, () =>
+              this._renderList(<ListGroup>group)
+            );
+          } else if (group instanceof TableGroup) {
+            return this._renderWithCallbacks(
+              GroupType.TableCellLine,
+              group,
+              () => this._renderTable(<TableGroup>group)
+            );
+          } else if (group instanceof BlockGroup) {
+            var g = <BlockGroup>group;
+
+            return this._renderWithCallbacks(GroupType.Block, group, () =>
+              this._renderBlock(g.op, g.ops)
+            );
+          } else if (group instanceof BlotBlock) {
+            return this._renderCustom(group.op, null);
+          } else if (group instanceof VideoItem) {
+            return this._renderWithCallbacks(GroupType.Video, group, () => {
+              var g = <VideoItem>group;
+              var converter = new OpToHtmlConverter(
+                g.op,
+                this.converterOptions
+              );
+              return converter.getHtml();
+            });
+          } else {
+            // InlineGroup
+            return this._renderWithCallbacks(
+              GroupType.InlineGroup,
+              group,
+              () => {
+                return this._renderInlines((<InlineGroup>group).ops, true);
+              }
+            );
+          }
+        })
+        .join('') +
+      makeEndTag('div')
+    );
+  }
+
+  _renderAdvancedBanner(banner: AdvancedBanner): string {
+    const bannerAttrs = [{ key: 'class', value: 'ql-advanced-banner' }];
+
+    if (!!banner.color) {
+      bannerAttrs.push({
+        key: 'data-advanced-banner-color',
+        value: banner.color,
+      });
+    }
+
+    if (!!banner.icon) {
+      bannerAttrs.push({
+        key: 'data-advanced-banner-icon',
+        value: banner.icon,
+      });
+    }
+
+    return (
+      makeStartTag('div', bannerAttrs) +
+      banner.items
         .map((group) => {
           if (group instanceof ListGroup) {
             return this._renderWithCallbacks(GroupType.List, group, () =>

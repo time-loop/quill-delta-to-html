@@ -74,6 +74,7 @@ interface IOpAttributes {
   rowspan?: string | undefined;
   'table-col'?: TableColAttributes | undefined;
   layout?: string | undefined;
+  'advanced-banner'?: string | undefined;
 
   mentions?: boolean | undefined;
   mention?: IMention | undefined;
