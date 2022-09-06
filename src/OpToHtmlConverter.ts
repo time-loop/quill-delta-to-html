@@ -448,6 +448,7 @@ class OpToHtmlConverter {
       ['direction', positionTag],
       ['indent', positionTag],
       ['layout', positionTag],
+      ['advanced-banner', positionTag],
     ];
     for (var item of blocks) {
       var firstItem = item[0]!;
