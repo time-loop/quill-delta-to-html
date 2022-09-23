@@ -1,6 +1,6 @@
 import { DeltaInsertOp } from './../DeltaInsertOp';
 import { IOpAttributes } from './../OpAttributeSanitizer';
-import { cloneDeep } from 'lodash-es';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 class InlineGroup {
   readonly ops: DeltaInsertOp[];
