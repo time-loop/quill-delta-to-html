@@ -193,7 +193,9 @@ class ListNester {
     return grouped.map((item: TDataGroup | (BlockGroup | BlotBlock)[]) => {
       if (!Array.isArray(item)) {
         if (
-          (item instanceof BlockGroup && item.op.isList()) ||
+          (item instanceof BlockGroup &&
+            (item.op.isList() ||
+              item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))) ||
           (item instanceof BlotBlock &&
             item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)) ||
           (item instanceof AdvancedBanner &&
