@@ -69,6 +69,13 @@ class DeltaInsertOp {
     return !!this.attributes['advanced-banner'];
   }
 
+  isAdvancedBannerBlockInList(): boolean {
+    return (
+      this.isAdvancedBannerBlock() &&
+      !!this.attributes['advanced-banner-in-list']
+    );
+  }
+
   isSameHeaderAs(op: DeltaInsertOp): boolean {
     return op.attributes.header === this.attributes.header && this.isHeader();
   }
@@ -125,6 +132,8 @@ class DeltaInsertOp {
         this.attributes[attrKey] &&
         parseInt(this.attributes[attrKey]['wrapper-indent'], 10)
       );
+    } else if (this.isAdvancedBannerBlockInList() && !this.isList()) {
+      return this.attributes['advanced-banner-list-indent'];
     } else {
       return this.attributes.indent;
     }
@@ -150,6 +159,8 @@ class DeltaInsertOp {
         this.attributes[attrKey] &&
         this.attributes[attrKey]['in-list']
       );
+    } else if (this.isAdvancedBannerBlockInList() && !this.isList()) {
+      return this.attributes['advanced-banner-in-list'];
     } else if (this.isList()) {
       return this.attributes.list!.list;
     }

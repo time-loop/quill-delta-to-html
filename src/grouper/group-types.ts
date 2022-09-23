@@ -1,5 +1,6 @@
 import { DeltaInsertOp } from './../DeltaInsertOp';
 import { IOpAttributes } from './../OpAttributeSanitizer';
+import { cloneDeep } from 'lodash-es';
 
 class InlineGroup {
   readonly ops: DeltaInsertOp[];
@@ -34,6 +35,7 @@ class BlockGroup {
 
 class ListGroup {
   items: ListItem[];
+  readonly headListItem: ListItem;
   readonly headOp: DeltaInsertOp | undefined;
   readonly layout: string;
   readonly layoutWidth: string;
@@ -41,103 +43,134 @@ class ListGroup {
   readonly bannerId: string;
   readonly bannerColor: string;
   readonly bannerIcon: string;
+  readonly bannerInList: string;
+  readonly bannerListIndent: string;
   readonly counters: string;
   readonly isEmptyNest: boolean | undefined;
   constructor(items: ListItem[], isEmptyNest?: boolean) {
     this.items = items;
     this.isEmptyNest = isEmptyNest;
 
-    const headListItem = items[0];
-    if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.cell
+    this.headListItem = items[0];
+    while (
+      this.headListItem.item instanceof EmptyBlock &&
+      this.headListItem.innerList
     ) {
-      this.headOp = headListItem.item.op;
+      this.headListItem = this.headListItem.innerList.items[0];
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layout
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes.cell
     ) {
-      this.layout = headListItem.item.op.attributes.layout;
+      this.headOp = this.headListItem.item.op;
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layoutWidth
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes.layout
     ) {
-      this.layoutWidth = headListItem.item.op.attributes.layoutWidth;
+      this.layout = this.headListItem.item.op.attributes.layout;
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layoutAlign
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes.layoutWidth
     ) {
-      this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
+      this.layoutWidth = this.headListItem.item.op.attributes.layoutWidth;
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes['advanced-banner']
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes.layoutAlign
     ) {
-      this.bannerId = headListItem.item.op.attributes['advanced-banner'] || '';
+      this.layoutAlign = this.headListItem.item.op.attributes.layoutAlign;
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes['advanced-banner-color']
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes['advanced-banner']
     ) {
-      this.bannerColor =
-        headListItem.item.op.attributes['advanced-banner-color'];
+      this.bannerId =
+        this.headListItem.item.op.attributes['advanced-banner'] || '';
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes['advanced-banner-icon']
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes['advanced-banner-color']
     ) {
-      this.bannerIcon = headListItem.item.op.attributes['advanced-banner-icon'];
+      this.bannerColor = this.headListItem.item.op.attributes[
+        'advanced-banner-color'
+      ];
     }
 
-    if (headListItem && headListItem.item.op) {
-      this.counters = headListItem.item.op.getListAttributes([
+    if (
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes['advanced-banner-icon']
+    ) {
+      this.bannerIcon = this.headListItem.item.op.attributes[
+        'advanced-banner-icon'
+      ];
+    }
+
+    if (
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes['advanced-banner-in-list']
+    ) {
+      this.bannerInList = this.headListItem.item.op.attributes[
+        'advanced-banner-in-list'
+      ];
+    }
+
+    if (
+      this.headListItem &&
+      this.headListItem.item.op.attributes &&
+      this.headListItem.item.op.attributes['advanced-banner-list-indent']
+    ) {
+      this.bannerListIndent = this.headListItem.item.op.attributes[
+        'advanced-banner-list-indent'
+      ];
+    }
+
+    if (this.headListItem && this.headListItem.item.op) {
+      this.counters = this.headListItem.item.op.getListAttributes([
         'blockquote',
         'code-block',
         'banner',
         'bookmark',
       ]).counters;
     }
-
-    if (
-      headListItem &&
-      headListItem.item instanceof EmptyBlock &&
-      headListItem.innerList &&
-      headListItem.innerList.headOp
-    ) {
-      this.headOp = headListItem.innerList.headOp;
-    }
   }
 }
 
 class ListItem {
-  readonly item: BlockGroup | BlotBlock | EmptyBlock;
+  readonly item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner;
   innerList: ListGroup | null;
   readonly layout: string;
   readonly bannerId: string;
   constructor(
-    item: BlockGroup | BlotBlock | EmptyBlock,
+    item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner,
     innerList: ListGroup | null = null
   ) {
-    this.item = item;
-    this.innerList = innerList;
-    this.layout = item.op.attributes.layout || '';
-    this.bannerId = item.op.attributes['advanced-banner'] || '';
+    if (item instanceof AdvancedBanner) {
+      this.item = item;
+      this.innerList = innerList;
+      this.layout = item.layout;
+      this.bannerId = item.banner;
+    } else {
+      this.item = item;
+      this.innerList = innerList;
+      this.layout = item.op.attributes.layout || '';
+      this.bannerId = item.op.attributes['advanced-banner'] || '';
+    }
   }
 }
 
@@ -221,16 +254,33 @@ class AdvancedBanner {
   readonly banner: string;
   readonly color: string;
   readonly icon: string;
+  readonly inList: string;
+  readonly listIndent: string;
+  readonly layout: string;
+  readonly op: DeltaInsertOp;
+
   constructor(
     items: any[],
     banner: string,
     color: string,
-    icon: string = 'top'
+    icon: string = 'top',
+    inList: string,
+    listIndent: string,
+    layout: string
   ) {
     this.items = items;
     this.banner = banner;
     this.color = color;
     this.icon = icon;
+    this.inList = inList;
+    this.listIndent = listIndent;
+    this.layout = layout;
+    if (items[0] instanceof ListGroup) {
+      this.op = cloneDeep(items[0].headListItem.item.op);
+      this.op.attributes.list = undefined;
+    } else {
+      this.op = items[0].op;
+    }
   }
 }
 
