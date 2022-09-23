@@ -10,6 +10,8 @@ import { groupConsecutiveElementsWhile } from '../helpers/array';
 const BANNER_ID_ATTR_KEY = 'advanced-banner';
 const BANNER_COLOR_ATTR_KEY = 'advanced-banner-color';
 const BANNER_ICON_ATTR_KEY = 'advanced-banner-icon';
+const BANNER_IN_LIST_ATTR_KEY = 'advanced-banner-in-list';
+const BANNER_LIST_INDENT_ATTR_KEY = 'advanced-banner-list-indent';
 
 export class BannerNester {
   nest(groups: TDataGroup[]): TDataGroup[] {
@@ -34,7 +36,10 @@ export class BannerNester {
             [item],
             getBannerId(item),
             getBannerColor(item),
-            getBannerIcon(item)
+            getBannerIcon(item),
+            getBannerInList(item),
+            getBannerListIndent(item),
+            getBannerLayout(item)
           );
         }
         return item;
@@ -44,41 +49,50 @@ export class BannerNester {
         item,
         getBannerId(item[0]),
         getBannerColor(item[0]),
-        getBannerIcon(item[0])
+        getBannerIcon(item[0]),
+        getBannerInList(item[0]),
+        getBannerListIndent(item[0]),
+        getBannerLayout(item[0])
       );
     });
   }
 }
 
 function getBannerId(g: TDataGroup) {
-  if (g instanceof BlockGroup) {
-    return g.op.attributes[BANNER_ID_ATTR_KEY] || '';
-  } else if (g instanceof ListGroup) {
-    return g.bannerId || '';
-  } else if (g instanceof BlotBlock) {
-    return g.op.attributes[BANNER_ID_ATTR_KEY] || '';
-  }
-  return '';
+  return getBannerAttr(g, BANNER_ID_ATTR_KEY, 'bannerId');
 }
 
 function getBannerColor(g: TDataGroup) {
-  if (g instanceof BlockGroup) {
-    return g.op.attributes[BANNER_COLOR_ATTR_KEY] || '';
-  } else if (g instanceof ListGroup) {
-    return g.bannerColor || '';
-  } else if (g instanceof BlotBlock) {
-    return g.op.attributes[BANNER_COLOR_ATTR_KEY] || '';
-  }
-  return '';
+  return getBannerAttr(g, BANNER_COLOR_ATTR_KEY, 'bannerColor');
 }
 
 function getBannerIcon(g: TDataGroup) {
+  return getBannerAttr(g, BANNER_ICON_ATTR_KEY, 'bannerIcon');
+}
+
+function getBannerInList(g: TDataGroup) {
+  return getBannerAttr(g, BANNER_IN_LIST_ATTR_KEY, 'bannerInList');
+}
+
+function getBannerListIndent(g: TDataGroup) {
+  return getBannerAttr(g, BANNER_LIST_INDENT_ATTR_KEY, 'bannerListIndent');
+}
+
+function getBannerLayout(g: TDataGroup) {
+  return getBannerAttr(g, 'layout', 'layout');
+}
+
+function getBannerAttr(
+  g: TDataGroup,
+  key: string,
+  keyForListGroup: string
+): string {
   if (g instanceof BlockGroup) {
-    return g.op.attributes[BANNER_ICON_ATTR_KEY] || '';
+    return g.op.attributes[key] || '';
   } else if (g instanceof ListGroup) {
-    return g.bannerIcon || '';
+    return g[keyForListGroup] || '';
   } else if (g instanceof BlotBlock) {
-    return g.op.attributes[BANNER_ICON_ATTR_KEY] || '';
+    return g.op.attributes[key] || '';
   }
   return '';
 }

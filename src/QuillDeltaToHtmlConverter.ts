@@ -33,7 +33,7 @@ import {
   ITagKeyValue,
 } from './funcs-html';
 import * as obj from './helpers/object';
-import { GroupType } from './value-types';
+import { GroupType, ListType } from './value-types';
 import { IOpAttributeSanitizerOptions } from './OpAttributeSanitizer';
 import { TableGrouper } from './grouper/TableGrouper';
 import { ColumnsNester } from './grouper/ColumnsNester';
@@ -154,7 +154,7 @@ class QuillDeltaToHtmlConverter {
     );
 
     var listNester = new ListNester(this.options.blocksCanBeWrappedWithList);
-    groupedOps = listNester.nest(groupedOps);
+    groupedOps = listNester.nest(groupedOps, false);
 
     var tableGrouper = new TableGrouper(
       this.options.blocksCanBeWrappedWithList
@@ -280,6 +280,10 @@ class QuillDeltaToHtmlConverter {
       liElementsHtml = this._renderCustom(li.item.op, null);
     } else if (li.item instanceof EmptyBlock) {
       liElementsHtml = '';
+    } else if (li.item instanceof AdvancedBanner) {
+      liElementsHtml = this._renderAdvancedBanner(li.item);
+      parts.openingTag = '';
+      parts.closingTag = '';
     }
 
     return (
@@ -488,8 +492,23 @@ class QuillDeltaToHtmlConverter {
       });
     }
 
+    const openingTags = [makeStartTag('div', bannerAttrs)];
+    const endTags = [makeEndTag('div')];
+    if (banner.inList) {
+      const listAttrs =
+        banner.inList === ListType.Ordered
+          ? [
+              { key: 'data-none-type', value: 'true' },
+              { key: 'class', value: 'ql-rendered-ordered-list' },
+            ]
+          : [{ key: 'data-none-type', value: 'true' }];
+
+      openingTags.unshift(makeStartTag('li', listAttrs));
+      endTags.push(makeEndTag('li'));
+    }
+
     return (
-      makeStartTag('div', bannerAttrs) +
+      openingTags.join('') +
       banner.items
         .map((group) => {
           if (group instanceof ListGroup) {
@@ -531,7 +550,7 @@ class QuillDeltaToHtmlConverter {
           }
         })
         .join('') +
-      makeEndTag('div')
+      endTags.join('')
     );
   }
 
