@@ -290,6 +290,10 @@ class AdvancedBanner {
     this.inList = inList;
     this.listIndent = listIndent;
     this.layout = layout;
+    /**
+     * Set op attribute for AdvancedBanner
+     * When the first child of AdvancedBanner is ListGroup, it needs to be set to the op of the first listItem of the ListGroup.
+     */
     if (items[0] instanceof ListGroup) {
       this.op = cloneDeep(items[0].headListItem.item.op);
       this.op.attributes.list = undefined;
