@@ -176,14 +176,13 @@ class ListItem {
     item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner,
     innerList: ListGroup | null = null
   ) {
+    this.item = item;
+    this.innerList = innerList;
+
     if (item instanceof AdvancedBanner) {
-      this.item = item;
-      this.innerList = innerList;
       this.layout = item.layout;
       this.bannerId = item.banner;
     } else {
-      this.item = item;
-      this.innerList = innerList;
       this.layout = item.op.attributes.layout || '';
       this.bannerId = item.op.attributes['advanced-banner'] || '';
     }
