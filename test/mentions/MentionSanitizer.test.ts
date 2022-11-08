@@ -1,4 +1,3 @@
-import 'mocha';
 import * as assert from 'assert';
 
 import { MentionSanitizer } from './../../src/mentions/MentionSanitizer';

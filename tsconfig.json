@@ -10,8 +10,7 @@
          "es6"
       ],
       "types": [
-         "node",
-         "mocha"
+         "node"
       ],
       "declaration": true,
       "noImplicitThis": true,
