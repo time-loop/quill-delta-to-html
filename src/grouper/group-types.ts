@@ -1,6 +1,6 @@
 import { DeltaInsertOp } from './../DeltaInsertOp';
 import { IOpAttributes } from './../OpAttributeSanitizer';
-import { cloneDeep } from 'lodash-es';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 class InlineGroup {
   readonly ops: DeltaInsertOp[];
@@ -35,30 +35,40 @@ class BlockGroup {
 
 class ListGroup {
   items: ListItem[];
-  readonly headListItem: ListItem;
-  readonly headOp: DeltaInsertOp | undefined;
-  readonly layout: string;
-  readonly layoutWidth: string;
-  readonly layoutAlign: string;
-  readonly bannerId: string;
-  readonly bannerColor: string;
-  readonly bannerIcon: string;
-  readonly bannerInList: string;
-  readonly bannerListIndent: string;
-  readonly counters: string;
+  headListItem: ListItem;
+  headOp: DeltaInsertOp | undefined;
+  layout: string;
+  layoutWidth: string;
+  layoutAlign: string;
+  bannerId: string;
+  bannerColor: string;
+  bannerIcon: string;
+  bannerInList: string;
+  bannerListIndent: string;
+  counters: string;
   readonly isEmptyNest: boolean | undefined;
   constructor(items: ListItem[], isEmptyNest?: boolean) {
     this.items = items;
     this.isEmptyNest = isEmptyNest;
-
     this.headListItem = items[0];
+
+    this.updateHeadListItemIfThisIsAnEmptyListGroup();
+    this.setHeadOpIfThisListIsNestedWithTable();
+    this.setAttributesForColumnLayout();
+    this.setAttributesForNestedBanner();
+    this.setCountersForContinuousList();
+  }
+
+  private updateHeadListItemIfThisIsAnEmptyListGroup() {
     while (
       this.headListItem.item instanceof EmptyBlock &&
       this.headListItem.innerList
     ) {
       this.headListItem = this.headListItem.innerList.items[0];
     }
+  }
 
+  private setHeadOpIfThisListIsNestedWithTable() {
     if (
       this.headListItem &&
       this.headListItem.item.op.attributes &&
@@ -66,7 +76,9 @@ class ListGroup {
     ) {
       this.headOp = this.headListItem.item.op;
     }
+  }
 
+  private setAttributesForColumnLayout() {
     if (
       this.headListItem &&
       this.headListItem.item.op.attributes &&
@@ -90,7 +102,9 @@ class ListGroup {
     ) {
       this.layoutAlign = this.headListItem.item.op.attributes.layoutAlign;
     }
+  }
 
+  private setAttributesForNestedBanner() {
     if (
       this.headListItem &&
       this.headListItem.item.op.attributes &&
@@ -139,7 +153,9 @@ class ListGroup {
         'advanced-banner-list-indent'
       ];
     }
+  }
 
+  private setCountersForContinuousList() {
     if (this.headListItem && this.headListItem.item.op) {
       this.counters = this.headListItem.item.op.getListAttributes([
         'blockquote',
@@ -160,14 +176,13 @@ class ListItem {
     item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner,
     innerList: ListGroup | null = null
   ) {
+    this.item = item;
+    this.innerList = innerList;
+
     if (item instanceof AdvancedBanner) {
-      this.item = item;
-      this.innerList = innerList;
       this.layout = item.layout;
       this.bannerId = item.banner;
     } else {
-      this.item = item;
-      this.innerList = innerList;
       this.layout = item.op.attributes.layout || '';
       this.bannerId = item.op.attributes['advanced-banner'] || '';
     }
@@ -275,6 +290,10 @@ class AdvancedBanner {
     this.inList = inList;
     this.listIndent = listIndent;
     this.layout = layout;
+    /**
+     * Set op attribute for AdvancedBanner
+     * When the first child of AdvancedBanner is ListGroup, it needs to be set to the op of the first listItem of the ListGroup.
+     */
     if (items[0] instanceof ListGroup) {
       this.op = cloneDeep(items[0].headListItem.item.op);
       this.op.attributes.list = undefined;
