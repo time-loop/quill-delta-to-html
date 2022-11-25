@@ -153,7 +153,7 @@ class QuillDeltaToHtmlConverter {
     );
 
     var listNester = new ListNester(this.options.blocksCanBeWrappedWithList);
-    groupedOps = listNester.nest(groupedOps, false);
+    groupedOps = listNester.nest(groupedOps);
 
     var tableGrouper = new TableGrouper(
       this.options.blocksCanBeWrappedWithList

@@ -18,7 +18,7 @@ class ListNester {
     this.blocksCanBeWrappedWithList = blocksCanBeWrappedWithList;
   }
 
-  nest(groups: TDataGroup[], ignoreBanner: boolean): TDataGroup[] {
+  nest(groups: TDataGroup[], ignoreBanner = false): TDataGroup[] {
     const grouped = ignoreBanner
       ? groups
       : this.nestAdvancedBannerInList(groups);
