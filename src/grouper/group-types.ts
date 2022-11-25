@@ -52,117 +52,95 @@ class ListGroup {
     this.isEmptyNest = isEmptyNest;
     this.headListItem = items[0];
 
-    this.updateHeadListItemIfThisIsAnEmptyListGroup();
-    this.setHeadOpIfThisListIsNestedWithTable();
-    this.setAttributesForColumnLayout();
-    this.setAttributesForNestedBanner();
-    this.setCountersForContinuousList();
-    this.resetHeadListItem();
+    const availableHeadItem = this.getAvailableHeadItem();
+    this.setHeadOpIfThisListIsNestedWithTable(availableHeadItem);
+    this.setAttributesForColumnLayout(availableHeadItem);
+    this.setAttributesForNestedBanner(availableHeadItem);
+    this.setCountersForContinuousList(availableHeadItem);
   }
 
-  private updateHeadListItemIfThisIsAnEmptyListGroup() {
-    while (
-      this.headListItem.item instanceof EmptyBlock &&
-      this.headListItem.innerList
-    ) {
-      this.headListItem = this.headListItem.innerList.items[0];
+  private getAvailableHeadItem(): ListItem {
+    let curItem = this.headListItem;
+    while (curItem.item instanceof EmptyBlock && curItem.innerList) {
+      curItem = curItem.innerList.items[0];
     }
+    return curItem;
   }
 
-  private resetHeadListItem() {
-    this.headListItem = this.items[0];
-  }
-
-  private setHeadOpIfThisListIsNestedWithTable() {
-    if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes.cell
-    ) {
-      this.headOp = this.headListItem.item.op;
+  private setHeadOpIfThisListIsNestedWithTable(item: ListItem) {
+    if (item && item.item.op.attributes && item.item.op.attributes.cell) {
+      this.headOp = item.item.op;
     }
   }
 
-  private setAttributesForColumnLayout() {
-    if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes.layout
-    ) {
-      this.layout = this.headListItem.item.op.attributes.layout;
+  private setAttributesForColumnLayout(item: ListItem) {
+    if (item && item.item.op.attributes && item.item.op.attributes.layout) {
+      this.layout = item.item.op.attributes.layout;
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes.layoutWidth
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes.layoutWidth
     ) {
-      this.layoutWidth = this.headListItem.item.op.attributes.layoutWidth;
+      this.layoutWidth = item.item.op.attributes.layoutWidth;
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes.layoutAlign
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes.layoutAlign
     ) {
-      this.layoutAlign = this.headListItem.item.op.attributes.layoutAlign;
+      this.layoutAlign = item.item.op.attributes.layoutAlign;
     }
   }
 
-  private setAttributesForNestedBanner() {
+  private setAttributesForNestedBanner(item: ListItem) {
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes['advanced-banner']
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner']
     ) {
-      this.bannerId =
-        this.headListItem.item.op.attributes['advanced-banner'] || '';
+      this.bannerId = item.item.op.attributes['advanced-banner'] || '';
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes['advanced-banner-color']
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-color']
     ) {
-      this.bannerColor = this.headListItem.item.op.attributes[
-        'advanced-banner-color'
-      ];
+      this.bannerColor = item.item.op.attributes['advanced-banner-color'];
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes['advanced-banner-icon']
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-icon']
     ) {
-      this.bannerIcon = this.headListItem.item.op.attributes[
-        'advanced-banner-icon'
-      ];
+      this.bannerIcon = item.item.op.attributes['advanced-banner-icon'];
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes['advanced-banner-in-list']
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-in-list']
     ) {
-      this.bannerInList = this.headListItem.item.op.attributes[
-        'advanced-banner-in-list'
-      ];
+      this.bannerInList = item.item.op.attributes['advanced-banner-in-list'];
     }
 
     if (
-      this.headListItem &&
-      this.headListItem.item.op.attributes &&
-      this.headListItem.item.op.attributes['advanced-banner-list-indent']
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-list-indent']
     ) {
-      this.bannerListIndent = this.headListItem.item.op.attributes[
-        'advanced-banner-list-indent'
-      ];
+      this.bannerListIndent =
+        item.item.op.attributes['advanced-banner-list-indent'];
     }
   }
 
-  private setCountersForContinuousList() {
-    if (this.headListItem && this.headListItem.item.op) {
-      this.counters = this.headListItem.item.op.getListAttributes([
+  private setCountersForContinuousList(item: ListItem) {
+    if (item && item.item.op) {
+      this.counters = item.item.op.getListAttributes([
         'blockquote',
         'code-block',
         'banner',
