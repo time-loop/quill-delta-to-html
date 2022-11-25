@@ -1,4 +1,3 @@
-import 'mocha';
 import * as assert from 'assert';
 
 import { OpAttributeSanitizer } from './../src/OpAttributeSanitizer';
@@ -76,23 +75,23 @@ describe('OpAttributeSanitizer', function () {
   });
   describe('#IsValidRGBAColor()', function () {
     it('should return true if rgba color is valid', function () {
-      assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgba(0,0,0,0)'));
-      assert.ok(OpAttributeSanitizer.IsValidRGBColor('rgba(255, 99, 1, 1)'));
+      assert.ok(OpAttributeSanitizer.IsValidRGBAColor('rgba(0,0,0,0)'));
+      assert.ok(OpAttributeSanitizer.IsValidRGBAColor('rgba(255, 99, 1, 1)'));
       assert.ok(
-        OpAttributeSanitizer.IsValidRGBColor('RGBA(254, 249, 109, 0.5)')
+        OpAttributeSanitizer.IsValidRGBAColor('RGBA(254, 249, 109, 0.5)')
       );
-      assert.equal(OpAttributeSanitizer.IsValidRGBColor('yellow'), false);
-      assert.equal(OpAttributeSanitizer.IsValidRGBColor('#FFF'), false);
+      assert.equal(OpAttributeSanitizer.IsValidRGBAColor('yellow'), false);
+      assert.equal(OpAttributeSanitizer.IsValidRGBAColor('#FFF'), false);
       assert.equal(
-        OpAttributeSanitizer.IsValidRGBColor('rgba(260,0,0,0.2)'),
+        OpAttributeSanitizer.IsValidRGBAColor('rgba(260,0,0,0.2)'),
         false
       );
       assert.equal(
-        OpAttributeSanitizer.IsValidRGBColor('rgba(253,0,0,2)'),
+        OpAttributeSanitizer.IsValidRGBAColor('rgba(253,0,0,2)'),
         false
       );
       assert.equal(
-        OpAttributeSanitizer.IsValidRGBColor('rgba(2000,0,0,0)'),
+        OpAttributeSanitizer.IsValidRGBAColor('rgba(2000,0,0,0)'),
         false
       );
     });
