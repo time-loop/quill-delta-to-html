@@ -57,6 +57,7 @@ class ListGroup {
     this.setAttributesForColumnLayout();
     this.setAttributesForNestedBanner();
     this.setCountersForContinuousList();
+    this.resetHeadListItem();
   }
 
   private updateHeadListItemIfThisIsAnEmptyListGroup() {
@@ -66,6 +67,10 @@ class ListGroup {
     ) {
       this.headListItem = this.headListItem.innerList.items[0];
     }
+  }
+
+  private resetHeadListItem() {
+    this.headListItem = this.items[0];
   }
 
   private setHeadOpIfThisListIsNestedWithTable() {
