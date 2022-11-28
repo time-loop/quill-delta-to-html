@@ -985,7 +985,23 @@ describe('QuillDeltaToHtmlConverter', function () {
       ];
 
       const qdc = new QuillDeltaToHtmlConverter(ops);
-      assert.equal(qdc.convert(), [``].join(''));
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>green banner in column 1</p>`,
+          `</div>`,
+          `</div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="red">`,
+          `<p>red banner in column 2</p>`,
+          `</div>`,
+          `</div>`,
+          `</div>`,
+        ].join('')
+      );
     });
   });
 
