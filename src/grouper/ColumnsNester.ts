@@ -5,6 +5,7 @@ import {
   BlockGroup,
   ListGroup,
   BlotBlock,
+  AdvancedBanner,
 } from './group-types';
 import { groupConsecutiveElementsWhile } from '../helpers/array';
 
@@ -83,7 +84,7 @@ export class ColumnsNester {
 function getLayoutId(g: TDataGroup) {
   if (g instanceof BlockGroup) {
     return g.op.attributes.layout || '';
-  } else if (g instanceof ListGroup) {
+  } else if (g instanceof ListGroup || g instanceof AdvancedBanner) {
     return g.layout || '';
   } else if (g instanceof BlotBlock) {
     return g.op.attributes.layout || '';
@@ -96,7 +97,7 @@ function getLayoutWidth(g: TDataGroup) {
     return g.op.attributes['layout-width'] || '';
   } else if (g instanceof ListGroup) {
     return g.layoutWidth || '';
-  } else if (g instanceof BlotBlock) {
+  } else if (g instanceof BlotBlock || g instanceof AdvancedBanner) {
     return g.op.attributes['layout-width'] || '';
   }
   return '';
@@ -107,7 +108,7 @@ function getLayoutAlign(g: TDataGroup) {
     return g.op.attributes['layout-align'] || 'top';
   } else if (g instanceof ListGroup) {
     return g.layoutAlign || 'top';
-  } else if (g instanceof BlotBlock) {
+  } else if (g instanceof BlotBlock || g instanceof AdvancedBanner) {
     return g.op.attributes['layout-align'] || 'top';
   }
   return '';
