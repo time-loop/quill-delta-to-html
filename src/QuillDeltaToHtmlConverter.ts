@@ -459,6 +459,12 @@ class QuillDeltaToHtmlConverter {
               );
               return converter.getHtml();
             });
+          } else if (group instanceof AdvancedBanner) {
+            return this._renderWithCallbacks(
+              GroupType.AdvancedBanner,
+              group,
+              () => this._renderAdvancedBanner(<AdvancedBanner>group)
+            );
           } else {
             // InlineGroup
             return this._renderWithCallbacks(
