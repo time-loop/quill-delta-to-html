@@ -7,11 +7,11 @@ import {
 } from './group-types';
 import { groupConsecutiveElementsWhile } from '../helpers/array';
 
-const BANNER_ID_ATTR_KEY = 'advanced-banner';
-const BANNER_COLOR_ATTR_KEY = 'advanced-banner-color';
-const BANNER_ICON_ATTR_KEY = 'advanced-banner-icon';
-const BANNER_IN_LIST_ATTR_KEY = 'advanced-banner-in-list';
-const BANNER_LIST_INDENT_ATTR_KEY = 'advanced-banner-list-indent';
+export const BANNER_ID_ATTR_KEY = 'advanced-banner';
+export const BANNER_COLOR_ATTR_KEY = 'advanced-banner-color';
+export const BANNER_ICON_ATTR_KEY = 'advanced-banner-icon';
+export const BANNER_IN_LIST_ATTR_KEY = 'advanced-banner-in-list';
+export const BANNER_LIST_INDENT_ATTR_KEY = 'advanced-banner-list-indent';
 
 export class BannerNester {
   nest(groups: TDataGroup[]): TDataGroup[] {
