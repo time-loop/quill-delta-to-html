@@ -10,7 +10,6 @@ import * as obj from './helpers/object';
 import { IMention } from './mentions/MentionSanitizer';
 import * as arr from './helpers/array';
 import { OpAttributeSanitizer } from './OpAttributeSanitizer';
-import find from 'lodash-es/find';
 
 export type InlineStyleType =
   | ((value: string, op: DeltaInsertOp) => string | undefined)
@@ -128,13 +127,12 @@ class OpToHtmlConverter {
       }
       // Add li tag before when the block wrapped by list
       if (this.op.isListBlockWrapper(this.options.blocksCanBeWrappedWithList)) {
-        const attrKey = find(
-          this.options.blocksCanBeWrappedWithList,
-          (key) => !!this.op.attributes[key]
+        const listType = this.op.getListType(
+          this.options.blocksCanBeWrappedWithList
         );
 
         beginTags.push(
-          attrKey && this.op.attributes[attrKey]['in-list'] === ListType.Ordered
+          listType === ListType.Ordered
             ? makeStartTag('li', [
                 this.makeAttr('data-none-type', 'true'),
                 this.makeAttr('class', 'ql-rendered-ordered-list'),

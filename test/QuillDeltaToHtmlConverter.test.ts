@@ -324,171 +324,6 @@ describe('QuillDeltaToHtmlConverter', function () {
       );
     });
 
-    // it('should render empty table', () => {
-    //   let ops = [
-    //     {
-    //       insert: '\n\n\n',
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n\n\n',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n\n\n',
-    //     },
-    //     {
-    //       insert: '\n',
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1"><br/></td><td data-row="row-1"><br/></td><td data-row="row-1"><br/></td></tr>`,
-    //       `<tr><td data-row="row-2"><br/></td><td data-row="row-2"><br/></td><td data-row="row-2"><br/></td></tr>`,
-    //       `<tr><td data-row="row-3"><br/></td><td data-row="row-3"><br/></td><td data-row="row-3"><br/></td></tr>`,
-    //       `</tbody></table>`,
-    //       `<p><br/></p>`,
-    //     ].join('')
-    //   );
-    // });
-
-    // it('should render singe cell table', () => {
-    //   let ops = [
-    //     {
-    //       insert: 'cell',
-    //     },
-    //     {
-    //       insert: '\n',
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1">cell</td></tr>`,
-    //       `</tbody></table>`,
-    //     ].join('')
-    //   );
-    // });
-
-    // it('should render filled table', () => {
-    //   let ops = [
-    //     {
-    //       insert: '11',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '12',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '13',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '21',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '22',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '23',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '31',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '32',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '33',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '\n',
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1">11</td><td data-row="row-1">12</td><td data-row="row-1">13</td></tr>`,
-    //       `<tr><td data-row="row-2">21</td><td data-row="row-2">22</td><td data-row="row-2">23</td></tr>`,
-    //       `<tr><td data-row="row-3">31</td><td data-row="row-3">32</td><td data-row="row-3">33</td></tr>`,
-    //       `</tbody></table>`,
-    //       `<p><br/></p>`,
-    //     ].join('')
-    //   );
-    // });
-
     // test case for cu-table
     it('should render empty cu-table', () => {
       let ops = [
@@ -1025,6 +860,144 @@ describe('QuillDeltaToHtmlConverter', function () {
           `</div>`,
           `<div class="ql-layout-col-container" data-layout-align="top">`,
           `<ol><li>column 2</li></ol>`,
+          `</div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    // test cases for advanced banner
+    it('should render advanced banner', () => {
+      const ops = [
+        {
+          insert: 'line',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+          },
+        },
+        {
+          insert: 'list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            list: { list: 'bullet' },
+          },
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>line</p>`,
+          `<ul><li>list</li></ul>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render advanced banner nested in list', () => {
+      const ops = [
+        {
+          insert: 'root list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: { list: 'bullet' },
+          },
+        },
+        {
+          insert: 'list banner',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            'advanced-banner-in-list': 'bullet',
+            'advanced-banner-list-indent': '1',
+          },
+        },
+        {
+          insert: 'list banner list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: { list: 'bullet' },
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            'advanced-banner-in-list': 'bullet',
+            'advanced-banner-list-indent': '1',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<ul><li>root list`,
+          `<li data-none-type="true">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>list banner</p>`,
+          `<ul><li>list banner list</li></ul>`,
+          `</div>`,
+          `</li></li></ul>`,
+        ].join('')
+      );
+    });
+
+    it('should render banner in column', () => {
+      const ops = [
+        {
+          insert: 'green banner in column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id-1',
+            'advanced-banner-color': 'green',
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca82455555',
+          },
+        },
+        {
+          insert: 'red banner in column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id-2',
+            'advanced-banner-color': 'red',
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+          },
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>green banner in column 1</p>`,
+          `</div>`,
+          `</div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="red">`,
+          `<p>red banner in column 2</p>`,
+          `</div>`,
           `</div>`,
           `</div>`,
         ].join('')
