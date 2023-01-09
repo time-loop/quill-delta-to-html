@@ -181,13 +181,15 @@ export class TableGrouper {
           row =
             firstCell.attrs?.['table-cell-line']?.row ||
             firstCell.attrs?.list?.row ||
+            firstCell.attrs?.row ||
             undefined;
         }
       } else {
         row =
           item.attrs?.['table-cell-line']?.row ||
           item.attrs?.list?.row ||
-          undefined;
+          item.attrs?.row;
+        undefined;
       }
 
       return new TableRow(

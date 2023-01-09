@@ -352,7 +352,8 @@ class QuillDeltaToHtmlConverter {
       ? this.options.customTableCellAttrs(cell)
       : [];
 
-    const cellAttributes = cell.attrs?.['table-cell-line'] || cell.attrs?.list;
+    const cellAttributes =
+      cell.attrs?.['table-cell-line'] || cell.attrs?.list || cell.attrs;
     const attributes: ITagKeyValue[] = [
       { key: 'data-row', value: cellAttributes?.row },
       { key: 'rowspan', value: cellAttributes?.rowspan },
