@@ -208,6 +208,10 @@ class DeltaInsertOp {
     );
   }
 
+  isListNestedInTable() {
+    return !!this.attributes?.list?.cell;
+  }
+
   isOrderedList() {
     return (
       !!this.attributes.list && this.attributes.list!.list === ListType.Ordered
