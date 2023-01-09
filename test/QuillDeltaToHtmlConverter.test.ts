@@ -756,6 +756,258 @@ describe('QuillDeltaToHtmlConverter', function () {
       );
     });
 
+    // test cases for refactored cu-table
+    it('should render empty cu-table', () => {
+      let ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-kdrmch',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-ljjq9j',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-lj7h6y',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-xa4lb9',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-2w5wjp',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-o7q92h',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-4nujo2',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 450px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-kdrmch" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-ljjq9j" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-929dk8">`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-lj7h6y" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-xa4lb9" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-j95olh">`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-2w5wjp" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-o7q92h" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-4nujo2" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render table with list', () => {
+      let ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+              list: 'bullet',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-kdrmch',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-lj7h6y',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+              list: 'ordered',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 300px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><br/></p>`,
+          `<ul data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><li><br/></li></ul>`,
+          `</td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-kdrmch" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-929dk8">`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-lj7h6y" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><br/></p>`,
+          `<ol data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><li><br/></li></ol>`,
+          `</td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    // test cases for columns
     it('should render columns with list', () => {
       let ops = [
         {

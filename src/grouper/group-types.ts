@@ -68,7 +68,7 @@ class ListGroup {
   }
 
   private setHeadOpIfThisListIsNestedWithTable(item: ListItem) {
-    if (item && item.item.op.attributes && item.item.op.attributes.cell) {
+    if (item && item.item.op.attributes && item.item.op.attributes.list?.cell) {
       this.headOp = item.item.op;
     }
   }
