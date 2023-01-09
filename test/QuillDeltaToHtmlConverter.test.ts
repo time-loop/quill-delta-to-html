@@ -807,7 +807,10 @@ describe('QuillDeltaToHtmlConverter', function () {
             colspan: '1',
           },
         },
-        { insert: { hidden_table_cell: '2' } },
+        {
+          insert: { hidden_table_cell: '2' },
+          attributes: { renderAsBlock: true },
+        },
         { insert: '4' },
         {
           insert: '\n',
@@ -871,7 +874,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<td data-row="1" rowspan="3" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="2" data-rowspan="3" data-colspan="1">2</p></td>`,
           `<td data-row="1" rowspan="4" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="3" data-rowspan="4" data-colspan="1">3</p></td>`,
           `</tr>`,
-          `<tr data-row="2"><td data-row="2" rowspan colspan hidden="true"></td></tr>`,
+          `<tr data-row="2"><td data-row="2" rowspan colspan></td></tr>`,
           `<tr data-row="3">`,
           `<td data-row="3" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="3" data-cell="4" data-rowspan="1" data-colspan="1">4</p></td>`,
           `</tr>`,
