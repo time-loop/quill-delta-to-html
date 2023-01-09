@@ -756,6 +756,138 @@ describe('QuillDeltaToHtmlConverter', function () {
       );
     });
 
+    it('should render table with merged cell and empty row', () => {
+      const ops = [
+        { insert: '\n\n\n', attributes: { 'table-col': { width: '150' } } },
+        { insert: '1' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '2',
+              colspan: '1',
+              row: '1',
+              cell: '1',
+            },
+            row: '1',
+            cell: '1',
+            rowspan: '2',
+            colspan: '1',
+          },
+        },
+        { insert: '2' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '3',
+              colspan: '1',
+              row: '1',
+              cell: '2',
+            },
+            row: '1',
+            cell: '2',
+            rowspan: '3',
+            colspan: '1',
+          },
+        },
+        { insert: '3' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '4',
+              colspan: '1',
+              row: '1',
+              cell: '3',
+            },
+            row: '1',
+            cell: '3',
+            rowspan: '4',
+            colspan: '1',
+          },
+        },
+        { insert: { hidden_table_cell: '2' } },
+        { insert: '4' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '3',
+              cell: '4',
+            },
+            row: '3',
+            cell: '4',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+        { insert: '5' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '4',
+              cell: '5',
+            },
+            row: '4',
+            cell: '5',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+        { insert: '6' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '5',
+              cell: '6',
+            },
+            row: '5',
+            cell: '6',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 450px">`,
+          `<colgroup><col width="150"><col width="150"><col width="150"></colgroup>`,
+          `<tbody>`,
+          `<tr data-row="1">`,
+          `<td data-row="1" rowspan="2" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="1" data-rowspan="2" data-colspan="1">1</p></td>`,
+          `<td data-row="1" rowspan="3" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="2" data-rowspan="3" data-colspan="1">2</p></td>`,
+          `<td data-row="1" rowspan="4" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="3" data-rowspan="4" data-colspan="1">3</p></td>`,
+          `</tr>`,
+          `<tr data-row="2"><td data-row="2" rowspan colspan hidden="true"></td></tr>`,
+          `<tr data-row="3">`,
+          `<td data-row="3" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="3" data-cell="4" data-rowspan="1" data-colspan="1">4</p></td>`,
+          `</tr>`,
+          `<tr data-row="4">`,
+          `<td data-row="4" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="4" data-cell="5" data-rowspan="1" data-colspan="1">5</p></td>`,
+          `</tr>`,
+          `<tr data-row="5">`,
+          `<td data-row="5" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="5" data-cell="6" data-rowspan="1" data-colspan="1">6</p></td>`,
+          `</tr>`,
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
     // test cases for refactored cu-table
     it('should render empty cu-table', () => {
       let ops = [
