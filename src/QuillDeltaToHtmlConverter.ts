@@ -245,10 +245,10 @@ class QuillDeltaToHtmlConverter {
     var firstItem = list.items[0];
     let attrsOfList: ITagKeyValue[] = !!list.headOp
       ? [
-          { key: 'data-row', value: list.headOp.attributes!.row },
-          { key: 'data-cell', value: list.headOp.attributes!.cell },
-          { key: 'data-rowspan', value: list.headOp.attributes!.rowspan },
-          { key: 'data-colspan', value: list.headOp.attributes!.colspan },
+          { key: 'data-row', value: list.headOp.attributes.list?.row },
+          { key: 'data-cell', value: list.headOp.attributes.list?.cell },
+          { key: 'data-rowspan', value: list.headOp.attributes.list?.rowspan },
+          { key: 'data-colspan', value: list.headOp.attributes.list?.colspan },
         ]
       : [];
 
@@ -353,10 +353,12 @@ class QuillDeltaToHtmlConverter {
       ? this.options.customTableCellAttrs(cell)
       : [];
 
+    const cellAttributes =
+      cell.attrs?.['table-cell-line'] || cell.attrs?.list || cell.attrs;
     const attributes: ITagKeyValue[] = [
-      { key: 'data-row', value: cell.attrs!.row },
-      { key: 'rowspan', value: cell.attrs!.rowspan },
-      { key: 'colspan', value: cell.attrs!.colspan },
+      { key: 'data-row', value: cellAttributes?.row },
+      { key: 'rowspan', value: cellAttributes?.rowspan },
+      { key: 'colspan', value: cellAttributes?.colspan },
     ];
 
     customAttributes.forEach((item) => {
