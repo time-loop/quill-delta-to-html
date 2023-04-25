@@ -212,6 +212,7 @@ describe('QuillDeltaToHtmlConverter', function () {
     });
 
     it('should create checked/unchecked lists', function () {
+      debugger;
       var ops4 = [
         { insert: 'hello' },
         { insert: '\n', attributes: { list: { list: 'checked' } } },
@@ -231,10 +232,10 @@ describe('QuillDeltaToHtmlConverter', function () {
         html,
         [
           '<ul>',
-          '<li data-checked="true">hello</li>',
-          '<li data-checked="false">there</li>',
-          '<li data-checked="true">man',
-          '<ul><li data-checked="false">not done</li></ul>',
+          '<li data-checked="true"><p>hello</p></li>',
+          '<li data-checked="false"><p>there</p></li>',
+          '<li data-checked="true"><p>man</p>',
+          '<ul><li data-checked="false"><p>not done</p></li></ul>',
           '</li>',
           '</ul>',
         ].join('')
@@ -1124,7 +1125,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<tr data-row="row-dvagmt">`,
           `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
           `<p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><br/></p>`,
-          `<ul data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><li><br/></li></ul>`,
+          `<ul data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ul>`,
           `</td>`,
           `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-kdrmch" data-rowspan="1" data-colspan="1"><br/></p></td>`,
           '</tr>',
@@ -1132,7 +1133,7 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-lj7h6y" data-rowspan="1" data-colspan="1"><br/></p></td>`,
           `<td data-row="row-929dk8" rowspan="1" colspan="1">`,
           `<p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><br/></p>`,
-          `<ol data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><li><br/></li></ol>`,
+          `<ol data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ol>`,
           `</td>`,
           '</tr>',
           `</tbody>`,
@@ -1188,10 +1189,10 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<div class="ql-layout-row-container">`,
           `<div class="ql-layout-col-container" data-layout-align="top"><p>column 1</p></div>`,
           `<div class="ql-layout-col-container" data-layout-align="top">`,
-          `<ol><li>column 2</li></ol>`,
+          `<ol><li><p>column 2</p></li></ol>`,
           `</div>`,
           `</div>`,
-          `<ol><li>column 1</li></ol>`,
+          `<ol><li><p>column 1</p></li></ol>`,
         ].join('')
       );
     });
@@ -1243,10 +1244,10 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<div class="ql-layout-row-container">`,
           `<div class="ql-layout-col-container" data-layout-align="top">`,
           `<p>column 1</p>`,
-          `<ol><li>column 1</li></ol>`,
+          `<ol><li><p>column 1</p></li></ol>`,
           `</div>`,
           `<div class="ql-layout-col-container" data-layout-align="top">`,
-          `<ol><li>column 2</li></ol>`,
+          `<ol><li><p>column 2</p></li></ol>`,
           `</div>`,
           `</div>`,
         ].join('')
@@ -1285,7 +1286,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         [
           `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
           `<p>line</p>`,
-          `<ul><li>list</li></ul>`,
+          `<ul><li><p>list</p></li></ul>`,
           `</div>`,
         ].join('')
       );
@@ -1332,11 +1333,11 @@ describe('QuillDeltaToHtmlConverter', function () {
       assert.equal(
         qdc.convert(),
         [
-          `<ul><li>root list`,
+          `<ul><li><p>root list</p>`,
           `<li data-none-type="true">`,
           `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
           `<p>list banner</p>`,
-          `<ul><li>list banner list</li></ul>`,
+          `<ul><li><p>list banner list</p></li></ul>`,
           `</div>`,
           `</li></li></ul>`,
         ].join('')
@@ -1912,7 +1913,7 @@ describe('QuillDeltaToHtmlConverter', function () {
             var d = <any>data;
             assert.ok(d.op.attributes.blockquote && d.ops.length === 2);
           } else {
-            assert.ok(html.indexOf('list item 1<ul><li') > -1);
+            assert.ok(html.indexOf('list item 1</p><ul><li') > -1);
           }
           status.x++;
           return html;
@@ -2035,18 +2036,20 @@ describe('QuillDeltaToHtmlConverter', function () {
           [
             '<p>first line</p>',
             '<ol>',
-            '<li>first list item parent',
+            '<li><p>first list item parent</p>',
             '<ol>',
-            '<li>child list item</li>',
+            '<li><p>child list item</p></li>',
             '<li data-none-type="true">',
-            '<blockquote>blockq</blockquote>',
+            '<blockquote><p>blockq</p></blockquote>',
             '</li>',
             '</ol>',
             '</li>',
-            '<li>aaa',
+            '<li><p>aaa</p>',
             '<li data-empty-block="true">',
             '<li data-empty-block="true">',
-            '<ul><li data-none-type="true"><blockquote>bbb<br/>ccc</blockquote></li></ul>',
+            '<ul><li data-none-type="true">',
+            '<blockquote><p>bbb<br/>ccc</p></blockquote>',
+            '</li></ul>',
             '</li>',
             '</li>',
             '</li>',
