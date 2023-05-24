@@ -119,10 +119,14 @@ var testAdvancedBannerInList = { "ops": [
   {"insert":"\n","attributes":{"block-id":"block-2922ac17-3b23-462d-a317-f9b82e8fb23b"}}]
 };
 var codeBlocksInList = {
-  "op": [
+  "ops": [
     {"insert":"hello this is a list.","attributes":{}},
     {"insert":"\n","attributes":{"list":{"list":"bullet"}}},
     {"insert":"code block","attributes":{}},
+    {"attributes":{"code-block":{"code-block":"javascript", "in-list":"bullet"}},"insert":"\n"},
+    {"insert":"code block 2","attributes":{}},
+    {"attributes":{"code-block":{"code-block":"javascript", "in-list":"bullet"}},"insert":"\n"},
+    {"insert":"code block 3","attributes":{}},
     {"attributes":{"code-block":{"code-block":"javascript", "in-list":"bullet"}},"insert":"\n"}
   ]
 };
