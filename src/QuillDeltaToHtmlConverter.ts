@@ -275,7 +275,9 @@ class QuillDeltaToHtmlConverter {
     var liElementsHtml;
     if (li.item instanceof BlockGroup) {
       if (li.item.op.isCodeBlock()) {
-        liElementsHtml = this._renderBlock(li.item.op, li.item.ops);
+        liElementsHtml = encodeHtml(
+          li.item.ops.map((iop) => iop.insert.value).join('')
+        );
       } else {
         liElementsHtml = this._renderInlines(li.item.ops, true);
       }
