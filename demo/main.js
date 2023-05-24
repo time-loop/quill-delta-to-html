@@ -118,9 +118,17 @@ var testAdvancedBannerInList = { "ops": [
   {"insert":"list in banner.","attributes":{}},{"insert":"\n","attributes":{"list":{"list":"ordered"},"indent":1,"block-id":"block-7993bf4b-3279-4f54-9c5e-98678a577a70","advanced-banner":"b6c2105f-89c4-4887-9870-4f5233261c94","advanced-banner-color":"blue"}},
   {"insert":"\n","attributes":{"block-id":"block-2922ac17-3b23-462d-a317-f9b82e8fb23b"}}]
 };
+var codeBlocksInList = {
+  "op": [
+    {"insert":"hello this is a list.","attributes":{}},
+    {"insert":"\n","attributes":{"list":{"list":"bullet"}}},
+    {"insert":"code block","attributes":{}},
+    {"attributes":{"code-block":{"code-block":"javascript", "in-list":"bullet"}},"insert":"\n"}
+  ]
+};
 
 
-var qdc = new QuillDeltaToHtmlConverter(tableWithBackgroundColors.ops, {
+var qdc = new QuillDeltaToHtmlConverter(codeBlocksInList.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
