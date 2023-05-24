@@ -1391,6 +1391,40 @@ describe('QuillDeltaToHtmlConverter', function () {
         ].join('')
       );
     });
+
+    it('should escape html code while rendering code blocks in list', () => {
+      const ops = [
+        { insert: 'hello this is a list.', attributes: {} },
+        { insert: '\n', attributes: { list: { list: 'bullet' } } },
+        { insert: 'code block 1', attributes: {} },
+        {
+          attributes: {
+            'code-block': { 'code-block': 'javascript', 'in-list': 'bullet' },
+          },
+          insert: '\n',
+        },
+        { insert: 'code block 2', attributes: {} },
+        {
+          attributes: {
+            'code-block': { 'code-block': 'javascript', 'in-list': 'bullet' },
+          },
+          insert: '\n',
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        blocksCanBeWrappedWithList: ['code-block'],
+      });
+      assert.equal(
+        qdc.convert(),
+        [
+          `<ul>` +
+            `<li><p>hello this is a list.</p></li>` +
+            `<li data-none-type=\"true\"><pre data-language=\"javascript\">code block 1\ncode block 2</pre></li>` +
+            `</ul>`,
+        ].join('')
+      );
+    });
   });
 
   describe('custom types', () => {
