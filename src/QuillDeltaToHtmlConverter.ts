@@ -274,7 +274,13 @@ class QuillDeltaToHtmlConverter {
         : converter.getHtmlParts();
     var liElementsHtml;
     if (li.item instanceof BlockGroup) {
-      liElementsHtml = this._renderInlines(li.item.ops, true);
+      if (li.item.op.isCodeBlock()) {
+        liElementsHtml = encodeHtml(
+          li.item.ops.map((iop) => iop.insert.value).join('')
+        );
+      } else {
+        liElementsHtml = this._renderInlines(li.item.ops, true);
+      }
     } else if (li.item instanceof BlotBlock) {
       liElementsHtml = this._renderCustom(li.item.op, null);
     } else if (li.item instanceof EmptyBlock) {
