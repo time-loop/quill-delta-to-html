@@ -1,19 +1,19 @@
 {
   "name": "@time-loop/quill-delta-to-html",
-  "version": "0.12.0-56",
+  "version": "0.12.0-57",
   "description": "Converts Quill's delta ops to HTML",
   "main": "./dist/commonjs/main.js",
   "types": "./dist/esm/main.d.ts",
   "module": "./dist/esm/main.js",
   "dependencies": {
-    "lodash-es": "^4.17.21"
+    "lodash": "^4.17.21"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
   "devDependencies": {
     "@types/jest": "^29.2.0",
-    "@types/lodash-es": "^4.17.4",
+    "@types/lodash": "^4.14.195",
     "@types/node": "^7.0",
     "coveralls": "^3.0",
     "husky": "^3.0.9",

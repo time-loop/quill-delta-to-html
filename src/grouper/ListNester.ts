@@ -8,7 +8,7 @@ import {
   AdvancedBanner,
 } from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
-import find from 'lodash-es/find';
+import find from 'lodash/find';
 import { BannerNester } from './BannerNester';
 
 class ListNester {

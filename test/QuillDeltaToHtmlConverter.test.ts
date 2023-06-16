@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import isEqual from 'lodash-es/isEqual';
+import isEqual from 'lodash/isEqual';
 import { BlockGroup, InlineGroup } from '../src/grouper/group-types';
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
 import { encodeHtml } from './../src/funcs-html';

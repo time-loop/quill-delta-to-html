@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import isEqual from 'lodash-es/isEqual';
+import isEqual from 'lodash/isEqual';
 import { DeltaInsertOp } from './../../src/DeltaInsertOp';
 import {
   BlockGroup,
