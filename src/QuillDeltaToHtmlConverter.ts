@@ -407,10 +407,19 @@ class QuillDeltaToHtmlConverter {
   }
 
   _renderLayoutRow(row: LayoutRow): string {
+    const firstColumn = row.columns[0];
+    const rowAttrs = [{ key: 'class', value: 'ql-layout-row-container' }];
+    if (firstColumn && firstColumn.rowWidth) {
+      rowAttrs.push({
+        key: 'style',
+        value: `width: ${
+          parseFloat(firstColumn.rowWidth) * 100
+        }%; max-width: 100%;`,
+      });
+    }
+
     return (
-      makeStartTag('div', [
-        { key: 'class', value: 'ql-layout-row-container' },
-      ]) +
+      makeStartTag('div', rowAttrs) +
       row.columns
         .map((col: LayoutColumn) => this._renderLayoutColumn(col))
         .join('') +
