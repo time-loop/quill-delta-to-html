@@ -1144,6 +1144,44 @@ describe('QuillDeltaToHtmlConverter', function () {
     });
 
     // test cases for columns
+    it('should render columns with row width', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+            'layout-row-width': '0.8',
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            'layout-row-width': '0.8',
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container" style="width: 80%; max-width: 100%;">`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 1</p></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 2</p></div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
     it('should render columns with list', () => {
       let ops = [
         {
