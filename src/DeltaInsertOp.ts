@@ -1,8 +1,8 @@
 import { NewLine, ListType, DataType } from './value-types';
 import { IOpAttributes } from './OpAttributeSanitizer';
 import { InsertData, InsertDataCustom, InsertDataQuill } from './InsertData';
-import find from 'lodash-es/find';
-import isEqual from 'lodash-es/isEqual';
+import find from 'lodash/find';
+import isEqual from 'lodash/isEqual';
 
 class DeltaInsertOp {
   readonly insert: InsertData;
