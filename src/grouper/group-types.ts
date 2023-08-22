@@ -40,6 +40,7 @@ class ListGroup {
   layout: string;
   layoutWidth: string;
   layoutAlign: string;
+  layoutRowWidth: string;
   bannerId: string;
   bannerColor: string;
   bannerIcon: string;
@@ -92,6 +93,14 @@ class ListGroup {
       item.item.op.attributes.layoutAlign
     ) {
       this.layoutAlign = item.item.op.attributes.layoutAlign;
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes.layoutRowWidth
+    ) {
+      this.layoutRowWidth = item.item.op.attributes.layoutRowWidth;
     }
   }
 
@@ -227,16 +236,19 @@ class LayoutColumn {
   readonly layout: string;
   readonly width: string;
   readonly align: string;
+  readonly rowWidth: string;
   constructor(
     items: any[],
     layout: string,
     width: string,
-    align: string = 'top'
+    align: string = 'top',
+    rowWidth: string = ''
   ) {
     this.items = items;
     this.layout = layout;
     this.width = width;
     this.align = align;
+    this.rowWidth = rowWidth;
   }
 }
 
