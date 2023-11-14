@@ -1166,11 +1166,12 @@ describe('QuillDeltaToHtmlConverter', function () {
         },
         {
           attributes: {
-            'table-cell-line': {
+            list: {
               rowspan: '1',
               colspan: '1',
               row: 'row-dvagmt',
               cell: 'cell-495b7o',
+              list: 'ordered',
             },
           },
           insert: '\n',
@@ -1190,7 +1191,9 @@ describe('QuillDeltaToHtmlConverter', function () {
           `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
           `<p class="ql-align-center qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1">align text</p>`,
           `</td>`,
-          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-495b7o" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<ol data-row="row-dvagmt" data-cell="cell-495b7o" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ol>`,
+          `</td>`,
           '</tr>',
           `</tbody>`,
           `</table>`,
