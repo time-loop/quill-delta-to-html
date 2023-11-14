@@ -337,4 +337,9 @@ class OpAttributeSanitizer {
   }
 }
 
-export { OpAttributeSanitizer, IOpAttributes, IOpAttributeSanitizerOptions };
+export {
+  OpAttributeSanitizer,
+  IOpAttributes,
+  IOpAttributeSanitizerOptions,
+  TableCellLineAttributes,
+};

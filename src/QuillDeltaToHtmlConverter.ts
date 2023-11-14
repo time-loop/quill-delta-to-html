@@ -390,20 +390,7 @@ class QuillDeltaToHtmlConverter {
     var converter = new OpToHtmlConverter(line.item.op, this.converterOptions);
     var parts = converter.getHtmlParts();
     var cellElementsHtml = this._renderInlines(line.item.ops, false);
-
-    return (
-      makeStartTag('p', [
-        { key: 'class', value: 'qlbt-cell-line' },
-        { key: 'data-row', value: line.attrs!.row },
-        { key: 'data-cell', value: line.attrs!.cell },
-        { key: 'data-rowspan', value: line.attrs!.rowspan },
-        { key: 'data-colspan', value: line.attrs!.colspan },
-      ]) +
-      parts.openingTag +
-      cellElementsHtml +
-      parts.closingTag +
-      makeEndTag('p')
-    );
+    return parts.openingTag + cellElementsHtml + parts.closingTag;
   }
 
   _renderLayoutRow(row: LayoutRow): string {
