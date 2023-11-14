@@ -131,8 +131,45 @@ var codeBlocksInList = {
   ]
 };
 
+var tableWithAlignedText = {
+  "ops":[
+    {
+      attributes: {
+        'table-col': { width: '150' },
+      },
+      insert: '\n\n',
+    },
+    { insert: 'align text' },
+    {
+      attributes: {
+        'table-cell-line': {
+          rowspan: '1',
+          colspan: '1',
+          row: 'row-dvagmt',
+          cell: 'cell-383p7o',
+        },
+        align: 'center'
+      },
+      insert: '\n',
+    },
+    { insert: 'list item' },
+    {
+      attributes: {
+        'list': {
+          rowspan: '1',
+          colspan: '1',
+          row: 'row-dvagmt',
+          cell: 'cell-495b7o',
+          list: 'ordered',
+        },
+      },
+      insert: '\n',
+    },
+  ]
+};
 
-var qdc = new QuillDeltaToHtmlConverter(codeBlocksInList.ops, {
+
+var qdc = new QuillDeltaToHtmlConverter(tableWithAlignedText.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
