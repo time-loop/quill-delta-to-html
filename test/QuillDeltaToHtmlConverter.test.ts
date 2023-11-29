@@ -1143,6 +1143,65 @@ describe('QuillDeltaToHtmlConverter', function () {
       );
     });
 
+    it('should render table with align text', () => {
+      const ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n',
+        },
+        { insert: 'align text' },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+            align: 'center',
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-495b7o',
+              list: 'ordered',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 300px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<p class="ql-align-center qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1">align text</p>`,
+          `</td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<ol data-row="row-dvagmt" data-cell="cell-495b7o" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ol>`,
+          `</td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
     // test cases for columns
     it('should render columns with row width', () => {
       let ops = [
