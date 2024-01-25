@@ -83,7 +83,15 @@ interface IOpAttributes {
 
   // should this custom blot be rendered as block?
   renderAsBlock?: boolean | undefined;
+  attachment?: IOpAttachment;
   [key: string]: any;
+}
+
+interface IOpAttachment {
+  height?: string;
+  width?: string;
+  'data-attachment'?: string;
+  'data-id'?: string;
 }
 
 interface IUrlSanitizerFn {
@@ -340,6 +348,7 @@ class OpAttributeSanitizer {
 export {
   OpAttributeSanitizer,
   IOpAttributes,
+  IOpAttachment,
   IOpAttributeSanitizerOptions,
   TableCellLineAttributes,
 };
