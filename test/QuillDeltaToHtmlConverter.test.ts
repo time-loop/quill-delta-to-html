@@ -2237,7 +2237,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         let html = qdc.convert();
         assert.equal(
           html,
-          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
+          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list" data-checked="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
         );
       });
     });
