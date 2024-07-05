@@ -133,12 +133,13 @@ class OpToHtmlConverter {
         const listType = this.op.getListType(
           this.options.blocksCanBeWrappedWithList
         );
-
+        const displayListType = this.op.getListDisplayListType(
+          this.options.blocksCanBeWrappedWithList
+        );
         beginTags.push(
-          listType === ListType.Ordered
+          listType !== ListType.NoneType && displayListType
             ? makeStartTag('li', [
-                this.makeAttr('data-none-type', 'true'),
-                this.makeAttr('class', 'ql-rendered-ordered-list'),
+                this.makeAttr('class', `ql-rendered-${listType}-list`),
               ])
             : makeStartTag('li', [this.makeAttr('data-none-type', 'true')])
         );
