@@ -137,7 +137,7 @@ class OpToHtmlConverter {
           this.options.blocksCanBeWrappedWithList
         );
         beginTags.push(
-          listType !== ListType.NoneType && displayListType
+          listType !== ListType.NoneType && displayListType === 'true'
             ? makeStartTag('li', [
                 this.makeAttr('class', `ql-rendered-${listType}-list`),
               ])

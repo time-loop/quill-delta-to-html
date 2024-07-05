@@ -2206,21 +2206,21 @@ describe('QuillDeltaToHtmlConverter', function () {
           {
             insert: { custom: true },
             attributes: {
-              custom: { 'in-list': 'ordered', 'display-list-type': true },
+              custom: { 'in-list': 'ordered', 'display-list-type': 'true' },
               renderAsBlock: true,
             },
           },
           {
             insert: { custom: true },
             attributes: {
-              custom: { 'in-list': 'checked', 'display-list-type': true },
+              custom: { 'in-list': 'checked', 'display-list-type': 'true' },
               renderAsBlock: true,
             },
           },
           {
             insert: { custom: true },
             attributes: {
-              custom: { 'in-list': 'unchecked', 'display-list-type': true },
+              custom: { 'in-list': 'unchecked', 'display-list-type': 'false' },
               renderAsBlock: true,
             },
           },
@@ -2237,7 +2237,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         let html = qdc.convert();
         assert.equal(
           html,
-          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list"><div>Custom embed</div></li><li class="ql-rendered-unchecked-list"><div>Custom embed</div></li></ul>'
+          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
         );
       });
     });
