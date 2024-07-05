@@ -2189,6 +2189,58 @@ describe('QuillDeltaToHtmlConverter', function () {
           ].join('')
         );
       });
+
+      it('should create block embed within list', function () {
+        const ops = [
+          {
+            insert: { custom: true },
+            attributes: { custom: { 'in-list': 'none' }, renderAsBlock: true },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'bullet' },
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'ordered', 'display-list-type': 'true' },
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'checked', 'display-list-type': 'true' },
+              'block-id': 'test-block-id',
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'unchecked', 'display-list-type': 'false' },
+              renderAsBlock: true,
+            },
+          },
+        ];
+        const qdc = new QuillDeltaToHtmlConverter(ops, {
+          blocksCanBeWrappedWithList: ['custom'],
+        });
+        qdc.renderCustomWith((op) => {
+          if (op.insert.type === 'custom') {
+            return '<div>Custom embed</div>';
+          }
+          return 'unknown';
+        });
+        let html = qdc.convert();
+        assert.equal(
+          html,
+          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list" data-checked="true" data-block-id="test-block-id"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
+        );
+      });
     });
   });
 });
