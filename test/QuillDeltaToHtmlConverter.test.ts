@@ -2214,6 +2214,7 @@ describe('QuillDeltaToHtmlConverter', function () {
             insert: { custom: true },
             attributes: {
               custom: { 'in-list': 'checked', 'display-list-type': 'true' },
+              'block-id': 'test-block-id',
               renderAsBlock: true,
             },
           },
@@ -2237,7 +2238,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         let html = qdc.convert();
         assert.equal(
           html,
-          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list" data-checked="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
+          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list" data-checked="true" data-block-id="test-block-id"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
         );
       });
     });

@@ -150,6 +150,11 @@ class OpToHtmlConverter {
         ) {
           tagAttrs.push(this.makeAttr('data-checked', 'false'));
         }
+        if (this.op.attributes['block-id']) {
+          tagAttrs.push(
+            this.makeAttr('data-block-id', this.op.attributes['block-id'])
+          );
+        }
         beginTags.push(makeStartTag('li', tagAttrs));
         endTags.push(makeEndTag('li'));
       }
