@@ -595,14 +595,28 @@ class QuillDeltaToHtmlConverter {
 
   _renderInlines(ops: DeltaInsertOp[], isInlineGroup = true) {
     var opsLen = ops.length - 1;
-    var html = ops
-      .map((op: DeltaInsertOp, i: number) => {
-        if (i > 0 && i === opsLen && op.isJustNewline()) {
-          return '';
-        }
-        return this._renderInline(op, null);
-      })
-      .join('');
+    let html = '';
+
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      if (i > 0 && i === opsLen && op.isJustNewline()) {
+        continue;
+      }
+
+      // we want to merge consecutive empty lines into one
+      if (
+        this.options.mergeEmptyLines &&
+        i > 1 &&
+        op.isJustNewline() &&
+        ops[i - 1].isJustNewline() &&
+        ops[i - 2].isJustNewline()
+      ) {
+        continue;
+      }
+
+      html += this._renderInline(op, null);
+    }
+
     if (!isInlineGroup) {
       return html;
     }

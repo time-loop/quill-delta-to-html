@@ -2275,7 +2275,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         mergeEmptyLines: true,
       });
       const html = qdc.convert();
-      console.log('html:', html);
+      assert.equal(html, '<p>line1</p><p><br/></p><p>line2</p>');
     });
 
     it('should merge multiple lines', () => {
@@ -2314,7 +2314,7 @@ describe('QuillDeltaToHtmlConverter', function () {
         mergeEmptyLines: true,
       });
       const html = qdc.convert();
-      console.log('html:', html);
+      assert.equal(html, '<p>line1</p><p><br/></p><p>line2</p>');
     });
   });
 });
