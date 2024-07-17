@@ -50,6 +50,11 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineParagraph?: boolean;
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
+  /**
+   * Merge consecutive empty lines into one.
+   * Default is false.
+   */
+  mergeEmptyLines?: boolean;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
   customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
   customTableCellAttrs?: (g: TableCell) => ITagKeyValue[];
@@ -77,6 +82,7 @@ class QuillDeltaToHtmlConverter {
         multiLineCodeblock: true,
         multiLineParagraph: true,
         multiLineCustomBlock: true,
+        mergeEmptyLines: false,
         allowBackgroundClasses: false,
         linkTarget: '_blank',
       },

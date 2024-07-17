@@ -1,7 +1,7 @@
 {
    "compilerOptions": {
       "module": "es6",
-      "removeComments": true,
+      "removeComments": false,
       "preserveConstEnums": true,
       "sourceMap": false,
       "target": "es6",
