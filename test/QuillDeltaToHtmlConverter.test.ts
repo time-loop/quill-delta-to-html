@@ -2359,5 +2359,74 @@ describe('QuillDeltaToHtmlConverter', function () {
         '<p>line1</p><p class="ql-linebreak-container"><br/></p><p>line2</p>'
       );
     });
+
+    it('should preserve linebreaks for code block', () => {
+      const ops = [
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-81f0e1be-3e2e-44a9-8cc6-dc7308563849',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-37b02bf2-c32c-45cb-a084-5ef6d561a740',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-bbebb048-0ca7-4002-b6ea-c436d104f009',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        { insert: 'fasdfasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-3549d879-2687-45d4-a1b2-33be06001ce1',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        { insert: 'asdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2f2c11bf-9569-46ba-b8b4-8614cf52e4e9',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        `<pre data-language="plain">fasdf
+
+
+fasdfasdf</pre><p>asdf</p>`
+      );
+    });
   });
 });
