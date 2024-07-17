@@ -50,6 +50,16 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineParagraph?: boolean;
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
+  /**
+   * Merge consecutive empty lines into one.
+   * Default is false.
+   */
+  mergeEmptyLines?: boolean;
+  /**
+   * If this is set, the converter
+   * will add a class attribute to the contaienr of the line breaks.
+   */
+  linebreakBlockClassName?: string;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
   customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
   customTableCellAttrs?: (g: TableCell) => ITagKeyValue[];
@@ -77,6 +87,7 @@ class QuillDeltaToHtmlConverter {
         multiLineCodeblock: true,
         multiLineParagraph: true,
         multiLineCustomBlock: true,
+        mergeEmptyLines: false,
         allowBackgroundClasses: false,
         linkTarget: '_blank',
       },
@@ -583,20 +594,50 @@ class QuillDeltaToHtmlConverter {
       );
     }
 
-    var inlines = ops.map((op) => this._renderInline(op, bop)).join('');
+    let inlines = '';
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+
+      // we want to merge consecutive empty lines into one
+      if (
+        this.options.mergeEmptyLines &&
+        i > 1 &&
+        op.isJustNewline() &&
+        ops[i - 1].isJustNewline() &&
+        ops[i - 2].isJustNewline()
+      ) {
+        continue;
+      }
+
+      inlines += this._renderInline(op, bop);
+    }
     return htmlParts.openingTag + (inlines || BrTag) + htmlParts.closingTag;
   }
 
   _renderInlines(ops: DeltaInsertOp[], isInlineGroup = true) {
     var opsLen = ops.length - 1;
-    var html = ops
-      .map((op: DeltaInsertOp, i: number) => {
-        if (i > 0 && i === opsLen && op.isJustNewline()) {
-          return '';
-        }
-        return this._renderInline(op, null);
-      })
-      .join('');
+    let html = '';
+
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      if (i > 0 && i === opsLen && op.isJustNewline()) {
+        continue;
+      }
+
+      // we want to merge consecutive empty lines into one
+      if (
+        this.options.mergeEmptyLines &&
+        i > 1 &&
+        op.isJustNewline() &&
+        ops[i - 1].isJustNewline() &&
+        ops[i - 2].isJustNewline()
+      ) {
+        continue;
+      }
+
+      html += this._renderInline(op, null);
+    }
+
     if (!isInlineGroup) {
       return html;
     }
@@ -606,6 +647,34 @@ class QuillDeltaToHtmlConverter {
     if (html === BrTag || this.options.multiLineParagraph) {
       return startParaTag + html + endParaTag;
     }
+
+    if (this.options.linebreakBlockClassName) {
+      let result = startParaTag;
+
+      const splits = html.split(BrTag);
+      for (let i = 0; i < splits.length; i++) {
+        const item = splits[i];
+        if (i > 0) {
+          result += makeEndTag(this.options.paragraphTag);
+          if (item === '') {
+            result += makeStartTag(this.options.paragraphTag, [
+              { key: 'class', value: this.options.linebreakBlockClassName },
+            ]);
+          } else {
+            result += makeStartTag(this.options.paragraphTag);
+          }
+        }
+        if (item === '') {
+          result += BrTag;
+        } else {
+          result += item;
+        }
+      }
+
+      result += endParaTag;
+      return result;
+    }
+
     return (
       startParaTag +
       html
