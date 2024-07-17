@@ -2428,5 +2428,66 @@ describe('QuillDeltaToHtmlConverter', function () {
 fasdfasdf</pre><p>asdf</p>`
       );
     });
+
+    it('should merge lines in quote', () => {
+      const ops = [
+        { insert: 'asdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-dfe32e0c-d47d-4607-89f5-d0a2b0033dcd',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-8b218d86-9274-48a0-b9dd-06a6c1c5a6c9',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-f783f36b-c994-4976-89b3-7d6150440226',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-ab20c98d-1b0d-49f5-ad61-a743c7549e49',
+            blockquote: {},
+          },
+        },
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-24c2de52-c0d2-4f60-af3e-a85b9e2cf8a6',
+            blockquote: {},
+          },
+        },
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-124583ce-c283-4af9-a496-40325a09fa6e',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<blockquote>asdf<br/><br/>fasdf</blockquote><p>fasdf</p>'
+      );
+    });
   });
 });

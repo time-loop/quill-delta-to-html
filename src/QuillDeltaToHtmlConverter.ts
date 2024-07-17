@@ -594,7 +594,23 @@ class QuillDeltaToHtmlConverter {
       );
     }
 
-    var inlines = ops.map((op) => this._renderInline(op, bop)).join('');
+    let inlines = '';
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+
+      // we want to merge consecutive empty lines into one
+      if (
+        this.options.mergeEmptyLines &&
+        i > 1 &&
+        op.isJustNewline() &&
+        ops[i - 1].isJustNewline() &&
+        ops[i - 2].isJustNewline()
+      ) {
+        continue;
+      }
+
+      inlines += this._renderInline(op, bop);
+    }
     return htmlParts.openingTag + (inlines || BrTag) + htmlParts.closingTag;
   }
 
