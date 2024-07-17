@@ -2244,7 +2244,7 @@ describe('QuillDeltaToHtmlConverter', function () {
     });
   });
 
-  describe.only('mergeEmptyLines', () => {
+  describe('mergeEmptyLines', () => {
     it('should behave nomally', () => {
       const ops = [
         { insert: 'line1', attributes: {} },
@@ -2315,6 +2315,49 @@ describe('QuillDeltaToHtmlConverter', function () {
       });
       const html = qdc.convert();
       assert.equal(html, '<p>line1</p><p><br/></p><p>line2</p>');
+    });
+
+    it("should add class to linebreaks' container", () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-de1b5382-8c99-41c9-97df-8d927aac907b',
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2fa3c7e6-a1ef-45fb-83c7-9833dc0f2606',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<p>line1</p><p class="ql-linebreak-container"><br/></p><p>line2</p>'
+      );
     });
   });
 });

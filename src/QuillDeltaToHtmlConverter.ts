@@ -55,6 +55,11 @@ interface IQuillDeltaToHtmlConverterOptions
    * Default is false.
    */
   mergeEmptyLines?: boolean;
+  /**
+   * If this is set, the converter
+   * will add a class attribute to the contaienr of the line breaks.
+   */
+  linebreakBlockClassName?: string;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
   customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
   customTableCellAttrs?: (g: TableCell) => ITagKeyValue[];
@@ -626,6 +631,34 @@ class QuillDeltaToHtmlConverter {
     if (html === BrTag || this.options.multiLineParagraph) {
       return startParaTag + html + endParaTag;
     }
+
+    if (this.options.linebreakBlockClassName) {
+      let result = startParaTag;
+
+      const splits = html.split(BrTag);
+      for (let i = 0; i < splits.length; i++) {
+        const item = splits[i];
+        if (i > 0) {
+          result += makeEndTag(this.options.paragraphTag);
+          if (item === '') {
+            result += makeStartTag(this.options.paragraphTag, [
+              { key: 'class', value: this.options.linebreakBlockClassName },
+            ]);
+          } else {
+            result += makeStartTag(this.options.paragraphTag);
+          }
+        }
+        if (item === '') {
+          result += BrTag;
+        } else {
+          result += item;
+        }
+      }
+
+      result += endParaTag;
+      return result;
+    }
+
     return (
       startParaTag +
       html
