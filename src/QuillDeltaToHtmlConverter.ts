@@ -183,7 +183,7 @@ class QuillDeltaToHtmlConverter {
   convert() {
     let groups = this.getGroupedOps();
     return groups
-      .map((group) => {
+      .map((group, index) => {
         if (group instanceof ListGroup) {
           return this._renderWithCallbacks(GroupType.List, group, () =>
             this._renderList(<ListGroup>group, true)
@@ -219,7 +219,7 @@ class QuillDeltaToHtmlConverter {
         } else {
           // InlineGroup
           return this._renderWithCallbacks(GroupType.InlineGroup, group, () => {
-            return this._renderInlines((<InlineGroup>group).ops, true);
+            return this._renderInlines((<InlineGroup>group).ops, true, index);
           });
         }
       })
@@ -445,7 +445,7 @@ class QuillDeltaToHtmlConverter {
     return (
       makeStartTag('div', columnAttrs) +
       column.items
-        .map((group) => {
+        .map((group, index) => {
           if (group instanceof ListGroup) {
             return this._renderWithCallbacks(GroupType.List, group, () =>
               this._renderList(<ListGroup>group)
@@ -485,7 +485,11 @@ class QuillDeltaToHtmlConverter {
               GroupType.InlineGroup,
               group,
               () => {
-                return this._renderInlines((<InlineGroup>group).ops, true);
+                return this._renderInlines(
+                  (<InlineGroup>group).ops,
+                  true,
+                  index
+                );
               }
             );
           }
@@ -596,25 +600,22 @@ class QuillDeltaToHtmlConverter {
 
     let inlines = '';
     for (let i = 0; i < ops.length; i++) {
-      const op = ops[i];
-
-      // we want to merge consecutive empty lines into one
-      if (
-        this.options.mergeEmptyLines &&
-        i > 1 &&
-        op.isJustNewline() &&
-        ops[i - 1].isJustNewline() &&
-        ops[i - 2].isJustNewline()
-      ) {
+      if (this._shouldIgnoreThisLine(ops, i)) {
         continue;
       }
+
+      const op = ops[i];
 
       inlines += this._renderInline(op, bop);
     }
     return htmlParts.openingTag + (inlines || BrTag) + htmlParts.closingTag;
   }
 
-  _renderInlines(ops: DeltaInsertOp[], isInlineGroup = true) {
+  _renderInlines(
+    ops: DeltaInsertOp[],
+    isInlineGroup = true,
+    groupIndex?: number
+  ) {
     var opsLen = ops.length - 1;
     let html = '';
 
@@ -624,14 +625,7 @@ class QuillDeltaToHtmlConverter {
         continue;
       }
 
-      // we want to merge consecutive empty lines into one
-      if (
-        this.options.mergeEmptyLines &&
-        i > 1 &&
-        op.isJustNewline() &&
-        ops[i - 1].isJustNewline() &&
-        ops[i - 2].isJustNewline()
-      ) {
+      if (this._shouldIgnoreThisLine(ops, i, groupIndex === 0)) {
         continue;
       }
 
@@ -649,12 +643,20 @@ class QuillDeltaToHtmlConverter {
     }
 
     if (this.options.linebreakBlockClassName) {
-      let result = startParaTag;
+      let result = '';
 
       const splits = html.split(BrTag);
       for (let i = 0; i < splits.length; i++) {
         const item = splits[i];
-        if (i > 0) {
+        if (i == 0) {
+          if (item === '' && this.options.linebreakBlockClassName) {
+            result += makeStartTag(this.options.paragraphTag, [
+              { key: 'class', value: this.options.linebreakBlockClassName },
+            ]);
+          } else {
+            result += startParaTag;
+          }
+        } else {
           result += makeEndTag(this.options.paragraphTag);
           if (item === '') {
             result += makeStartTag(this.options.paragraphTag, [
@@ -664,11 +666,7 @@ class QuillDeltaToHtmlConverter {
             result += makeStartTag(this.options.paragraphTag);
           }
         }
-        if (item === '') {
-          result += BrTag;
-        } else {
-          result += item;
-        }
+        result += item === '' ? BrTag : item;
       }
 
       result += endParaTag;
@@ -685,6 +683,45 @@ class QuillDeltaToHtmlConverter {
         .join(endParaTag + startParaTag) +
       endParaTag
     );
+  }
+
+  private _shouldIgnoreThisLine(
+    ops: DeltaInsertOp[],
+    index: number,
+    ignoreStartNewLines: boolean = false
+  ): boolean {
+    if (!this.options.mergeEmptyLines) {
+      return false;
+    }
+
+    const op = ops[index];
+
+    if (ignoreStartNewLines && index == 0 && op.isJustNewline()) {
+      // skip the first newline
+      return true;
+    }
+
+    if (
+      ignoreStartNewLines &&
+      index == 1 &&
+      op.isJustNewline() &&
+      ops[0].isJustNewline()
+    ) {
+      // skip the second newline
+      return true;
+    }
+
+    // we want to merge consecutive empty lines into one
+    if (
+      index > 1 &&
+      op.isJustNewline() &&
+      ops[index - 1].isJustNewline() &&
+      ops[index - 2].isJustNewline()
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   _renderInline(op: DeltaInsertOp, contextOp: DeltaInsertOp | null) {
