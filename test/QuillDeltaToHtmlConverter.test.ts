@@ -2417,7 +2417,6 @@ describe('QuillDeltaToHtmlConverter', function () {
         multiLineHeader: false,
         multiLineCustomBlock: true,
         mergeEmptyLines: true,
-        linebreakBlockClassName: 'ql-linebreak-container',
       });
       const html = qdc.convert();
       assert.equal(
@@ -2481,13 +2480,91 @@ fasdfasdf</pre><p>asdf</p>`
         multiLineHeader: false,
         multiLineCustomBlock: true,
         mergeEmptyLines: true,
-        linebreakBlockClassName: 'ql-linebreak-container',
       });
       const html = qdc.convert();
       assert.equal(
         html,
         '<blockquote>asdf<br/><br/>fasdf</blockquote><p>fasdf</p>'
       );
+    });
+
+    it('should add class in linebreak after list', () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-9c5f8d12-eb4f-40d7-9875-2bc96a8f2ea9',
+            list: { list: 'bullet' },
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-bf0ed33d-bcf4-483c-b073-663d61dac6c2',
+            list: { list: 'bullet' },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-7c494390-719b-421e-b4c6-bcd30ce523ee',
+          },
+        },
+        { insert: 'o', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-eef85a06-205e-4c00-90d8-d4af2975b419',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<ul><li><p>line1</p></li><li><p>line2</p></li></ul><p class="ql-linebreak-container"><br/></p><p>o</p>'
+      );
+    });
+
+    it('should remove beginning lines', () => {
+      const ops = [
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-294dab12-1fc8-406b-bf41-f045ad8c42a1',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-294dab12-1fc8-406b-bf41-f045ad8c42a9',
+          },
+        },
+        { insert: 'fas', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-d3eb1962-fdf2-4d11-99c4-6d23149d2899',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(html, '<p>fas</p>');
     });
   });
 });
