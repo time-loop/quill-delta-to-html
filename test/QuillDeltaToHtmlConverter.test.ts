@@ -2534,6 +2534,93 @@ fasdfasdf</pre><p>asdf</p>`
       );
     });
 
+    it('should add class in linebreak under list item', () => {
+      const ops = [
+        {
+          insert: 'Test:',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-8a9002ac-d7fd-400b-ad19-3b92c8d41e78',
+          },
+        },
+        {
+          insert: '1',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-54c1128b-5cf4-407d-9ec3-9bac98efd2f2',
+          },
+        },
+        {
+          insert: '2',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-7a75ef52-d480-4123-966b-7e222cc7b663',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'none',
+            },
+            'block-id': 'block-17ec2b57-bd5e-4ed4-a649-c11dfe93f4b0',
+          },
+        },
+        {
+          insert: 'b',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'none',
+            },
+            'block-id': 'block-d7ef5fc8-32db-4372-9d2a-a2d38480e0bd',
+          },
+        },
+        {
+          insert: '3',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-6cf7e1d9-9f11-417b-a2ec-f4fae0297041',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<p>Test:</p><ul><li><p>1</p></li><li><p>2</p></li><li><p class="ql-linebreak-container"><br/></p></li><li><p>b</p></li><li><p>3</p></li></ul>'
+      );
+    });
+
     it('should remove beginning lines', () => {
       const ops = [
         {
