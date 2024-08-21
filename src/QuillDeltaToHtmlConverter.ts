@@ -636,6 +636,16 @@ class QuillDeltaToHtmlConverter {
       return html;
     }
 
+    if (html === BrTag && this.options.linebreakBlockClassName) {
+      return (
+        makeStartTag(this.options.paragraphTag, [
+          { key: 'class', value: this.options.linebreakBlockClassName },
+        ]) +
+        BrTag +
+        makeEndTag(this.options.paragraphTag)
+      );
+    }
+
     let startParaTag = makeStartTag(this.options.paragraphTag);
     let endParaTag = makeEndTag(this.options.paragraphTag);
     if (html === BrTag || this.options.multiLineParagraph) {
