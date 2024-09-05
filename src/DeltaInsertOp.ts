@@ -207,6 +207,13 @@ class DeltaInsertOp {
     return this.insert.value === NewLine;
   }
 
+  isJustNewLineWithBlockId() {
+    return (
+      this.isJustNewline() &&
+      (!!this.attributes.blockId || !!this.attributes['block-id'])
+    );
+  }
+
   isList() {
     return (
       this.isOrderedList() ||

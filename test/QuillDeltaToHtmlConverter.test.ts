@@ -2124,7 +2124,7 @@ describe('QuillDeltaToHtmlConverter', function () {
       it('should create blockquote within list', function () {
         var qdc = new QuillDeltaToHtmlConverter(
           [
-            { insert: 'first line\nfirst list item parent' },
+            { insert: 'first line\n\nfirst list item parent' },
             { attributes: { list: { list: 'ordered' } }, insert: '\n' },
             { insert: 'child list item' },
             {
@@ -2652,6 +2652,42 @@ fasdfasdf</pre><p>asdf</p>`
       });
       const html = qdc.convert();
       assert.equal(html, '<p>fas</p>');
+    });
+
+    it.only('bullet ', () => {
+      const ops = [
+        {
+          insert: 'reply with the following text exactly\n\n\nfirst line',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            blockId: '795525bc-eb1f-4f52-a5a8-15e9d8b613cc',
+          },
+        },
+        {
+          insert: 'bullet on first line\nsecond line\nthird line',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<p>reply with the following text exactly</p><p><br/></p><p>first line</p><ul><li><p>bullet on first line</p><p>second line</p><p>third line</p></li></ul>'
+      );
     });
   });
 });

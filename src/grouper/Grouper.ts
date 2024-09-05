@@ -15,6 +15,7 @@ import {
 
 class Grouper {
   static pairOpsWithTheirBlock(ops: DeltaInsertOp[]): TDataGroup[] {
+    debugger;
     let result: TDataGroup[] = [];
 
     const canBeInBlock = (op: DeltaInsertOp) => {
@@ -37,6 +38,20 @@ class Grouper {
         result.push(new VideoItem(op));
       } else if (op.isCustomEmbedBlock()) {
         result.push(new BlotBlock(op));
+      } else if (op.isList()) {
+        const allowJustNewLine = (op: DeltaInsertOp) => {
+          return !(
+            op.isJustNewLineWithBlockId() ||
+            op.isCustomEmbedBlock() ||
+            op.isVideo() ||
+            op.isContainerBlock()
+          );
+        };
+
+        opsSlice = sliceFromReverseWhile(ops, i - 1, allowJustNewLine);
+
+        result.push(new BlockGroup(op, opsSlice.elements));
+        i = opsSlice.sliceStartsAt > -1 ? opsSlice.sliceStartsAt : i;
       } else if (op.isContainerBlock()) {
         opsSlice = sliceFromReverseWhile(ops, i - 1, canBeInBlock);
 
