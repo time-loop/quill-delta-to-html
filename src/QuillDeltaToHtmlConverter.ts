@@ -18,7 +18,6 @@ import {
   TableRow,
   TableCell,
   TableCol,
-  TableColGroup,
   TableCellLine,
   LayoutRow,
   LayoutColumn,
@@ -311,8 +310,9 @@ class QuillDeltaToHtmlConverter {
   }
 
   _renderTable(table: TableGroup): string {
-    const tableColGroup: TableColGroup = table.colGroup;
+    const tableColGroup = table.colGroup;
     let tableWidth: number = 0;
+    let colgroupStr = '';
     if (tableColGroup && tableColGroup.cols) {
       tableWidth = tableColGroup.cols.reduce(
         (result: number, col: TableCol) => {
@@ -326,6 +326,13 @@ class QuillDeltaToHtmlConverter {
         },
         0
       );
+
+      colgroupStr =
+        makeStartTag('colgroup') +
+        tableColGroup.cols
+          .map((col: TableCol) => this._renderTableCol(col))
+          .join('') +
+        makeEndTag('colgroup');
     }
 
     return (
@@ -334,11 +341,7 @@ class QuillDeltaToHtmlConverter {
         { key: 'class', value: 'clickup-table' },
         { key: 'style', value: !!tableWidth ? `width: ${tableWidth}px` : '' },
       ]) +
-      makeStartTag('colgroup') +
-      tableColGroup.cols
-        .map((col: TableCol) => this._renderTableCol(col))
-        .join('') +
-      makeEndTag('colgroup') +
+      colgroupStr +
       makeStartTag('tbody') +
       table.rows.map((row: TableRow) => this._renderTableRow(row)).join('') +
       makeEndTag('tbody') +
