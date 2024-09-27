@@ -183,8 +183,8 @@ class ListItem {
 
 class TableGroup {
   rows: TableRow[];
-  colGroup: TableColGroup;
-  constructor(rows: TableRow[], colGroup: TableColGroup) {
+  colGroup: TableColGroup | undefined;
+  constructor(rows: TableRow[], colGroup?: TableColGroup) {
     this.rows = rows;
     this.colGroup = colGroup;
   }

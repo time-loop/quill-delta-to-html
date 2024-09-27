@@ -1,12 +1,20 @@
 import * as assert from 'assert';
 import isEqual from 'lodash/isEqual';
-import { BlockGroup, InlineGroup } from '../src/grouper/group-types';
+import {
+  BlockGroup,
+  InlineGroup,
+  TableCell,
+  TableCellLine,
+  TableGroup,
+  TableRow,
+} from '../src/grouper/group-types';
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
 import { encodeHtml } from './../src/funcs-html';
 import { QuillDeltaToHtmlConverter } from './../src/QuillDeltaToHtmlConverter';
 import { GroupType, ListType } from './../src/value-types';
 import { delta1 } from './data/delta1';
 import { callWhenXEqualY } from './_helper';
+import { Grouper } from '../src/grouper/Grouper';
 
 describe('QuillDeltaToHtmlConverter', function () {
   describe('constructor()', function () {
@@ -2652,6 +2660,58 @@ fasdfasdf</pre><p>asdf</p>`
       });
       const html = qdc.convert();
       assert.equal(html, '<p>fas</p>');
+    });
+  });
+
+  describe('_renderTable', function () {
+    it('should render cu-table with no cols', () => {
+      const ops = [
+        new DeltaInsertOp('cell1'),
+        new DeltaInsertOp('\n', {
+          colspan: '1',
+          rowspan: '1',
+          row: 'row-1',
+          'table-cell-line': {
+            cell: 'cell-1',
+            row: 'row-1',
+            rowspan: '1',
+            colspan: '1',
+          },
+        }),
+      ];
+      const groups = Grouper.pairOpsWithTheirBlock(ops);
+
+      const mockTableGroup = new TableGroup(
+        [
+          new TableRow(
+            [
+              new TableCell(
+                [new TableCellLine(<BlockGroup>groups[0])],
+                ops[1].attributes
+              ),
+            ],
+            ops[1].attributes.row
+          ),
+        ],
+        undefined
+      );
+
+      const qdc = new QuillDeltaToHtmlConverter([]);
+      assert.equal(
+        qdc._renderTable(mockTableGroup),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style>`,
+          `<tbody>`,
+          `<tr data-row="row-1">`,
+          `<td data-row="row-1" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-1" data-cell="cell-1" data-rowspan="1" data-colspan="1">cell1</p></td>`,
+          `</tr>`,
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
     });
   });
 });
