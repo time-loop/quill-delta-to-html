@@ -39,7 +39,8 @@ export class ColumnsNester {
             getLayoutId(item),
             getLayoutWidth(item),
             getLayoutAlign(item),
-            getLayoutRowWidth(item)
+            getLayoutRowWidth(item),
+            getLayoutColor(item)
           );
         }
         return item;
@@ -50,7 +51,8 @@ export class ColumnsNester {
         getLayoutId(item[0]),
         getLayoutWidth(item[0]),
         getLayoutAlign(item[0]),
-        getLayoutRowWidth(item[0])
+        getLayoutRowWidth(item[0]),
+        getLayoutColor(item[0])
       );
     });
   }
@@ -112,6 +114,17 @@ function getLayoutAlign(g: TDataGroup) {
     return g.layoutAlign || 'top';
   } else if (g instanceof BlotBlock || g instanceof AdvancedBanner) {
     return g.op.attributes['layout-align'] || 'top';
+  }
+  return '';
+}
+
+function getLayoutColor(g: TDataGroup) {
+  if (g instanceof BlockGroup) {
+    return g.op.attributes['layout-color'] || '';
+  } else if (g instanceof ListGroup) {
+    return g.layoutColor || '';
+  } else if (g instanceof BlotBlock || g instanceof AdvancedBanner) {
+    return g.op.attributes['layout-color'] || '';
   }
   return '';
 }
