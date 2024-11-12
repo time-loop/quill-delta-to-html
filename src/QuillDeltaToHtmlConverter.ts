@@ -445,6 +445,13 @@ class QuillDeltaToHtmlConverter {
       });
     }
 
+    if (!!column.color) {
+      columnAttrs.push({
+        key: 'data-layout-color',
+        value: column.color,
+      });
+    }
+
     return (
       makeStartTag('div', columnAttrs) +
       column.items

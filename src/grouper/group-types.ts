@@ -40,6 +40,7 @@ class ListGroup {
   layout: string;
   layoutWidth: string;
   layoutAlign: string;
+  layoutColor: string;
   layoutRowWidth: string;
   bannerId: string;
   bannerColor: string;
@@ -82,25 +83,33 @@ class ListGroup {
     if (
       item &&
       item.item.op.attributes &&
-      item.item.op.attributes.layoutWidth
+      item.item.op.attributes['layout-width']
     ) {
-      this.layoutWidth = item.item.op.attributes.layoutWidth;
+      this.layoutWidth = item.item.op.attributes['layout-width'];
     }
 
     if (
       item &&
       item.item.op.attributes &&
-      item.item.op.attributes.layoutAlign
+      item.item.op.attributes['layout-align']
     ) {
-      this.layoutAlign = item.item.op.attributes.layoutAlign;
+      this.layoutAlign = item.item.op.attributes['layout-align'];
     }
 
     if (
       item &&
       item.item.op.attributes &&
-      item.item.op.attributes.layoutRowWidth
+      item.item.op.attributes['layout-color']
     ) {
-      this.layoutRowWidth = item.item.op.attributes.layoutRowWidth;
+      this.layoutColor = item.item.op.attributes['layout-color'];
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['layout-row-width']
+    ) {
+      this.layoutRowWidth = item.item.op.attributes['layout-row-width'];
     }
   }
 
@@ -237,18 +246,21 @@ class LayoutColumn {
   readonly width: string;
   readonly align: string;
   readonly rowWidth: string;
+  readonly color: string;
   constructor(
     items: any[],
     layout: string,
     width: string,
     align: string = 'top',
-    rowWidth: string = ''
+    rowWidth: string = '',
+    color: string = ''
   ) {
     this.items = items;
     this.layout = layout;
     this.width = width;
     this.align = align;
     this.rowWidth = rowWidth;
+    this.color = color;
   }
 }
 
