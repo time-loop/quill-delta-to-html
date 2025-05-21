@@ -1666,6 +1666,65 @@ describe('QuillDeltaToHtmlConverter', function () {
         ].join('')
       );
     });
+
+    it('should render continuous empty lines when multiLineParagraph is false', function () {
+      var ops = [
+        {
+          insert: 'doc line 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            header: 1,
+          },
+        },
+        {
+          insert: '\n',
+        },
+        {
+          insert: 'doc line 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            header: 1,
+          },
+        },
+        {
+          insert: '\n\n',
+        },
+        {
+          insert: 'doc line 3',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            header: 1,
+          },
+        },
+        {
+          insert: '\n\n\n',
+        },
+      ];
+      var qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+      });
+      var html = qdc.convert();
+      assert.equal(
+        html,
+        [
+          '<h1>doc line 1</h1>',
+          '<p><br/></p>',
+          '<h1>doc line 2</h1>',
+          '<p><br/></p>',
+          '<p><br/></p>',
+          '<h1>doc line 3</h1>',
+          '<p><br/></p>',
+          '<p><br/></p>',
+          '<p><br/></p>',
+        ].join('')
+      );
+    });
   });
 
   describe('custom types', () => {
