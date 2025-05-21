@@ -1,5 +1,6 @@
 import { DeltaInsertOp } from './../DeltaInsertOp';
 import { IOpAttributes } from './../OpAttributeSanitizer';
+import cloneDeep from 'lodash/cloneDeep';
 
 class InlineGroup {
   readonly ops: DeltaInsertOp[];
@@ -34,87 +35,165 @@ class BlockGroup {
 
 class ListGroup {
   items: ListItem[];
-  readonly headOp: DeltaInsertOp | undefined;
-  readonly layout: string;
-  readonly layoutWidth: string;
-  readonly layoutAlign: string;
-  readonly counters: string;
+  headListItem: ListItem;
+  headOp: DeltaInsertOp | undefined;
+  layout: string;
+  layoutWidth: string;
+  layoutAlign: string;
+  layoutColor: string;
+  layoutRowWidth: string;
+  bannerId: string;
+  bannerColor: string;
+  bannerIcon: string;
+  bannerInList: string;
+  bannerListIndent: string;
+  counters: string;
   readonly isEmptyNest: boolean | undefined;
   constructor(items: ListItem[], isEmptyNest?: boolean) {
     this.items = items;
     this.isEmptyNest = isEmptyNest;
+    this.headListItem = items[0];
 
-    const headListItem = items[0];
-    if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.cell
-    ) {
-      this.headOp = headListItem.item.op;
+    const availableHeadItem = this.getAvailableHeadItem();
+    this.setHeadOpIfThisListIsNestedWithTable(availableHeadItem);
+    this.setAttributesForColumnLayout(availableHeadItem);
+    this.setAttributesForNestedBanner(availableHeadItem);
+    this.setCountersForContinuousList(availableHeadItem);
+  }
+
+  private getAvailableHeadItem(): ListItem {
+    let curItem = this.headListItem;
+    while (curItem.item instanceof EmptyBlock && curItem.innerList) {
+      curItem = curItem.innerList.items[0];
+    }
+    return curItem;
+  }
+
+  private setHeadOpIfThisListIsNestedWithTable(item: ListItem) {
+    if (item && item.item.op.attributes && item.item.op.attributes.list?.cell) {
+      this.headOp = item.item.op;
+    }
+  }
+
+  private setAttributesForColumnLayout(item: ListItem) {
+    if (item && item.item.op.attributes && item.item.op.attributes.layout) {
+      this.layout = item.item.op.attributes.layout;
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layout
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['layout-width']
     ) {
-      this.layout = headListItem.item.op.attributes.layout;
+      this.layoutWidth = item.item.op.attributes['layout-width'];
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layoutWidth
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['layout-align']
     ) {
-      this.layoutWidth = headListItem.item.op.attributes.layoutWidth;
+      this.layoutAlign = item.item.op.attributes['layout-align'];
     }
 
     if (
-      headListItem &&
-      headListItem.item.op.attributes &&
-      headListItem.item.op.attributes.layoutAlign
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['layout-color']
     ) {
-      this.layoutAlign = headListItem.item.op.attributes.layoutAlign;
+      this.layoutColor = item.item.op.attributes['layout-color'];
     }
 
-    if (headListItem && headListItem.item.op) {
-      this.counters = headListItem.item.op.getListAttributes([
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['layout-row-width']
+    ) {
+      this.layoutRowWidth = item.item.op.attributes['layout-row-width'];
+    }
+  }
+
+  private setAttributesForNestedBanner(item: ListItem) {
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner']
+    ) {
+      this.bannerId = item.item.op.attributes['advanced-banner'] || '';
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-color']
+    ) {
+      this.bannerColor = item.item.op.attributes['advanced-banner-color'];
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-icon']
+    ) {
+      this.bannerIcon = item.item.op.attributes['advanced-banner-icon'];
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-in-list']
+    ) {
+      this.bannerInList = item.item.op.attributes['advanced-banner-in-list'];
+    }
+
+    if (
+      item &&
+      item.item.op.attributes &&
+      item.item.op.attributes['advanced-banner-list-indent']
+    ) {
+      this.bannerListIndent =
+        item.item.op.attributes['advanced-banner-list-indent'];
+    }
+  }
+
+  private setCountersForContinuousList(item: ListItem) {
+    if (item && item.item.op) {
+      this.counters = item.item.op.getListAttributes([
         'blockquote',
         'code-block',
         'banner',
         'bookmark',
       ]).counters;
     }
-
-    if (
-      headListItem &&
-      headListItem.item instanceof EmptyBlock &&
-      headListItem.innerList &&
-      headListItem.innerList.headOp
-    ) {
-      this.headOp = headListItem.innerList.headOp;
-    }
   }
 }
 
 class ListItem {
-  readonly item: BlockGroup | BlotBlock | EmptyBlock;
+  readonly item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner;
   innerList: ListGroup | null;
   readonly layout: string;
+  readonly bannerId: string;
   constructor(
-    item: BlockGroup | BlotBlock | EmptyBlock,
+    item: BlockGroup | BlotBlock | EmptyBlock | AdvancedBanner,
     innerList: ListGroup | null = null
   ) {
     this.item = item;
     this.innerList = innerList;
-    this.layout = item.op.attributes.layout || '';
+
+    if (item instanceof AdvancedBanner) {
+      this.layout = item.layout;
+      this.bannerId = item.banner;
+    } else {
+      this.layout = item.op.attributes.layout || '';
+      this.bannerId = item.op.attributes['advanced-banner'] || '';
+    }
   }
 }
 
 class TableGroup {
   rows: TableRow[];
-  colGroup: TableColGroup;
-  constructor(rows: TableRow[], colGroup: TableColGroup) {
+  colGroup: TableColGroup | undefined;
+  constructor(rows: TableRow[], colGroup?: TableColGroup) {
     this.rows = rows;
     this.colGroup = colGroup;
   }
@@ -166,16 +245,22 @@ class LayoutColumn {
   readonly layout: string;
   readonly width: string;
   readonly align: string;
+  readonly rowWidth: string;
+  readonly color: string;
   constructor(
     items: any[],
     layout: string,
     width: string,
-    align: string = 'top'
+    align: string = 'top',
+    rowWidth: string = '',
+    color: string = ''
   ) {
     this.items = items;
     this.layout = layout;
     this.width = width;
     this.align = align;
+    this.rowWidth = rowWidth;
+    this.color = color;
   }
 }
 
@@ -183,6 +268,45 @@ class LayoutRow {
   columns: LayoutColumn[];
   constructor(columns: any[]) {
     this.columns = columns;
+  }
+}
+
+class AdvancedBanner {
+  items: any[];
+  readonly banner: string;
+  readonly color: string;
+  readonly icon: string;
+  readonly inList: string;
+  readonly listIndent: string;
+  readonly layout: string;
+  readonly op: DeltaInsertOp;
+
+  constructor(
+    items: any[],
+    banner: string,
+    color: string,
+    icon: string = 'top',
+    inList: string,
+    listIndent: string,
+    layout: string
+  ) {
+    this.items = items;
+    this.banner = banner;
+    this.color = color;
+    this.icon = icon;
+    this.inList = inList;
+    this.listIndent = listIndent;
+    this.layout = layout;
+    /**
+     * Set op attribute for AdvancedBanner
+     * When the first child of AdvancedBanner is ListGroup, it needs to be set to the op of the first listItem of the ListGroup.
+     */
+    if (items[0] instanceof ListGroup) {
+      this.op = cloneDeep(items[0].headListItem.item.op);
+      this.op.attributes.list = undefined;
+    } else {
+      this.op = items[0].op;
+    }
   }
 }
 
@@ -199,7 +323,8 @@ type TDataGroup =
   | TableCell
   | TableCellLine
   | LayoutColumn
-  | LayoutRow;
+  | LayoutRow
+  | AdvancedBanner;
 
 export {
   VideoItem,
@@ -218,4 +343,5 @@ export {
   LayoutColumn,
   LayoutRow,
   TDataGroup,
+  AdvancedBanner,
 };

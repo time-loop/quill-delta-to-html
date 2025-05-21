@@ -216,3 +216,14 @@ following types:
 `BlotBlock` represents custom blots with `renderAsBlock:true` property pair in its attributes
 
 See above for `op object` format. 
+
+## Post Merge ## 
+Once your PR has merged you will need to build and publish the package.
+
+1. npm install
+2. npm build
+3. npm publish
+
+- If you run into authentication issues follow these steps below
+1. Create a new [PAT](https://github.com/settings/tokens/new) with the `repo` and `write:packages` scopes
+2. Run `npm login --registry=https://npm.pkg.github.com`, use your Github handle as the username and the PAT you just generated as the password

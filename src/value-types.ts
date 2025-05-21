@@ -41,6 +41,7 @@ enum GroupType {
   TableCellLine = 'table-cell-line',
   TableCol = 'table-col',
   LayoutRow = 'layout',
+  AdvancedBanner = 'advanced-banner',
 }
 
 export {

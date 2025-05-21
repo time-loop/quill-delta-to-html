@@ -74,15 +74,26 @@ interface IOpAttributes {
   rowspan?: string | undefined;
   'table-col'?: TableColAttributes | undefined;
   layout?: string | undefined;
+  'advanced-banner'?: string | undefined;
 
   mentions?: boolean | undefined;
   mention?: IMention | undefined;
   target?: string | undefined;
   rel?: string | undefined;
 
+  'block-id'?: string | undefined;
+
   // should this custom blot be rendered as block?
   renderAsBlock?: boolean | undefined;
+  attachment?: IOpAttachment;
   [key: string]: any;
+}
+
+interface IOpAttachment {
+  height?: string;
+  width?: string;
+  'data-attachment'?: string;
+  'data-id'?: string;
 }
 
 interface IUrlSanitizerFn {
@@ -336,4 +347,10 @@ class OpAttributeSanitizer {
   }
 }
 
-export { OpAttributeSanitizer, IOpAttributes, IOpAttributeSanitizerOptions };
+export {
+  OpAttributeSanitizer,
+  IOpAttributes,
+  IOpAttachment,
+  IOpAttributeSanitizerOptions,
+  TableCellLineAttributes,
+};

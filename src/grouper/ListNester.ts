@@ -5,9 +5,11 @@ import {
   TDataGroup,
   BlotBlock,
   EmptyBlock,
+  AdvancedBanner,
 } from './group-types';
 import { flatten, groupConsecutiveElementsWhile } from './../helpers/array';
-import find from 'lodash-es/find';
+import find from 'lodash/find';
+import { BannerNester } from './BannerNester';
 
 class ListNester {
   blocksCanBeWrappedWithList: string[];
@@ -16,8 +18,11 @@ class ListNester {
     this.blocksCanBeWrappedWithList = blocksCanBeWrappedWithList;
   }
 
-  nest(groups: TDataGroup[]): TDataGroup[] {
-    const listBlocked = this.convertListBlocksToListGroups(groups);
+  nest(groups: TDataGroup[], ignoreBanner = false): TDataGroup[] {
+    const grouped = ignoreBanner
+      ? groups
+      : this.nestAdvancedBannerInList(groups);
+    const listBlocked = this.convertListBlocksToListGroups(grouped);
     const groupedByListGroups = this.groupConsecutiveListGroups(listBlocked);
     // convert grouped ones into listgroup
     const nested = flatten(
@@ -45,6 +50,9 @@ class ListNester {
 
         return (
           curr.layout === prev.layout &&
+          (curr.bannerId === prev.bannerId ||
+            !!curr.bannerInList ||
+            !!prev.bannerInList) &&
           ((!curr.headOp && !prev.headOp) ||
             (!!curr.headOp &&
               !!prev.headOp &&
@@ -124,31 +132,60 @@ class ListNester {
     var grouped = groupConsecutiveElementsWhile(
       items,
       (g: TDataGroup, gPrev: TDataGroup) => {
+        const isTheListItemInTheSameListAsAnotherListItem =
+          g instanceof BlockGroup &&
+          gPrev instanceof BlockGroup &&
+          g.op.isList() &&
+          gPrev.op.isList() &&
+          g.op.hasSameIndentationAs(
+            gPrev.op,
+            this.blocksCanBeWrappedWithList
+          ) &&
+          ((!g.op.isLayoutColumnBlock() && !gPrev.op.isLayoutColumnBlock()) ||
+            g.op.isSameColumnAs(gPrev.op)) &&
+          ((!g.op.isAdvancedBannerBlock() &&
+            !gPrev.op.isAdvancedBannerBlock()) ||
+            g.op.isSameBannerAs(gPrev.op)) &&
+          g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell;
+
+        const isTheListItemOrListBlockWrapperInTheSameListAsAnotherListItemOrListBlockWrapper =
+          (g instanceof BlockGroup || g instanceof BlotBlock) &&
+          (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
+          ((g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
+            gPrev.op.isList()) ||
+            (g.op.isList() &&
+              gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)) ||
+            (g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
+              gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))) &&
+          hasSameIndentation(g, gPrev) &&
+          listInSameTableCell(g, gPrev) &&
+          g.op.isSameColumnAs(gPrev.op) &&
+          g.op.isSameBannerAs(gPrev.op);
+
+        const isTheAdvancedBannerInTheSameListAsAnotherListItemOrListBlockWrapper =
+          g instanceof AdvancedBanner &&
+          (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
+          ((g.listIndent && parseInt(g.listIndent, 10)) || 0) ===
+            (gPrev.op.getIndent(this.blocksCanBeWrappedWithList) || 0);
+
+        const isTheListItemOrListBlockWrapperInTheSameListAsTheAdvancedBanner =
+          gPrev instanceof AdvancedBanner &&
+          (g instanceof BlockGroup || g instanceof BlotBlock) &&
+          ((gPrev.listIndent && parseInt(gPrev.listIndent, 10)) || 0) ===
+            (g.op.getIndent(this.blocksCanBeWrappedWithList) || 0);
+
+        const isTheAdvancedBannerInTheSameListAsAnotherAdvancedBanner =
+          g instanceof AdvancedBanner &&
+          gPrev instanceof AdvancedBanner &&
+          ((g.listIndent && parseInt(g.listIndent, 10)) || 0) ===
+            ((gPrev.listIndent && parseInt(gPrev.listIndent, 10)) || 0);
+
         return (
-          (g instanceof BlockGroup &&
-            gPrev instanceof BlockGroup &&
-            g.op.isList() &&
-            gPrev.op.isList() &&
-            g.op.hasSameIndentationAs(
-              gPrev.op,
-              this.blocksCanBeWrappedWithList
-            ) &&
-            ((!g.op.isLayoutColumnBlock() && !gPrev.op.isLayoutColumnBlock()) ||
-              g.op.isSameColumnAs(gPrev.op)) &&
-            g.op.attributes.list!.cell === gPrev.op.attributes.list!.cell) ||
-          ((g instanceof BlockGroup || g instanceof BlotBlock) &&
-            (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
-            ((g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
-              gPrev.op.isList()) ||
-              (g.op.isList() &&
-                gPrev.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)) ||
-              (g.op.isListBlockWrapper(this.blocksCanBeWrappedWithList) &&
-                gPrev.op.isListBlockWrapper(
-                  this.blocksCanBeWrappedWithList
-                ))) &&
-            hasSameIndentation(g, gPrev) &&
-            listInSameTableCell(g, gPrev) &&
-            g.op.isSameColumnAs(gPrev.op))
+          isTheListItemInTheSameListAsAnotherListItem ||
+          isTheListItemOrListBlockWrapperInTheSameListAsAnotherListItemOrListBlockWrapper ||
+          isTheAdvancedBannerInTheSameListAsAnotherListItemOrListBlockWrapper ||
+          isTheListItemOrListBlockWrapperInTheSameListAsTheAdvancedBanner ||
+          isTheAdvancedBannerInTheSameListAsAnotherAdvancedBanner
         );
       }
     );
@@ -156,9 +193,13 @@ class ListNester {
     return grouped.map((item: TDataGroup | (BlockGroup | BlotBlock)[]) => {
       if (!Array.isArray(item)) {
         if (
-          (item instanceof BlockGroup || item instanceof BlotBlock) &&
-          (item.op.isList() ||
-            item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))
+          (item instanceof BlockGroup &&
+            (item.op.isList() ||
+              item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList))) ||
+          (item instanceof BlotBlock &&
+            item.op.isListBlockWrapper(this.blocksCanBeWrappedWithList)) ||
+          (item instanceof AdvancedBanner &&
+            item.op.isAdvancedBannerBlockInList())
         ) {
           return new ListGroup([new ListItem(item)]);
         }
@@ -178,6 +219,9 @@ class ListNester {
           curr instanceof ListGroup &&
           prev instanceof ListGroup &&
           curr.layout === prev.layout &&
+          (curr.bannerId === prev.bannerId ||
+            !!curr.bannerInList ||
+            !!prev.bannerInList) &&
           ((!curr.headOp && !prev.headOp) ||
             (!!curr.headOp &&
               !!prev.headOp &&
@@ -188,6 +232,30 @@ class ListNester {
         );
       }
     );
+  }
+
+  private nestAdvancedBannerInList(items: TDataGroup[]): Array<TDataGroup> {
+    const grouped = groupConsecutiveElementsWhile(
+      items,
+      (g: TDataGroup, gPrev: TDataGroup) => {
+        return (
+          (g instanceof BlockGroup || g instanceof BlotBlock) &&
+          (gPrev instanceof BlockGroup || gPrev instanceof BlotBlock) &&
+          g.op.isAdvancedBannerBlockInList() &&
+          gPrev.op.isAdvancedBannerBlockInList() &&
+          g.op.isSameBannerAs(gPrev.op)
+        );
+      }
+    );
+
+    const listNester = new ListNester(this.blocksCanBeWrappedWithList);
+    const bannerNester = new BannerNester();
+    return grouped.map((item: TDataGroup | (BlockGroup | BlotBlock)[]) => {
+      if (!Array.isArray(item)) {
+        return item;
+      }
+      return bannerNester.nest(listNester.nest(item, true))[0];
+    });
   }
 
   private nestListSection(sectionItems: ListGroup[]): ListGroup[] {
@@ -212,24 +280,9 @@ class ListNester {
   private groupByIndent(items: ListGroup[]): { [index: number]: ListGroup[] } {
     return items.reduce(
       (pv: { [index: number]: ListGroup[] }, cv: ListGroup) => {
-        let indent;
-        if (
-          cv.items[0].item.op.isListBlockWrapper(
-            this.blocksCanBeWrappedWithList
-          )
-        ) {
-          const attrKey: string =
-            find(
-              this.blocksCanBeWrappedWithList,
-              (key) => !!cv.items[0].item.op.attributes[key]
-            ) || '';
-          indent = parseInt(
-            cv.items[0].item.op.attributes[attrKey]['wrapper-indent'],
-            10
-          );
-        } else {
-          indent = cv.items[0].item.op.attributes.indent;
-        }
+        const indent = cv.items[0].item.op.getIndent(
+          this.blocksCanBeWrappedWithList
+        );
 
         if (indent) {
           pv[indent] = pv[indent] || [];

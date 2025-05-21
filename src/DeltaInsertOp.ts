@@ -1,8 +1,8 @@
 import { NewLine, ListType, DataType } from './value-types';
 import { IOpAttributes } from './OpAttributeSanitizer';
 import { InsertData, InsertDataCustom, InsertDataQuill } from './InsertData';
-import find from 'lodash-es/find';
-import isEqual from 'lodash-es/isEqual';
+import find from 'lodash/find';
+import isEqual from 'lodash/isEqual';
 
 class DeltaInsertOp {
   readonly insert: InsertData;
@@ -31,7 +31,8 @@ class DeltaInsertOp {
       this.isBlockAttribute() ||
       this.isCustomTextBlock() ||
       this.isListBlockWrapper(blocksCanBeWrappedWithList) ||
-      this.isLayoutColumnBlock()
+      this.isLayoutColumnBlock() ||
+      this.isAdvancedBannerBlock()
     );
   }
 
@@ -56,8 +57,23 @@ class DeltaInsertOp {
     return !!this.attributes['table-col'];
   }
 
+  isEmptyTableCell(): boolean {
+    return this.insert.type === 'hidden_table_cell';
+  }
+
   isLayoutColumnBlock(): boolean {
     return !!this.attributes['layout'];
+  }
+
+  isAdvancedBannerBlock(): boolean {
+    return !!this.attributes['advanced-banner'];
+  }
+
+  isAdvancedBannerBlockInList(): boolean {
+    return (
+      this.isAdvancedBannerBlock() &&
+      !!this.attributes['advanced-banner-in-list']
+    );
   }
 
   isSameHeaderAs(op: DeltaInsertOp): boolean {
@@ -116,6 +132,8 @@ class DeltaInsertOp {
         this.attributes[attrKey] &&
         parseInt(this.attributes[attrKey]['wrapper-indent'], 10)
       );
+    } else if (this.isAdvancedBannerBlockInList() && !this.isList()) {
+      return this.attributes['advanced-banner-list-indent'];
     } else {
       return this.attributes.indent;
     }
@@ -141,10 +159,22 @@ class DeltaInsertOp {
         this.attributes[attrKey] &&
         this.attributes[attrKey]['in-list']
       );
+    } else if (this.isAdvancedBannerBlockInList() && !this.isList()) {
+      return this.attributes['advanced-banner-in-list'];
     } else if (this.isList()) {
       return this.attributes.list!.list;
     }
     return;
+  }
+
+  getListDisplayListType(blocksCanBeWrappedWithList: string[] = []) {
+    const attrKey =
+      find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) || '';
+    return (
+      attrKey &&
+      this.attributes[attrKey] &&
+      this.attributes[attrKey]['display-list-type']
+    );
   }
 
   isInline() {
@@ -186,6 +216,10 @@ class DeltaInsertOp {
       this.isNoneTypeList() ||
       this.isUncheckedList()
     );
+  }
+
+  isListNestedInTable() {
+    return !!this.attributes?.list?.cell;
   }
 
   isOrderedList() {
@@ -323,6 +357,14 @@ class DeltaInsertOp {
       this.isLayoutColumnBlock() &&
       op.isLayoutColumnBlock() &&
       this.attributes.layout === op.attributes.layout
+    );
+  }
+
+  isSameBannerAs(op: DeltaInsertOp) {
+    return (
+      this.isAdvancedBannerBlock() &&
+      op.isAdvancedBannerBlock() &&
+      this.attributes['advanced-banner'] === op.attributes['advanced-banner']
     );
   }
 }

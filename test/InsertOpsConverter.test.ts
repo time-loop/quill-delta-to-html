@@ -1,4 +1,3 @@
-import 'mocha';
 import * as assert from 'assert';
 
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
@@ -71,7 +70,6 @@ describe('InsertOpsConverter', function () {
         [{ insert: { type: 'cake', value: '' }, attributes: {} }]
       );
       assert.deepEqual(InsertOpsConverter.convert([{ insert: 2 }], {}), []);
-      //console.log(objs);
     });
   });
 

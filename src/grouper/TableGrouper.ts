@@ -8,6 +8,7 @@ import {
   TableCell,
   TableCellLine,
   ListGroup,
+  BlotBlock,
 } from './group-types';
 import { groupConsecutiveElementsWhile } from '../helpers/array';
 import { IOpAttributes } from '../OpAttributeSanitizer';
@@ -40,23 +41,41 @@ export class TableGrouper {
           (g instanceof ListGroup &&
             gPrev instanceof BlockGroup &&
             g.headOp &&
-            g.headOp!.attributes &&
-            g.headOp!.attributes!.cell &&
+            g.headOp.isListNestedInTable() &&
             gPrev.op.isTableCellLine()) ||
           (g instanceof BlockGroup &&
             gPrev instanceof ListGroup &&
             g.op.isTableCellLine() &&
             gPrev.headOp &&
-            gPrev.headOp!.attributes &&
-            gPrev.headOp!.attributes!.cell) ||
+            gPrev.headOp.isListNestedInTable()) ||
           (g instanceof ListGroup &&
             gPrev instanceof ListGroup &&
             !!g.headOp &&
-            g.headOp!.attributes &&
             !!gPrev.headOp &&
-            gPrev.headOp!.attributes &&
-            g.headOp!.attributes!.cell &&
-            gPrev.headOp!.attributes!.cell)
+            g.headOp.isListNestedInTable() &&
+            gPrev.headOp.isListNestedInTable()) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof BlockGroup &&
+            g.op.isEmptyTableCell() &&
+            gPrev.op.isTableCellLine()) ||
+          (g instanceof BlockGroup &&
+            gPrev instanceof BlotBlock &&
+            g.op.isTableCellLine() &&
+            gPrev.op.isEmptyTableCell()) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof BlotBlock &&
+            g.op.isEmptyTableCell() &&
+            gPrev.op.isEmptyTableCell()) ||
+          (g instanceof BlotBlock &&
+            gPrev instanceof ListGroup &&
+            g.op.isEmptyTableCell() &&
+            gPrev.headOp &&
+            gPrev.headOp.isListNestedInTable()) ||
+          (g instanceof ListGroup &&
+            gPrev instanceof BlotBlock &&
+            !!g.headOp &&
+            g.headOp.isListNestedInTable() &&
+            gPrev.op.isEmptyTableCell())
         );
       }
     );
@@ -76,7 +95,7 @@ export class TableGrouper {
                         item.op.attributes
                       ),
                     ],
-                    item.op.attributes.row
+                    item.op.attributes['table-cell-line']?.row
                   ),
                 ],
                 tableColGroup ||
@@ -98,7 +117,7 @@ export class TableGrouper {
                 [
                   new TableRow(
                     [new TableCell([item], item.headOp.attributes)],
-                    item.headOp.attributes.row
+                    item.headOp.attributes.list?.row
                   ),
                 ],
                 tableColGroup ||
@@ -144,8 +163,12 @@ export class TableGrouper {
         return (
           g instanceof TableCell &&
           gPrev instanceof TableCell &&
-          (g.attrs ? g.attrs.row : undefined) ===
-            (gPrev.attrs ? gPrev.attrs.row : undefined)
+          (g.attrs?.['table-cell-line']?.row ||
+            g.attrs?.list?.row ||
+            undefined) ===
+            (gPrev.attrs?.['table-cell-line']?.row ||
+              gPrev.attrs?.list?.row ||
+              undefined)
         );
       }
     );
@@ -155,14 +178,18 @@ export class TableGrouper {
       if (Array.isArray(item)) {
         const firstCell = item[0];
         if (firstCell) {
-          row = firstCell.attrs ? firstCell.attrs.row : undefined;
+          row =
+            firstCell.attrs?.['table-cell-line']?.row ||
+            firstCell.attrs?.list?.row ||
+            firstCell.attrs?.row ||
+            undefined;
         }
       } else {
-        if (item.attrs) {
-          row = item.attrs.row;
-        } else {
-          row = undefined;
-        }
+        row =
+          item.attrs?.['table-cell-line']?.row ||
+          item.attrs?.list?.row ||
+          item.attrs?.row;
+        undefined;
       }
 
       return new TableRow(
@@ -214,7 +241,13 @@ export class TableGrouper {
     );
 
     return grouped.map(
-      (item: (BlockGroup | ListGroup) | (BlockGroup | ListGroup)[]) => {
+      (
+        item: (BlockGroup | ListGroup | BlotBlock) | (BlockGroup | ListGroup)[]
+      ) => {
+        if (item instanceof BlotBlock) {
+          return new TableCell([], { row: item.op.insert.value });
+        }
+
         const head = Array.isArray(item) ? item[0] : item;
         let attrs: IOpAttributes;
         if (head instanceof BlockGroup) {

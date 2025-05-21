@@ -1,13 +1,20 @@
 import * as assert from 'assert';
-import isEqual from 'lodash-es/isEqual';
-import 'mocha';
-import { BlockGroup, InlineGroup } from '../src/grouper/group-types';
+import isEqual from 'lodash/isEqual';
+import {
+  BlockGroup,
+  InlineGroup,
+  TableCell,
+  TableCellLine,
+  TableGroup,
+  TableRow,
+} from '../src/grouper/group-types';
 import { DeltaInsertOp } from './../src/DeltaInsertOp';
 import { encodeHtml } from './../src/funcs-html';
 import { QuillDeltaToHtmlConverter } from './../src/QuillDeltaToHtmlConverter';
 import { GroupType, ListType } from './../src/value-types';
 import { delta1 } from './data/delta1';
 import { callWhenXEqualY } from './_helper';
+import { Grouper } from '../src/grouper/Grouper';
 
 describe('QuillDeltaToHtmlConverter', function () {
   describe('constructor()', function () {
@@ -213,6 +220,7 @@ describe('QuillDeltaToHtmlConverter', function () {
     });
 
     it('should create checked/unchecked lists', function () {
+      debugger;
       var ops4 = [
         { insert: 'hello' },
         { insert: '\n', attributes: { list: { list: 'checked' } } },
@@ -232,10 +240,10 @@ describe('QuillDeltaToHtmlConverter', function () {
         html,
         [
           '<ul>',
-          '<li data-checked="true">hello</li>',
-          '<li data-checked="false">there</li>',
-          '<li data-checked="true">man',
-          '<ul><li data-checked="false">not done</li></ul>',
+          '<li data-checked="true"><p>hello</p></li>',
+          '<li data-checked="false"><p>there</p></li>',
+          '<li data-checked="true"><p>man</p>',
+          '<ul><li data-checked="false"><p>not done</p></li></ul>',
           '</li>',
           '</ul>',
         ].join('')
@@ -324,171 +332,6 @@ describe('QuillDeltaToHtmlConverter', function () {
         ].join('')
       );
     });
-
-    // it('should render empty table', () => {
-    //   let ops = [
-    //     {
-    //       insert: '\n\n\n',
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n\n\n',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n\n\n',
-    //     },
-    //     {
-    //       insert: '\n',
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1"><br/></td><td data-row="row-1"><br/></td><td data-row="row-1"><br/></td></tr>`,
-    //       `<tr><td data-row="row-2"><br/></td><td data-row="row-2"><br/></td><td data-row="row-2"><br/></td></tr>`,
-    //       `<tr><td data-row="row-3"><br/></td><td data-row="row-3"><br/></td><td data-row="row-3"><br/></td></tr>`,
-    //       `</tbody></table>`,
-    //       `<p><br/></p>`,
-    //     ].join('')
-    //   );
-    // });
-
-    // it('should render singe cell table', () => {
-    //   let ops = [
-    //     {
-    //       insert: 'cell',
-    //     },
-    //     {
-    //       insert: '\n',
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1">cell</td></tr>`,
-    //       `</tbody></table>`,
-    //     ].join('')
-    //   );
-    // });
-
-    // it('should render filled table', () => {
-    //   let ops = [
-    //     {
-    //       insert: '11',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '12',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '13',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-1',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '21',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '22',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '23',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-2',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '31',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '32',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '33',
-    //     },
-    //     {
-    //       attributes: {
-    //         table: 'row-3',
-    //       },
-    //       insert: '\n',
-    //     },
-    //     {
-    //       insert: '\n',
-    //     },
-    //   ];
-
-    //   let qdc = new QuillDeltaToHtmlConverter(ops);
-    //   assert.equal(
-    //     qdc.convert(),
-    //     [
-    //       `<table><tbody>`,
-    //       `<tr><td data-row="row-1">11</td><td data-row="row-1">12</td><td data-row="row-1">13</td></tr>`,
-    //       `<tr><td data-row="row-2">21</td><td data-row="row-2">22</td><td data-row="row-2">23</td></tr>`,
-    //       `<tr><td data-row="row-3">31</td><td data-row="row-3">32</td><td data-row="row-3">33</td></tr>`,
-    //       `</tbody></table>`,
-    //       `<p><br/></p>`,
-    //     ].join('')
-    //   );
-    // });
 
     // test case for cu-table
     it('should render empty cu-table', () => {
@@ -922,6 +765,626 @@ describe('QuillDeltaToHtmlConverter', function () {
       );
     });
 
+    it('should render table with merged cell and empty row', () => {
+      const ops = [
+        { insert: '\n\n\n', attributes: { 'table-col': { width: '150' } } },
+        { insert: '1' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '2',
+              colspan: '1',
+              row: '1',
+              cell: '1',
+            },
+            row: '1',
+            cell: '1',
+            rowspan: '2',
+            colspan: '1',
+          },
+        },
+        { insert: '2' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '3',
+              colspan: '1',
+              row: '1',
+              cell: '2',
+            },
+            row: '1',
+            cell: '2',
+            rowspan: '3',
+            colspan: '1',
+          },
+        },
+        { insert: '3' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '4',
+              colspan: '1',
+              row: '1',
+              cell: '3',
+            },
+            row: '1',
+            cell: '3',
+            rowspan: '4',
+            colspan: '1',
+          },
+        },
+        {
+          insert: { hidden_table_cell: '2' },
+          attributes: { renderAsBlock: true },
+        },
+        { insert: '4' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '3',
+              cell: '4',
+            },
+            row: '3',
+            cell: '4',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+        { insert: '5' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '4',
+              cell: '5',
+            },
+            row: '4',
+            cell: '5',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+        { insert: '6' },
+        {
+          insert: '\n',
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: '5',
+              cell: '6',
+            },
+            row: '5',
+            cell: '6',
+            rowspan: '1',
+            colspan: '1',
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 450px">`,
+          `<colgroup><col width="150"><col width="150"><col width="150"></colgroup>`,
+          `<tbody>`,
+          `<tr data-row="1">`,
+          `<td data-row="1" rowspan="2" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="1" data-rowspan="2" data-colspan="1">1</p></td>`,
+          `<td data-row="1" rowspan="3" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="2" data-rowspan="3" data-colspan="1">2</p></td>`,
+          `<td data-row="1" rowspan="4" colspan="1"><p class="qlbt-cell-line" data-row="1" data-cell="3" data-rowspan="4" data-colspan="1">3</p></td>`,
+          `</tr>`,
+          `<tr data-row="2"><td data-row="2" rowspan colspan></td></tr>`,
+          `<tr data-row="3">`,
+          `<td data-row="3" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="3" data-cell="4" data-rowspan="1" data-colspan="1">4</p></td>`,
+          `</tr>`,
+          `<tr data-row="4">`,
+          `<td data-row="4" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="4" data-cell="5" data-rowspan="1" data-colspan="1">5</p></td>`,
+          `</tr>`,
+          `<tr data-row="5">`,
+          `<td data-row="5" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="5" data-cell="6" data-rowspan="1" data-colspan="1">6</p></td>`,
+          `</tr>`,
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    // test cases for refactored cu-table
+    it('should render empty cu-table', () => {
+      let ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-kdrmch',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-ljjq9j',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-lj7h6y',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-xa4lb9',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-2w5wjp',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-o7q92h',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-j95olh',
+              cell: 'cell-4nujo2',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 450px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-kdrmch" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-ljjq9j" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-929dk8">`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-lj7h6y" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-xa4lb9" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-j95olh">`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-2w5wjp" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-o7q92h" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-j95olh" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-j95olh" data-cell="cell-4nujo2" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render table with list', () => {
+      let ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+              list: 'bullet',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-kdrmch',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-lj7h6y',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+            },
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-929dk8',
+              cell: 'cell-l0enbj',
+              list: 'ordered',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 300px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><br/></p>`,
+          `<ul data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ul>`,
+          `</td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-kdrmch" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          '</tr>',
+          `<tr data-row="row-929dk8">`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1"><p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-lj7h6y" data-rowspan="1" data-colspan="1"><br/></p></td>`,
+          `<td data-row="row-929dk8" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><br/></p>`,
+          `<ol data-row="row-929dk8" data-cell="cell-l0enbj" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ol>`,
+          `</td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render table with align text', () => {
+      const ops = [
+        {
+          attributes: {
+            'table-col': { width: '150' },
+          },
+          insert: '\n\n',
+        },
+        { insert: 'align text' },
+        {
+          attributes: {
+            'table-cell-line': {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-383p7o',
+            },
+            align: 'center',
+          },
+          insert: '\n',
+        },
+        {
+          attributes: {
+            list: {
+              rowspan: '1',
+              colspan: '1',
+              row: 'row-dvagmt',
+              cell: 'cell-495b7o',
+              list: 'ordered',
+            },
+          },
+          insert: '\n',
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style="width: 300px">`,
+          `<colgroup>`,
+          `<col width="150"><col width="150">`,
+          `</colgroup>`,
+          `<tbody>`,
+          `<tr data-row="row-dvagmt">`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<p class="ql-align-center qlbt-cell-line" data-row="row-dvagmt" data-cell="cell-383p7o" data-rowspan="1" data-colspan="1">align text</p>`,
+          `</td>`,
+          `<td data-row="row-dvagmt" rowspan="1" colspan="1">`,
+          `<ol data-row="row-dvagmt" data-cell="cell-495b7o" data-rowspan="1" data-colspan="1"><li><p><br/></p></li></ol>`,
+          `</td>`,
+          '</tr>',
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    // test cases for columns
+    it('should render columns with row width', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+            'layout-row-width': '0.8',
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            'layout-row-width': '0.8',
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container" style="width: 80%; max-width: 100%;">`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 1</p></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 2</p></div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render columns with row width - list in column', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+            'layout-row-width': '0.8',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            'layout-row-width': '0.8',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container" style="width: 80%; max-width: 100%;">`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><ol><li><p>column 1</p></li></ol></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><ol><li><p>column 2</p></li></ol></div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render columns with column color', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+            'layout-color': 'red',
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            'layout-color': 'green',
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container" data-layout-align="top" data-layout-color="red"><p>column 1</p></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top" data-layout-color="green"><p>column 2</p></div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render colored columns with list', () => {
+      let ops = [
+        {
+          insert: 'column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+          },
+        },
+        {
+          insert: 'column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_02676960-343e-4723-a07d-6429aedcf166',
+            'layout-color': 'red',
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+        {
+          insert: 'Not a column',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'ordered',
+            },
+          },
+        },
+      ];
+
+      let qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 1</p></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top" data-layout-color="red">`,
+          `<ol><li><p>column 2</p></li></ol>`,
+          `</div>`,
+          `</div>`,
+          `<ol><li><p>Not a column</p></li></ol>`,
+        ].join('')
+      );
+    });
+
     it('should render columns with list', () => {
       let ops = [
         {
@@ -965,12 +1428,12 @@ describe('QuillDeltaToHtmlConverter', function () {
         qdc.convert(),
         [
           `<div class="ql-layout-row-container">`,
-          `<div class="ql-layout-col-container">column 1</div>`,
-          `<div class="ql-layout-col-container">`,
-          `<ol><li>column 2</li></ol>`,
+          `<div class="ql-layout-col-container" data-layout-align="top"><p>column 1</p></div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<ol><li><p>column 2</p></li></ol>`,
           `</div>`,
           `</div>`,
-          `<ol><li>column 1</li></ol>`,
+          `<ol><li><p>column 1</p></li></ol>`,
         ].join('')
       );
     });
@@ -1020,14 +1483,186 @@ describe('QuillDeltaToHtmlConverter', function () {
         qdc.convert(),
         [
           `<div class="ql-layout-row-container">`,
-          `<div class="ql-layout-col-container">`,
-          `column 1`,
-          `<ol><li>column 1</li></ol>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<p>column 1</p>`,
+          `<ol><li><p>column 1</p></li></ol>`,
           `</div>`,
-          `<div class="ql-layout-col-container">`,
-          `<ol><li>column 2</li></ol>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<ol><li><p>column 2</p></li></ol>`,
           `</div>`,
           `</div>`,
+        ].join('')
+      );
+    });
+
+    // test cases for advanced banner
+    it('should render advanced banner', () => {
+      const ops = [
+        {
+          insert: 'line',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+          },
+        },
+        {
+          insert: 'list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            list: { list: 'bullet' },
+          },
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>line</p>`,
+          `<ul><li><p>list</p></li></ul>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should render advanced banner nested in list', () => {
+      const ops = [
+        {
+          insert: 'root list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: { list: 'bullet' },
+          },
+        },
+        {
+          insert: 'list banner',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            'advanced-banner-in-list': 'bullet',
+            'advanced-banner-list-indent': '1',
+          },
+        },
+        {
+          insert: 'list banner list',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: { list: 'bullet' },
+            'advanced-banner': 'test-banner-id',
+            'advanced-banner-color': 'green',
+            'advanced-banner-in-list': 'bullet',
+            'advanced-banner-list-indent': '1',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<ul><li><p>root list</p>`,
+          `<li data-none-type="true">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>list banner</p>`,
+          `<ul><li><p>list banner list</p></li></ul>`,
+          `</div>`,
+          `</li></li></ul>`,
+        ].join('')
+      );
+    });
+
+    it('should render banner in column', () => {
+      const ops = [
+        {
+          insert: 'green banner in column 1',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id-1',
+            'advanced-banner-color': 'green',
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca82455555',
+          },
+        },
+        {
+          insert: 'red banner in column 2',
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'advanced-banner': 'test-banner-id-2',
+            'advanced-banner-color': 'red',
+            layout:
+              'd5669c0e-2118-4641-8a5b-a62dec27dcc8_0b9022e4-7eea-4cf1-86de-91ca824dcbe7',
+          },
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops);
+      assert.equal(
+        qdc.convert(),
+        [
+          `<div class="ql-layout-row-container">`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="green">`,
+          `<p>green banner in column 1</p>`,
+          `</div>`,
+          `</div>`,
+          `<div class="ql-layout-col-container" data-layout-align="top">`,
+          `<div class="ql-advanced-banner" data-advanced-banner-color="red">`,
+          `<p>red banner in column 2</p>`,
+          `</div>`,
+          `</div>`,
+          `</div>`,
+        ].join('')
+      );
+    });
+
+    it('should escape html code while rendering code blocks in list', () => {
+      const ops = [
+        { insert: 'hello this is a list.', attributes: {} },
+        { insert: '\n', attributes: { list: { list: 'bullet' } } },
+        { insert: 'code block 1', attributes: {} },
+        {
+          attributes: {
+            'code-block': { 'code-block': 'javascript', 'in-list': 'bullet' },
+          },
+          insert: '\n',
+        },
+        { insert: 'code block 2', attributes: {} },
+        {
+          attributes: {
+            'code-block': { 'code-block': 'javascript', 'in-list': 'bullet' },
+          },
+          insert: '\n',
+        },
+      ];
+
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        blocksCanBeWrappedWithList: ['code-block'],
+      });
+      assert.equal(
+        qdc.convert(),
+        [
+          `<ul>` +
+            `<li><p>hello this is a list.</p></li>` +
+            `<li data-none-type=\"true\"><pre data-language=\"javascript\">code block 1\ncode block 2</pre></li>` +
+            `</ul>`,
         ].join('')
       );
     });
@@ -1553,7 +2188,7 @@ describe('QuillDeltaToHtmlConverter', function () {
             var d = <any>data;
             assert.ok(d.op.attributes.blockquote && d.ops.length === 2);
           } else {
-            assert.ok(html.indexOf('list item 1<ul><li') > -1);
+            assert.ok(html.indexOf('list item 1</p><ul><li') > -1);
           }
           status.x++;
           return html;
@@ -1676,20 +2311,543 @@ describe('QuillDeltaToHtmlConverter', function () {
           [
             '<p>first line</p>',
             '<ol>',
-            '<li>first list item parent',
+            '<li><p>first list item parent</p>',
             '<ol>',
-            '<li>child list item</li>',
+            '<li><p>child list item</p></li>',
             '<li data-none-type="true">',
-            '<blockquote>blockq</blockquote>',
+            '<blockquote><p>blockq</p></blockquote>',
             '</li>',
             '</ol>',
             '</li>',
-            '<li>aaa<ul><li data-none-type="true"><blockquote>bbb<br/>ccc</blockquote></li></ul></li>',
+            '<li><p>aaa</p>',
+            '<li data-empty-block="true">',
+            '<li data-empty-block="true">',
+            '<ul><li data-none-type="true">',
+            '<blockquote><p>bbb<br/>ccc</p></blockquote>',
+            '</li></ul>',
+            '</li>',
+            '</li>',
+            '</li>',
             '</ol>',
             '<p><br/></p>',
           ].join('')
         );
       });
+
+      it('should create block embed within list', function () {
+        const ops = [
+          {
+            insert: { custom: true },
+            attributes: { custom: { 'in-list': 'none' }, renderAsBlock: true },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'bullet' },
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'ordered', 'display-list-type': 'true' },
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'checked', 'display-list-type': 'true' },
+              'block-id': 'test-block-id',
+              renderAsBlock: true,
+            },
+          },
+          {
+            insert: { custom: true },
+            attributes: {
+              custom: { 'in-list': 'unchecked', 'display-list-type': 'false' },
+              renderAsBlock: true,
+            },
+          },
+        ];
+        const qdc = new QuillDeltaToHtmlConverter(ops, {
+          blocksCanBeWrappedWithList: ['custom'],
+        });
+        qdc.renderCustomWith((op) => {
+          if (op.insert.type === 'custom') {
+            return '<div>Custom embed</div>';
+          }
+          return 'unknown';
+        });
+        let html = qdc.convert();
+        assert.equal(
+          html,
+          '<ul><li data-none-type="true"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li><li class="ql-rendered-ordered-list"><div>Custom embed</div></li><li class="ql-rendered-checked-list" data-checked="true" data-block-id="test-block-id"><div>Custom embed</div></li><li data-none-type="true"><div>Custom embed</div></li></ul>'
+        );
+      });
+    });
+  });
+
+  describe('mergeEmptyLines', () => {
+    it('should behave nomally', () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-de1b5382-8c99-41c9-97df-8d927aac907b',
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2fa3c7e6-a1ef-45fb-83c7-9833dc0f2606',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+      });
+      const html = qdc.convert();
+      assert.equal(html, '<p>line1</p><p><br/></p><p>line2</p>');
+    });
+
+    it('should merge multiple lines', () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-de1b5382-8c99-41c9-97df-8d927aac907b',
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2fa3c7e6-a1ef-45fb-83c7-9833dc0f2606',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+      });
+      const html = qdc.convert();
+      assert.equal(html, '<p>line1</p><p><br/></p><p>line2</p>');
+    });
+
+    it("should add class to linebreaks' container", () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-5b7feb38-adb1-4b44-aa69-42d90c6e2e00',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-de1b5382-8c99-41c9-97df-8d927aac907b',
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2fa3c7e6-a1ef-45fb-83c7-9833dc0f2606',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<p>line1</p><p class="ql-linebreak-container"><br/></p><p>line2</p>'
+      );
+    });
+
+    it('should preserve linebreaks for code block', () => {
+      const ops = [
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-81f0e1be-3e2e-44a9-8cc6-dc7308563849',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-37b02bf2-c32c-45cb-a084-5ef6d561a740',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-bbebb048-0ca7-4002-b6ea-c436d104f009',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        { insert: 'fasdfasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-3549d879-2687-45d4-a1b2-33be06001ce1',
+            'code-block': {
+              'code-block': 'plain',
+              'code-block-line-numbers': 'false',
+            },
+          },
+        },
+        { insert: 'asdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-2f2c11bf-9569-46ba-b8b4-8614cf52e4e9',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        `<pre data-language="plain">fasdf
+
+
+fasdfasdf</pre><p>asdf</p>`
+      );
+    });
+
+    it('should merge lines in quote', () => {
+      const ops = [
+        { insert: 'asdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-dfe32e0c-d47d-4607-89f5-d0a2b0033dcd',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-8b218d86-9274-48a0-b9dd-06a6c1c5a6c9',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-f783f36b-c994-4976-89b3-7d6150440226',
+            blockquote: {},
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-ab20c98d-1b0d-49f5-ad61-a743c7549e49',
+            blockquote: {},
+          },
+        },
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-24c2de52-c0d2-4f60-af3e-a85b9e2cf8a6',
+            blockquote: {},
+          },
+        },
+        { insert: 'fasdf', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-124583ce-c283-4af9-a496-40325a09fa6e',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<blockquote>asdf<br/><br/>fasdf</blockquote><p>fasdf</p>'
+      );
+    });
+
+    it('should add class in linebreak after list', () => {
+      const ops = [
+        { insert: 'line1', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-9c5f8d12-eb4f-40d7-9875-2bc96a8f2ea9',
+            list: { list: 'bullet' },
+          },
+        },
+        { insert: 'line2', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-bf0ed33d-bcf4-483c-b073-663d61dac6c2',
+            list: { list: 'bullet' },
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-7c494390-719b-421e-b4c6-bcd30ce523ee',
+          },
+        },
+        { insert: 'o', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-eef85a06-205e-4c00-90d8-d4af2975b419',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<ul><li><p>line1</p></li><li><p>line2</p></li></ul><p class="ql-linebreak-container"><br/></p><p>o</p>'
+      );
+    });
+
+    it('should add class in linebreak under list item', () => {
+      const ops = [
+        {
+          insert: 'Test:',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-8a9002ac-d7fd-400b-ad19-3b92c8d41e78',
+          },
+        },
+        {
+          insert: '1',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-54c1128b-5cf4-407d-9ec3-9bac98efd2f2',
+          },
+        },
+        {
+          insert: '2',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-7a75ef52-d480-4123-966b-7e222cc7b663',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'none',
+            },
+            'block-id': 'block-17ec2b57-bd5e-4ed4-a649-c11dfe93f4b0',
+          },
+        },
+        {
+          insert: 'b',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'none',
+            },
+            'block-id': 'block-d7ef5fc8-32db-4372-9d2a-a2d38480e0bd',
+          },
+        },
+        {
+          insert: '3',
+          attributes: {},
+        },
+        {
+          insert: '\n',
+          attributes: {
+            list: {
+              list: 'bullet',
+            },
+            'block-id': 'block-6cf7e1d9-9f11-417b-a2ec-f4fae0297041',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(
+        html,
+        '<p>Test:</p><ul><li><p>1</p></li><li><p>2</p></li><li><p class="ql-linebreak-container"><br/></p></li><li><p>b</p></li><li><p>3</p></li></ul>'
+      );
+    });
+
+    it('should remove beginning lines', () => {
+      const ops = [
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-294dab12-1fc8-406b-bf41-f045ad8c42a1',
+          },
+        },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-294dab12-1fc8-406b-bf41-f045ad8c42a9',
+          },
+        },
+        { insert: 'fas', attributes: {} },
+        {
+          insert: '\n',
+          attributes: {
+            'block-id': 'block-d3eb1962-fdf2-4d11-99c4-6d23149d2899',
+          },
+        },
+      ];
+      const qdc = new QuillDeltaToHtmlConverter(ops, {
+        multiLineParagraph: false,
+        multiLineHeader: false,
+        multiLineCustomBlock: true,
+        mergeEmptyLines: true,
+        linebreakBlockClassName: 'ql-linebreak-container',
+      });
+      const html = qdc.convert();
+      assert.equal(html, '<p>fas</p>');
+    });
+  });
+
+  describe('_renderTable', function () {
+    it('should render cu-table with no cols', () => {
+      const ops = [
+        new DeltaInsertOp('cell1'),
+        new DeltaInsertOp('\n', {
+          colspan: '1',
+          rowspan: '1',
+          row: 'row-1',
+          'table-cell-line': {
+            cell: 'cell-1',
+            row: 'row-1',
+            rowspan: '1',
+            colspan: '1',
+          },
+        }),
+      ];
+      const groups = Grouper.pairOpsWithTheirBlock(ops);
+
+      const mockTableGroup = new TableGroup(
+        [
+          new TableRow(
+            [
+              new TableCell(
+                [new TableCellLine(<BlockGroup>groups[0])],
+                ops[1].attributes
+              ),
+            ],
+            ops[1].attributes.row
+          ),
+        ],
+        undefined
+      );
+
+      const qdc = new QuillDeltaToHtmlConverter([]);
+      assert.equal(
+        qdc._renderTable(mockTableGroup),
+        [
+          `<div class="clickup-table-view">`,
+          `<table class="clickup-table" style>`,
+          `<tbody>`,
+          `<tr data-row="row-1">`,
+          `<td data-row="row-1" rowspan="1" colspan="1">`,
+          `<p class="qlbt-cell-line" data-row="row-1" data-cell="cell-1" data-rowspan="1" data-colspan="1">cell1</p></td>`,
+          `</tr>`,
+          `</tbody>`,
+          `</table>`,
+          `</div>`,
+        ].join('')
+      );
     });
   });
 });

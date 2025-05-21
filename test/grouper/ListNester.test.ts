@@ -1,4 +1,3 @@
-import 'mocha';
 import * as assert from 'assert';
 
 import { Grouper } from './../../src/grouper/Grouper';
@@ -10,6 +9,7 @@ import {
   InlineGroup,
   BlockGroup,
   BlotBlock,
+  EmptyBlock,
 } from './../../src/grouper/group-types';
 import { ListType } from './../../src/value-types';
 import { InsertDataCustom } from '../../src/InsertData';
@@ -143,18 +143,53 @@ describe('ListNester', function () {
 
       var l1b = new ListItem(<BlockGroup>pairs[3]);
       var lai = new ListGroup([new ListItem(<BlockGroup>pairs[2])]);
-      var l1a = new ListGroup([new ListItem(<BlockGroup>pairs[1], lai)]);
-
+      var lae = new ListGroup(
+        [
+          new ListItem(
+            new EmptyBlock({ list: { list: ListType.Ordered } }),
+            lai
+          ),
+        ],
+        true
+      );
+      var l1a = new ListGroup([new ListItem(<BlockGroup>pairs[1], lae)]);
       var li1 = new ListGroup([new ListItem(<BlockGroup>pairs[0])]);
       li1.items[0].innerList = new ListGroup(l1a.items.concat(l1b));
       var li2 = new ListGroup([new ListItem(<BlockGroup>pairs[4])]);
-      //console.log(JSON.stringify(act, null, 3));
+
+      var l3 = Array(5)
+        .fill(0)
+        .reduce((acc) => {
+          return new ListGroup(
+            [
+              new ListItem(
+                new EmptyBlock({ list: { list: ListType.Ordered } }),
+                acc
+              ),
+            ],
+            true
+          );
+        }, new ListGroup([new ListItem(new BlockGroup(ops[12], []))]));
+
+      var l4 = Array(4)
+        .fill(0)
+        .reduce((acc) => {
+          return new ListGroup(
+            [
+              new ListItem(
+                new EmptyBlock({ list: { list: ListType.Bullet } }),
+                acc
+              ),
+            ],
+            true
+          );
+        }, new ListGroup([new ListItem(new BlockGroup(ops[13], []))]));
+
       assert.deepEqual(act, [
         new ListGroup(li1.items.concat(li2.items)),
 
         new InlineGroup([ops[10], ops[11]]),
-        new ListGroup([new ListItem(new BlockGroup(ops[12], []))]),
-        new ListGroup([new ListItem(new BlockGroup(ops[13], []))]),
+        new ListGroup(l3.items.concat(l4.items)),
       ]);
     });
   });
