@@ -167,6 +167,16 @@ class DeltaInsertOp {
     return;
   }
 
+  getListDisplayListType(blocksCanBeWrappedWithList: string[] = []) {
+    const attrKey =
+      find(blocksCanBeWrappedWithList, (key) => !!this.attributes[key]) || '';
+    return (
+      attrKey &&
+      this.attributes[attrKey] &&
+      this.attributes[attrKey]['display-list-type']
+    );
+  }
+
   isInline() {
     return !(
       this.isContainerBlock() ||

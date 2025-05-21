@@ -133,15 +133,29 @@ class OpToHtmlConverter {
         const listType = this.op.getListType(
           this.options.blocksCanBeWrappedWithList
         );
-
-        beginTags.push(
-          listType === ListType.Ordered
-            ? makeStartTag('li', [
-                this.makeAttr('data-none-type', 'true'),
-                this.makeAttr('class', 'ql-rendered-ordered-list'),
-              ])
-            : makeStartTag('li', [this.makeAttr('data-none-type', 'true')])
+        const displayListType = this.op.getListDisplayListType(
+          this.options.blocksCanBeWrappedWithList
         );
+        let tagAttrs: Array<ITagKeyValue> = [];
+        if (listType !== ListType.NoneType && displayListType === 'true') {
+          tagAttrs.push(this.makeAttr('class', `ql-rendered-${listType}-list`));
+        } else {
+          tagAttrs.push(this.makeAttr('data-none-type', 'true'));
+        }
+        if (listType === ListType.Checked && displayListType === 'true') {
+          tagAttrs.push(this.makeAttr('data-checked', 'true'));
+        } else if (
+          listType === ListType.Unchecked &&
+          displayListType === 'true'
+        ) {
+          tagAttrs.push(this.makeAttr('data-checked', 'false'));
+        }
+        if (this.op.attributes['block-id']) {
+          tagAttrs.push(
+            this.makeAttr('data-block-id', this.op.attributes['block-id'])
+          );
+        }
+        beginTags.push(makeStartTag('li', tagAttrs));
         endTags.push(makeEndTag('li'));
       }
 

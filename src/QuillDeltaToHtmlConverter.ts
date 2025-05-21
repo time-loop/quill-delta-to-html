@@ -18,7 +18,6 @@ import {
   TableRow,
   TableCell,
   TableCol,
-  TableColGroup,
   TableCellLine,
   LayoutRow,
   LayoutColumn,
@@ -50,6 +49,16 @@ interface IQuillDeltaToHtmlConverterOptions
   multiLineParagraph?: boolean;
   multiLineCustomBlock?: boolean;
   blocksCanBeWrappedWithList?: string[] | undefined;
+  /**
+   * Merge consecutive empty lines into one.
+   * Default is false.
+   */
+  mergeEmptyLines?: boolean;
+  /**
+   * If this is set, the converter
+   * will add a class attribute to the contaienr of the line breaks.
+   */
+  linebreakBlockClassName?: string;
   customBlockIsEqual?: (g: BlockGroup, gOther: BlockGroup) => boolean;
   customListGroupAttrs?: (g: ListGroup, isRoot: boolean) => ITagKeyValue[];
   customTableCellAttrs?: (g: TableCell) => ITagKeyValue[];
@@ -77,6 +86,7 @@ class QuillDeltaToHtmlConverter {
         multiLineCodeblock: true,
         multiLineParagraph: true,
         multiLineCustomBlock: true,
+        mergeEmptyLines: false,
         allowBackgroundClasses: false,
         linkTarget: '_blank',
       },
@@ -172,7 +182,7 @@ class QuillDeltaToHtmlConverter {
   convert() {
     let groups = this.getGroupedOps();
     return groups
-      .map((group) => {
+      .map((group, index) => {
         if (group instanceof ListGroup) {
           return this._renderWithCallbacks(GroupType.List, group, () =>
             this._renderList(<ListGroup>group, true)
@@ -208,7 +218,7 @@ class QuillDeltaToHtmlConverter {
         } else {
           // InlineGroup
           return this._renderWithCallbacks(GroupType.InlineGroup, group, () => {
-            return this._renderInlines((<InlineGroup>group).ops, true);
+            return this._renderInlines((<InlineGroup>group).ops, true, index);
           });
         }
       })
@@ -300,8 +310,9 @@ class QuillDeltaToHtmlConverter {
   }
 
   _renderTable(table: TableGroup): string {
-    const tableColGroup: TableColGroup = table.colGroup;
+    const tableColGroup = table.colGroup;
     let tableWidth: number = 0;
+    let colgroupStr = '';
     if (tableColGroup && tableColGroup.cols) {
       tableWidth = tableColGroup.cols.reduce(
         (result: number, col: TableCol) => {
@@ -315,6 +326,13 @@ class QuillDeltaToHtmlConverter {
         },
         0
       );
+
+      colgroupStr =
+        makeStartTag('colgroup') +
+        tableColGroup.cols
+          .map((col: TableCol) => this._renderTableCol(col))
+          .join('') +
+        makeEndTag('colgroup');
     }
 
     return (
@@ -323,11 +341,7 @@ class QuillDeltaToHtmlConverter {
         { key: 'class', value: 'clickup-table' },
         { key: 'style', value: !!tableWidth ? `width: ${tableWidth}px` : '' },
       ]) +
-      makeStartTag('colgroup') +
-      tableColGroup.cols
-        .map((col: TableCol) => this._renderTableCol(col))
-        .join('') +
-      makeEndTag('colgroup') +
+      colgroupStr +
       makeStartTag('tbody') +
       table.rows.map((row: TableRow) => this._renderTableRow(row)).join('') +
       makeEndTag('tbody') +
@@ -431,10 +445,17 @@ class QuillDeltaToHtmlConverter {
       });
     }
 
+    if (!!column.color) {
+      columnAttrs.push({
+        key: 'data-layout-color',
+        value: column.color,
+      });
+    }
+
     return (
       makeStartTag('div', columnAttrs) +
       column.items
-        .map((group) => {
+        .map((group, index) => {
           if (group instanceof ListGroup) {
             return this._renderWithCallbacks(GroupType.List, group, () =>
               this._renderList(<ListGroup>group)
@@ -474,7 +495,11 @@ class QuillDeltaToHtmlConverter {
               GroupType.InlineGroup,
               group,
               () => {
-                return this._renderInlines((<InlineGroup>group).ops, true);
+                return this._renderInlines(
+                  (<InlineGroup>group).ops,
+                  true,
+                  index
+                );
               }
             );
           }
@@ -583,22 +608,52 @@ class QuillDeltaToHtmlConverter {
       );
     }
 
-    var inlines = ops.map((op) => this._renderInline(op, bop)).join('');
+    let inlines = '';
+    for (let i = 0; i < ops.length; i++) {
+      if (this._shouldIgnoreThisLine(ops, i)) {
+        continue;
+      }
+
+      const op = ops[i];
+
+      inlines += this._renderInline(op, bop);
+    }
     return htmlParts.openingTag + (inlines || BrTag) + htmlParts.closingTag;
   }
 
-  _renderInlines(ops: DeltaInsertOp[], isInlineGroup = true) {
+  _renderInlines(
+    ops: DeltaInsertOp[],
+    isInlineGroup = true,
+    groupIndex?: number
+  ) {
     var opsLen = ops.length - 1;
-    var html = ops
-      .map((op: DeltaInsertOp, i: number) => {
-        if (i > 0 && i === opsLen && op.isJustNewline()) {
-          return '';
-        }
-        return this._renderInline(op, null);
-      })
-      .join('');
+    let html = '';
+
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      if (i > 0 && i === opsLen && op.isJustNewline()) {
+        continue;
+      }
+
+      if (this._shouldIgnoreThisLine(ops, i, groupIndex === 0)) {
+        continue;
+      }
+
+      html += this._renderInline(op, null);
+    }
+
     if (!isInlineGroup) {
       return html;
+    }
+
+    if (html === BrTag && this.options.linebreakBlockClassName) {
+      return (
+        makeStartTag(this.options.paragraphTag, [
+          { key: 'class', value: this.options.linebreakBlockClassName },
+        ]) +
+        BrTag +
+        makeEndTag(this.options.paragraphTag)
+      );
     }
 
     let startParaTag = makeStartTag(this.options.paragraphTag);
@@ -606,6 +661,38 @@ class QuillDeltaToHtmlConverter {
     if (html === BrTag || this.options.multiLineParagraph) {
       return startParaTag + html + endParaTag;
     }
+
+    if (this.options.linebreakBlockClassName) {
+      let result = '';
+
+      const splits = html.split(BrTag);
+      for (let i = 0; i < splits.length; i++) {
+        const item = splits[i];
+        if (i == 0) {
+          if (item === '' && this.options.linebreakBlockClassName) {
+            result += makeStartTag(this.options.paragraphTag, [
+              { key: 'class', value: this.options.linebreakBlockClassName },
+            ]);
+          } else {
+            result += startParaTag;
+          }
+        } else {
+          result += makeEndTag(this.options.paragraphTag);
+          if (item === '') {
+            result += makeStartTag(this.options.paragraphTag, [
+              { key: 'class', value: this.options.linebreakBlockClassName },
+            ]);
+          } else {
+            result += makeStartTag(this.options.paragraphTag);
+          }
+        }
+        result += item === '' ? BrTag : item;
+      }
+
+      result += endParaTag;
+      return result;
+    }
+
     return (
       startParaTag +
       html
@@ -616,6 +703,45 @@ class QuillDeltaToHtmlConverter {
         .join(endParaTag + startParaTag) +
       endParaTag
     );
+  }
+
+  private _shouldIgnoreThisLine(
+    ops: DeltaInsertOp[],
+    index: number,
+    ignoreStartNewLines: boolean = false
+  ): boolean {
+    if (!this.options.mergeEmptyLines) {
+      return false;
+    }
+
+    const op = ops[index];
+
+    if (ignoreStartNewLines && index == 0 && op.isJustNewline()) {
+      // skip the first newline
+      return true;
+    }
+
+    if (
+      ignoreStartNewLines &&
+      index == 1 &&
+      op.isJustNewline() &&
+      ops[0].isJustNewline()
+    ) {
+      // skip the second newline
+      return true;
+    }
+
+    // we want to merge consecutive empty lines into one
+    if (
+      index > 1 &&
+      op.isJustNewline() &&
+      ops[index - 1].isJustNewline() &&
+      ops[index - 2].isJustNewline()
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   _renderInline(op: DeltaInsertOp, contextOp: DeltaInsertOp | null) {
