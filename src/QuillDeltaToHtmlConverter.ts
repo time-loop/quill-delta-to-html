@@ -628,10 +628,12 @@ class QuillDeltaToHtmlConverter {
   ) {
     var opsLen = ops.length - 1;
     let html = '';
+    let skippedANewLine = false;
 
     for (let i = 0; i < ops.length; i++) {
       const op = ops[i];
       if (i > 0 && i === opsLen && op.isJustNewline()) {
+        skippedANewLine = true;
         continue;
       }
 
@@ -658,7 +660,10 @@ class QuillDeltaToHtmlConverter {
 
     let startParaTag = makeStartTag(this.options.paragraphTag);
     let endParaTag = makeEndTag(this.options.paragraphTag);
-    if (html === BrTag || this.options.multiLineParagraph) {
+    if (
+      (html === BrTag && !skippedANewLine) ||
+      this.options.multiLineParagraph
+    ) {
       return startParaTag + html + endParaTag;
     }
 
