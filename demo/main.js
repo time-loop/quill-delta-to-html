@@ -131,6 +131,59 @@ var codeBlocksInList = {
   ]
 };
 
+var testHeadersWithSpaces = {
+  "ops": [
+    {
+      insert: 'doc line 1',
+    },
+    {
+      insert: '\n',
+      attributes: {
+        'header': 1,
+      },
+    },
+    {
+      insert: '\n',
+    },
+    {
+      insert: 'doc line 2',
+    },
+    {
+      insert: '\n',
+      attributes: {
+        'header': 1,
+      },
+    },
+    {
+      insert: '\n\n',
+    },
+    {
+      insert: 'doc line 3',
+    },
+    {
+      insert: '\n',
+      attributes: {
+        'header': 1,
+      },
+    },
+    {
+      insert: '\n\n\n',
+    },
+    {
+      insert: 'doc line 4',
+    },
+    {
+      insert: '\n',
+      attributes: {
+        'header': 1,
+      },
+    },
+    {
+      insert: '\n\n\n\n',
+    },
+  ]
+};
+
 var tableWithAlignedText = {
   "ops":[
     {
@@ -169,7 +222,7 @@ var tableWithAlignedText = {
 };
 
 
-var qdc = new QuillDeltaToHtmlConverter(tableWithAlignedText.ops, {
+var qdc = new QuillDeltaToHtmlConverter(testHeadersWithSpaces.ops, {
   multiLineParagraph: false,
   multiLineHeader: false,
   blocksCanBeWrappedWithList: ['blockquote', 'code-block', 'banner', 'bookmark'],
